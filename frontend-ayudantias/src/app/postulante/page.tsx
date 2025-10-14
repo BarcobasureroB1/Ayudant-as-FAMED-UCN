@@ -1,14 +1,17 @@
 "use client";
 
-import React, { SyntheticEvent, useState } from 'react';
+import React, { SyntheticEvent, useEffect, useState } from 'react';
 import { useRouter } from "next/navigation";
-import { useUserProfile } from '@/app/hooks/useUserProfile';
-import { useAlumnoProfile } from '@/app/hooks/useAlumnoProfile';
-import { useComprobarCurriculum, useCrearCurriculum } from '@/app/hooks/useCurriculum';
+import { useUserProfile, User } from '@/hooks/useUserProfile';
+import { useAlumnoProfile } from '@/hooks/useAlumnoProfile';
+import { useComprobarCurriculum, useCrearCurriculum } from '@/hooks/useCurriculum';
 
-export const PostulanteVista = () => {
+interface UserProps {
+    user: User;
+}
 
-    const { data: user, isLoading: cargauser, isError } = useUserProfile();
+export const PostulanteVista = ({user}: UserProps) => {
+
     const { data: alumno, isLoading: cargaAlumno} = useAlumnoProfile(user?.rut);
     const { data: curriculum , isLoading: cargaCurriculum } = useComprobarCurriculum();
 
@@ -36,12 +39,10 @@ export const PostulanteVista = () => {
         ],
     });
 
-    if (cargauser || cargaCurriculum || cargaAlumno) return <div>Cargando...</div>;
+    if (cargaCurriculum || cargaAlumno) return <div>Cargando...</div>;
     
-    if (isError) {
-        router.push("/app");
-        return null;
-    }
+    
+
 
 
     if (curriculum && alumno) {
@@ -77,7 +78,9 @@ export const PostulanteVista = () => {
 
     }
 
-    
+    const logout = () => {
+
+    }
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
         setForm({ ...form, [e.target.name]: e.target.value });
@@ -197,3 +200,39 @@ export const PostulanteVista = () => {
         </div>
     );
 };
+
+//componente exportado 
+export default function PostulantePage() {
+    const { data: user, isLoading: cargauser, isError } = useUserProfile();
+    const router = useRouter();
+
+    useEffect(() => {
+        if (isError || !user) {
+            router.push("/login");
+        }
+    }, [isError, user, router]);
+
+    if (cargauser) {
+        return (
+            <div className="min-h-screen flex items-center justify-center">
+                <div className="text-center">
+                    <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-gray-900 mx-auto"></div>
+                    <p className="mt-4 text-gray-600">Cargando...</p>
+                </div>
+            </div>
+        );
+    }
+
+    if (isError || !user) {
+        return (
+            <div className="min-h-screen flex items-center justify-center">
+                <div className="text-center">
+                    <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-gray-900 mx-auto"></div>
+                    <p className="mt-4 text-gray-600">Redirigiendo al login...</p>
+                </div>
+            </div>
+        );
+    }
+
+    return <PostulanteVista user={user}/>;
+}

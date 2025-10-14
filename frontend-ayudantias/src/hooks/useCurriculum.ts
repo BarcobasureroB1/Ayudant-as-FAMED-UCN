@@ -1,5 +1,5 @@
 import {useQuery,useMutation,useQueryClient} from '@tanstack/react-query';
-import api from '@/app/api/axios';
+import api from '@/api/axios';
 
 interface Ayudantia {
   nombreAsig: string;

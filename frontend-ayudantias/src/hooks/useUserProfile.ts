@@ -1,6 +1,15 @@
 import {useQuery} from '@tanstack/react-query';
 import api from '../api/axios';
 
+export interface User
+{
+    rut: string;
+    nombres: string;
+    apellido: string;
+    tipo: 'admin' | 'postulante' | 'secretaria de departamento' | string; //despues añadir mas roles
+    correo: string;
+}
+
 
 export function useUserProfile(){
     return useQuery({
