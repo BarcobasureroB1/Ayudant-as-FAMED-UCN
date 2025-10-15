@@ -3,32 +3,32 @@
 import React, { SyntheticEvent, useEffect, useState } from 'react';
 import { useRouter } from "next/navigation";
 import { useUserProfile, User } from '@/hooks/useUserProfile';
-import { useAlumnoProfile } from '@/hooks/useAlumnoProfile';
-import { useComprobarCurriculum, useCrearCurriculum } from '@/hooks/useCurriculum';
+import { useAlumnoProfile, AlumnoData } from '@/hooks/useAlumnoProfile';
+import { useComprobarCurriculum, useCrearCurriculum, CurriculumData } from '@/hooks/useCurriculum';
+import { useAuth } from '@/context/AuthContext';
 
 interface UserProps {
     user: User;
+    alumno?: AlumnoData;
+    curriculum?: CurriculumData;
 }
 
-export const PostulanteVista = ({user}: UserProps) => {
-
-    const { data: alumno, isLoading: cargaAlumno} = useAlumnoProfile(user?.rut);
-    const { data: curriculum , isLoading: cargaCurriculum } = useComprobarCurriculum();
-
+export const PostulanteVista = ({user, alumno, curriculum}: UserProps) => {
     const crearCurriculum = useCrearCurriculum();
     const router = useRouter();
+    const { setToken } = useAuth();
 
     const [paso, setPaso] = useState(1);
   
     const [form, setForm] = useState({
-        rut_alumno: "",
-        nombres: "",
-        apellidos: "",
+        rut_alumno: user?.rut || "",
+        nombres: user?.nombres || "",
+        apellidos: user?.apellido || "",
         fecha_nacimiento: "",
         comuna: "",
         ciudad: "",
         num_celular: "",
-        correo: "",
+        correo: user?.correo || "",
         carrera: "",
         otros: "",
         ayudantias: [{ nombreAsig: "", coordinador: "", evaluacion: "" }],
@@ -39,16 +39,19 @@ export const PostulanteVista = ({user}: UserProps) => {
         ],
     });
 
-    if (cargaCurriculum || cargaAlumno) return <div>Cargando...</div>;
-    
-    
-
-
+    const logout = () => {
+        setToken(null); //elimina la cookie
+        router.push('/login');
+        router.refresh(); //pa recargar la pagina
+    }
 
     if (curriculum && alumno) {
         return (
         <div className="perfil-container">
             <h2 className="text-xl font-bold mb-4">Perfil del Postulante</h2>
+            <button onClick={logout} className="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded">
+                Cerrar Sesión
+            </button>
             <div className="perfil-datos">
             <p><b>RUT:</b> {user.rut}</p>
             <p><b>Nombre:</b> {user.nombres} {user.apellido}</p>
@@ -65,6 +68,9 @@ export const PostulanteVista = ({user}: UserProps) => {
         return (
         <div className="perfil-container">
             <h2 className="text-xl font-bold mb-4">Perfil del Postulante</h2>
+            <button onClick={logout} className="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded">
+                Cerrar Sesión
+            </button>
             <div className="perfil-datos">
             <p><b>RUT:</b> {user.rut}</p>
             <p><b>Nombre:</b> {user.nombres} {user.apellido}</p>
@@ -78,9 +84,7 @@ export const PostulanteVista = ({user}: UserProps) => {
 
     }
 
-    const logout = () => {
-
-    }
+    
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
         setForm({ ...form, [e.target.name]: e.target.value });
@@ -116,32 +120,32 @@ export const PostulanteVista = ({user}: UserProps) => {
             >
             <h3>Datos Personales</h3>
 
-            <label>RUT:</label>
-            <input name="rut_alumno" value={form.rut_alumno} onChange={handleChange} required />
+            <label htmlFor="rut_alumno">RUT:</label>
+            <input id="rut_alumno" name="rut_alumno" value={form.rut_alumno} onChange={handleChange} required />
 
-            <label>Nombres:</label>
-            <input name="nombres" value={form.nombres} onChange={handleChange} required />
+            <label htmlFor="nombres">Nombres:</label>
+            <input id="nombres" name="nombres" value={form.nombres} onChange={handleChange} required />
 
-            <label>Apellidos:</label>
-            <input name="apellidos" value={form.apellidos} onChange={handleChange} required />
+            <label htmlFor="apellidos">Apellidos:</label>
+            <input id="apellidos" name="apellidos" value={form.apellidos} onChange={handleChange} required />
 
-            <label>Fecha de nacimiento:</label>
-            <input name="fecha_nacimiento" value={form.fecha_nacimiento} onChange={handleChange} required />
+            <label htmlFor="fecha_nacimiento">Fecha de nacimiento:</label>
+            <input id="fecha_nacimiento" name="fecha_nacimiento" value={form.fecha_nacimiento} onChange={handleChange} required />
 
-            <label>Comuna:</label>
-            <input name="comuna" value={form.comuna} onChange={handleChange} required />
+            <label htmlFor="comuna">Comuna:</label>
+            <input id="comuna" name="comuna" value={form.comuna} onChange={handleChange} required />
 
-            <label>Ciudad:</label>
-            <input name="ciudad" value={form.ciudad} onChange={handleChange} required />
+            <label htmlFor="ciudad">Ciudad:</label>
+            <input id="ciudad" name="ciudad" value={form.ciudad} onChange={handleChange} required />
 
-            <label>Número de celular:</label>
-            <input name="num_celular" value={form.num_celular} onChange={handleChange} required />
+            <label htmlFor="num_celular">Número de celular:</label>
+            <input id="num_celular" name="num_celular" value={form.num_celular} onChange={handleChange} required />
 
-            <label>Correo:</label>
-            <input type="email" name="correo" value={form.correo} onChange={handleChange} required />
+            <label htmlFor="email">Correo:</label>
+            <input id="email" type="email" name="correo" value={form.correo} onChange={handleChange} required />
 
-            <label>Carrera:</label>
-            <input name="carrera" value={form.carrera} onChange={handleChange} required />
+            <label htmlFor="carrera">Carrera:</label>
+            <input id="carrera" name="carrera" value={form.carrera} onChange={handleChange} required />
 
             <button type="submit">Siguiente</button>
             </form>
@@ -152,7 +156,7 @@ export const PostulanteVista = ({user}: UserProps) => {
             <form onSubmit={handleSubmit}>
             <h3>Ayudantías Previas</h3>
             {form.ayudantias.map((a, i) => (
-                <div key={i}>
+                <div key={`ayudantia-${i}-${a.nombreAsig}`}>
                 <input placeholder="Nombre asignatura" name="nombreAsig" value={a.nombreAsig} onChange={(e) => handleArrayChange(e, "ayudantias", i)} />
                 <input placeholder="Coordinador" name="coordinador" value={a.coordinador} onChange={(e) => handleArrayChange(e, "ayudantias", i)} />
                 <input placeholder="Evaluación" name="evaluacion" value={a.evaluacion} onChange={(e) => handleArrayChange(e, "ayudantias", i)} />
@@ -162,7 +166,7 @@ export const PostulanteVista = ({user}: UserProps) => {
 
             <h3>Cursos, Títulos y Grados</h3>
             {form.cursos_titulos_grados.map((c, i) => (
-                <div key={i}>
+                <div key={`curso-${i}-${c.nombre}`}>
                 <input placeholder="Nombre" name="nombre" value={c.nombre} onChange={(e) => handleArrayChange(e, "cursos_titulos_grados", i)} />
                 <input placeholder="Institución" name="institucion" value={c.institucion} onChange={(e) => handleArrayChange(e, "cursos_titulos_grados", i)} />
                 <input type="date" name="fecha" value={c.fecha} onChange={(e) => handleArrayChange(e, "cursos_titulos_grados", i)} />
@@ -172,7 +176,7 @@ export const PostulanteVista = ({user}: UserProps) => {
 
             <h3>Actividades Científicas</h3>
             {form.actividades_cientificas.map((a, i) => (
-                <div key={i}>
+                <div key={`cientifica-${i}-${a.nombre}`}>
                 <input placeholder="Nombre" name="nombre" value={a.nombre} onChange={(e) => handleArrayChange(e, "actividades_cientificas", i)} />
                 <input placeholder="Descripción" name="descripcion" value={a.descripcion} onChange={(e) => handleArrayChange(e, "actividades_cientificas", i)} />
                 <input placeholder="Periodo de participación" name="periodoParticipacion" value={a.periodoParticipacion} onChange={(e) => handleArrayChange(e, "actividades_cientificas", i)} />
@@ -182,7 +186,7 @@ export const PostulanteVista = ({user}: UserProps) => {
 
             <h3>Actividades Extracurriculares</h3>
             {form.actividades_extracurriculares.map((a, i) => (
-                <div key={i}>
+                <div key={`extracurricular-${i}-${a.nombre}`}>
                 <input placeholder="Nombre" name="nombre" value={a.nombre} onChange={(e) => handleArrayChange(e, "actividades_extracurriculares", i)} />
                 <input placeholder="Docente o institución" name="docenteInstitucion" value={a.docenteInstitucion} onChange={(e) => handleArrayChange(e, "actividades_extracurriculares", i)} />
                 <input placeholder="Descripción" name="descripcion" value={a.descripcion} onChange={(e) => handleArrayChange(e, "actividades_extracurriculares", i)} />
@@ -204,6 +208,9 @@ export const PostulanteVista = ({user}: UserProps) => {
 //componente exportado 
 export default function PostulantePage() {
     const { data: user, isLoading: cargauser, isError } = useUserProfile();
+    const { data: alumno, isLoading: cargaAlumno} = useAlumnoProfile(user?.rut);
+    const { data: curriculum , isLoading: cargaCurriculum } = useComprobarCurriculum();
+
     const router = useRouter();
 
     useEffect(() => {
@@ -212,7 +219,7 @@ export default function PostulantePage() {
         }
     }, [isError, user, router]);
 
-    if (cargauser) {
+    if (cargauser || cargaCurriculum || cargaAlumno) {
         return (
             <div className="min-h-screen flex items-center justify-center">
                 <div className="text-center">
@@ -234,5 +241,5 @@ export default function PostulantePage() {
         );
     }
 
-    return <PostulanteVista user={user}/>;
+    return <PostulanteVista user={user} alumno={alumno} curriculum={curriculum}/>;
 }

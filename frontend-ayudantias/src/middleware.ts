@@ -26,5 +26,5 @@ export function middleware(request: NextRequest)
 
 //rutas a las que afecta el middleware
 export const config = {
-    matcher: ["/admin(.*)", "/login"],
+    matcher: ["/admin(.*)", "/login", "/postulante"],
 };

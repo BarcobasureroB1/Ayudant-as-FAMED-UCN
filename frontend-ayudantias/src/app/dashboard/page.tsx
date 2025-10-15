@@ -1,8 +1,8 @@
 "use client";
 
 import { useUserProfile } from "@/hooks/useUserProfile";
-import { PostulanteVista } from "../postulante/page";
-import { AdminDashboard } from "../adminDashboard/page";
+import PostulantePage from "../postulante/page";
+import AdminPage from "../adminDashboard/page";
 import { useRouter } from "next/navigation";
 
 export default function DashboardPage() {
@@ -24,9 +24,9 @@ export default function DashboardPage() {
     switch (user?.tipo)
     {
         case 'admin':
-            return <AdminDashboard user={user} />;
+            return <AdminPage/>;
         case 'postulante':
-            return <PostulanteVista user={user}/>;
+            return <PostulantePage/>;
         default:
             return <div>Sin permisos necesarios</div>
     }

@@ -26,7 +26,7 @@ interface ActividadExtracurricular {
   periodoParticipacion: string;
 }
 
-interface CurriculumData {
+export interface CurriculumData {
   rut_alumno: string;
   nombres: string;
   apellidos: string;
