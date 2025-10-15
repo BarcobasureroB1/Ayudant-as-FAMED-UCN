@@ -7,7 +7,6 @@ export interface User
     nombres: string;
     apellido: string;
     tipo: 'admin' | 'postulante' | 'secretaria de departamento' | string; //despues añadir mas roles
-    correo: string;
 }
 
 

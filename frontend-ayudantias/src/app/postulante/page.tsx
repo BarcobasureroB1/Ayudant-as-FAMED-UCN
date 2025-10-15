@@ -19,16 +19,17 @@ export const PostulanteVista = ({user, alumno, curriculum}: UserProps) => {
     const { setToken } = useAuth();
 
     const [paso, setPaso] = useState(1);
+    const [mostrarPopup, setMostrarPopup] = useState(false);
   
     const [form, setForm] = useState({
-        rut_alumno: user?.rut || "",
-        nombres: user?.nombres || "",
-        apellidos: user?.apellido || "",
+        rut_alumno: "",
+        nombres: "",
+        apellidos:  "",
         fecha_nacimiento: "",
         comuna: "",
         ciudad: "",
         num_celular: "",
-        correo: user?.correo || "",
+        correo: "",
         carrera: "",
         otros: "",
         ayudantias: [{ nombreAsig: "", coordinador: "", evaluacion: "" }],
@@ -45,6 +46,45 @@ export const PostulanteVista = ({user, alumno, curriculum}: UserProps) => {
         router.refresh(); //pa recargar la pagina
     }
 
+    const mostrarCurriculum = () => {
+        return (
+        <div className="curriculum-container">
+            <h2 className="text-xl font-bold mb-4">Curriculum Vitae</h2>
+            <p><b>RUT:</b> {curriculum?.rut_alumno}</p>
+            <p><b>Nombre:</b> {curriculum?.nombres} {curriculum?.apellidos}</p>
+            <p><b>Fecha de nacimiento:</b> {curriculum?.fecha_nacimiento}</p>
+            <p><b>Comuna:</b> {curriculum?.comuna}</p>
+            <p><b>Ciudad:</b> {curriculum?.ciudad}</p>
+            <p><b>Número de celular:</b> {curriculum?.num_celular}</p>
+            <p><b>Correo:</b> {curriculum?.correo}</p>
+            <p><b>Carrera:</b> {curriculum?.carrera}</p>
+            <p><b>Otros:</b> {curriculum?.otros}</p>
+        </div>
+        );
+    }
+
+    {mostrarPopup && (
+        <div
+            className="fixed inset-0 flex items-center justify-center bg-black/60 backdrop-blur-sm z-50"
+            onClick={() => setMostrarPopup(false)}
+        >
+            <div
+                className="bg-white p-6 rounded-2xl shadow-2xl w-[90%] max-w-[700px] relative animate-fadeIn"
+                onClick={(e) => e.stopPropagation()}
+            >
+                <button
+                onClick={() => setMostrarPopup(false)}
+                className="absolute top-3 right-3 text-gray-600 hover:text-gray-900 text-2xl"
+                >
+                ✕
+                </button>
+
+            {mostrarCurriculum()}
+            </div>
+        </div>
+    )}
+
+    
     if (curriculum && alumno) {
         return (
         <div className="perfil-container">
@@ -53,11 +93,18 @@ export const PostulanteVista = ({user, alumno, curriculum}: UserProps) => {
                 Cerrar Sesión
             </button>
             <div className="perfil-datos">
-            <p><b>RUT:</b> {user.rut}</p>
-            <p><b>Nombre:</b> {user.nombres} {user.apellido}</p>
-            <p><b>Correo:</b> {curriculum.correo}</p>
-            <p><b>Año de ingreso:</b> {alumno.fecha_admision}</p>
-            <p><b>Semestre actual:</b> {alumno.nivel}</p>
+                <p><b>RUT:</b> {user.rut}</p>
+                <p><b>Nombre:</b> {user.nombres} {user.apellido}</p>
+                <p><b>Correo:</b> {curriculum.correo}</p>
+                <p><b>Año de ingreso:</b> {alumno.fecha_admision}</p>
+                <p><b>Semestre actual:</b> {alumno.nivel}</p>
+                <p><b>CV</b></p>
+                <button
+                    onClick={() => setMostrarPopup(true)}
+                    className="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
+                >
+                    Ver documento
+                </button>
             </div>
         </div>
         );
@@ -72,12 +119,12 @@ export const PostulanteVista = ({user, alumno, curriculum}: UserProps) => {
                 Cerrar Sesión
             </button>
             <div className="perfil-datos">
-            <p><b>RUT:</b> {user.rut}</p>
-            <p><b>Nombre:</b> {user.nombres} {user.apellido}</p>
-            <p><b>Correo:</b> {curriculum.correo}</p>
-            <p><b>Los siguientes datos son exclusivos de los Alumnos: </b></p>
-            <p><b>Año de ingreso: vacío</b></p>
-            <p><b>Semestre actual: vacío</b></p>
+                <p><b>RUT:</b> {user.rut}</p>
+                <p><b>Nombre:</b> {user.nombres} {user.apellido}</p>
+                <p><b>Correo:</b> {curriculum.correo}</p>
+                <p><b>Los siguientes datos son exclusivos de los Alumnos: </b></p>
+                <p><b>Año de ingreso: vacío</b></p>
+                <p><b>Semestre actual: vacío</b></p>
             </div>
         </div>
         );
@@ -209,7 +256,7 @@ export const PostulanteVista = ({user, alumno, curriculum}: UserProps) => {
 export default function PostulantePage() {
     const { data: user, isLoading: cargauser, isError } = useUserProfile();
     const { data: alumno, isLoading: cargaAlumno} = useAlumnoProfile(user?.rut);
-    const { data: curriculum , isLoading: cargaCurriculum } = useComprobarCurriculum();
+    const { data: curriculum , isLoading: cargaCurriculum } = useComprobarCurriculum(user?.rut);
 
     const router = useRouter();
 
