@@ -12,11 +12,11 @@ export class Usuario {
     password: string;
     @Column()
     tipo: string;
-    @Column({nullable: false})
+    @Column({nullable: true})
     c_ayudantias : number;
     @Column()
     deshabilitado: boolean;
-    @ManyToMany(() => Departamento, (departamento) => departamento.secretarias)
+    @ManyToMany((nullable: true) => Departamento, (departamento) => departamento.secretarias)
     departamentos: Departamento[];
 
 

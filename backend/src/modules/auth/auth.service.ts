@@ -46,6 +46,8 @@ export class AuthService {
     newUser.apellidos = registerDto.apellidos;
     newUser.tipo = registerDto.tipo;
     newUser.password = hashedPassword;
+    newUser.c_ayudantias = 0;
+    newUser.deshabilitado = false;
     await this.usuarioService.guardar(newUser);
 
     return { message: 'Usuario registrado exitosamente' };

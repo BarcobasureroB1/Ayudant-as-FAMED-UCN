@@ -2,6 +2,7 @@ import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards, Request }
 import { AuthService } from './auth.service';
 import { LoginDto } from './dto/LoginDto';
 import { AuthGuard } from './guards/aurh.guard';
+import { RegisterDto } from './dto/RegisterDto';
 
 
 
@@ -20,5 +21,11 @@ export class AuthController {
         @Request() req
     ) {
      return req.user; 
+    }
+    @Post('register')
+    register(@Body()
+    registerDto:RegisterDto) {
+        
+        return this.authService.Register(registerDto); 
     }
 }
