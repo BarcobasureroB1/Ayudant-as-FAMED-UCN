@@ -37,7 +37,7 @@ async create(createUsuarioDto: CreateUsuarioDto) {
   async findalumno(rut: string) {
     const usuario = await this.usuarioRepository.findOneBy({ rut, tipo: 'alumno' });
     if (!usuario) {
-      throw new Error('Alumno no encontrado');
+      return null;
     }
     return usuario;
   }
