@@ -1,5 +1,14 @@
 {
   "dependencies": {
-    "@tanstack/react-query": "^5.90.3"
+    "@nestjs/config": "^3.2.0",
+    "@nestjs/mapped-types": "^2.1.0",
+    "@nestjs/typeorm": "^10.0.2",
+    "docker": "^1.0.0",
+    "pg": "^8.16.3",
+    "postgres": "^3.4.7",
+    "typeorm": "^0.3.20"
+  },
+  "devDependencies": {
+    "@types/node": "^24.8.0"
   }
 }
