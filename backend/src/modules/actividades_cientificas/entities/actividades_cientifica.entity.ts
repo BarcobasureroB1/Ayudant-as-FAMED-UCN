@@ -1,12 +1,12 @@
+import { Curriculum } from 'src/modules/curriculum/entities/curriculum.entity';
 import { Usuario } from 'src/modules/usuario/entities/usuario.entity';
-import { Column, Entity, JoinTable, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
+import { Column, Entity, JoinTable, ManyToOne, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
 @Entity()
 export class ActividadesCientifica {
     @PrimaryGeneratedColumn()
     id: number;
-    @OneToMany(() => Usuario, (usuario) => usuario.rut)
-    @JoinTable({ name: 'rut_alumno' })
-    usuario: Usuario;
+     @ManyToOne(() => Curriculum, (curriculum) => curriculum.ayudantias, { onDelete: 'CASCADE' })
+        curriculum: Curriculum;
     
     @Column()
     nombre : string;
