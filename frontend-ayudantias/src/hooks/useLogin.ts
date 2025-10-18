@@ -4,23 +4,25 @@ import { AxiosError } from 'axios';
 
 interface Logindata {
     rut: string;
-    contrasena: string;
+    password: string;
 }
 
 interface Loginresponse {
     message: string;
     //data: {
-    token: string;
+    access_token: string;
     statusCode: number;
     success: boolean;
 }
 
-export function useLogin(onSuccess: (data: Loginresponse)=> void, onError:(error:Error)=> void) {
-    return useMutation<Loginresponse,AxiosError,Logindata>({ mutationFn: async ({rut, contrasena}: Logindata): Promise<Loginresponse> => {
-            const respuesta = await api.post('/api/auth/login', {rut, contrasena});
+export function useLogin(onSuccess: (access_token: string)=> void, onError:(error:Error)=> void) {
+    return useMutation<Loginresponse,AxiosError,Logindata>({ mutationFn: async ({rut, password}: Logindata): Promise<Loginresponse> => {
+            const respuesta = await api.post('/auth/login', {rut, password});
             return respuesta.data;
         },
-        onSuccess,
+        onSuccess: (data) => {
+            onSuccess(data.access_token);
+        },
         onError,
     });
 }

@@ -12,9 +12,8 @@ export default function LoginPage() {
     const router = useRouter();
     const { setToken } = useAuth();
 
-    const login = useLogin((response) => {
-        const token = response.token;
-        setToken(token)
+    const login = useLogin( async (access_token: string) => {
+        setToken(access_token)
         router.push("/dashboard");
     },
     (error) => {
@@ -28,13 +27,21 @@ export default function LoginPage() {
 
         login.mutate({
             rut,
-            contrasena: password,
+            password: password,
         });
     };
 
     return(
         <div className="min-h-screen flex items-center justify-center bg-gray-50 px-4">
             <div className="bg-white p-8 rounded-xl shadow-md w-full max-w-md">
+                <div className="flex mb-6 border-b border-gray-200">
+                    <button onClick={() => router.push("/register")} className="w-1/2 text-sm font-medium py-2 text-center text-gray-400 hover:text-black transition-colors">
+                        Crear Cuenta
+                    </button>
+                    <span className="w-1/2 text-sm font-semibold py-2 text-center border-b-2 border-black text-black cursor-default">
+                        Iniciar Sesion
+                    </span>
+                </div>
                 <h1 className="text-2xl font-bold mb-6 text-center text-gray-800">Iniciar Sesión</h1>
                 <form onSubmit={submit} className="space-y-4">
                      <div>
