@@ -19,7 +19,7 @@ export class CurriculumController {
 
   @Get(':rut_alumno')
   findByRut(@Param('rut_alumno') rut_alumno: string) {
-    return this.curriculumService.findbyrut(rut_alumno);
+    return this.curriculumService.findByRut(rut_alumno);
   }
 
 }

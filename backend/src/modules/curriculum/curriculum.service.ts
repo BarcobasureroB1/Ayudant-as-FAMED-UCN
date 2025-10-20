@@ -50,7 +50,7 @@ export class CurriculumService {
     if (data.ayudantias?.length) {
       const ayudantias = data.ayudantias.map((a) =>
         this.ayudantiasCurriculumRepository.create({
-          rut_alumno: rut,
+          curriculum,
           nombre_asig: a.nombreAsig,
           n_coordinador: a.coordinador,
           evaluacion: a.evaluacion,
@@ -62,7 +62,7 @@ export class CurriculumService {
    if (data.cursos_titulos_grados?.length) {
       const titulos = data.cursos_titulos_grados.map((c) =>
         this.titulosCursoRepository.create({
-          usuario: usuario,
+          curriculum,
           nombre: c.nombre,
           institucion: c.institucion,
           ano: c.fecha,
@@ -73,7 +73,7 @@ export class CurriculumService {
      if (data.actividades_cientificas?.length) {
       const cientificas = data.actividades_cientificas.map((a) =>
         this.actividadesCientificaRepository.create({
-          usuario: usuario,
+          curriculum,
           nombre: a.nombre,
           descripcion: a.descripcion,
           periodo_participacion: a.periodoParticipacion,
@@ -85,6 +85,7 @@ export class CurriculumService {
       const extra = data.actividades_extracurriculares.map((a) =>
         this.actividadesExtracurriculareRepository.create({
           usuario: usuario,
+          curriculum,
           nombre: a.nombre,
           docente: a.docenteInstitucion,
           descripcion: a.descripcion,
@@ -110,11 +111,22 @@ export class CurriculumService {
     return `This action updates a #${id} curriculum`;
   }
 
-  async findbyrut(rut: string) {
-    const curriculum = await this.curriculumRepository.findOneBy({ usuario: { rut } });
-    if (!curriculum) {
-      return null
-    }
-    return curriculum;
+  async findByRut(rut: string) {
+  const curriculum = await this.curriculumRepository.findOne({
+    where: { usuario: { rut } },
+    relations: [
+      'usuario',
+      'ayudantias',
+      'titulos',
+      'actividades_cientificas',
+      'actividades_extracurriculares',
+    ],
+  });
+
+  if (!curriculum) {
+    return null;
   }
+
+  return curriculum;
+}
 }
