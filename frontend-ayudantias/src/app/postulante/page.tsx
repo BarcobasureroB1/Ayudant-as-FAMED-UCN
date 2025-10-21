@@ -4,16 +4,22 @@ import React, { SyntheticEvent, useEffect, useState } from 'react';
 import { useRouter } from "next/navigation";
 import { useUserProfile, User } from '@/hooks/useUserProfile';
 import { useAlumnoProfile, AlumnoData } from '@/hooks/useAlumnoProfile';
-import { useComprobarCurriculum, useCrearCurriculum, CurriculumData } from '@/hooks/useCurriculum';
+import { useComprobarCurriculum, useCrearCurriculum, CurriculumData, useActividadesExtracurriculares, useActividadescientificas, usecursos_titulos_grados, useAyudantias} from '@/hooks/useCurriculum';
 import { useAuth } from '@/context/AuthContext';
+import { AyudantiasAnteriores, useAyudantiasPorAlumno } from '@/hooks/useAyudantia';
 
 interface UserProps {
     user: User;
     alumno?: AlumnoData;
     curriculum?: CurriculumData;
+    actividadesExtracurriculares?: any;
+    actividadesCientificas?: any;
+    cursosTitulosGrados?: any;
+    ayudantias?: any;
+    ayudantiasAnteriores?: any;
 }
 
-export const PostulanteVista = ({user, alumno, curriculum}: UserProps) => {
+export const PostulanteVista = ({user, alumno, curriculum, actividadesExtracurriculares, actividadesCientificas, cursosTitulosGrados, ayudantias, ayudantiasAnteriores}: UserProps) => {
     const crearCurriculum = useCrearCurriculum();
     const router = useRouter();
     const { setToken } = useAuth();
@@ -22,7 +28,7 @@ export const PostulanteVista = ({user, alumno, curriculum}: UserProps) => {
     const [mostrarPopup, setMostrarPopup] = useState(false);
   
     const [form, setForm] = useState({
-        rut_alumno: "",
+        rut_alumno: user.rut || "",
         nombres: "",
         apellidos:  "",
         fecha_nacimiento: "",
@@ -48,7 +54,7 @@ export const PostulanteVista = ({user, alumno, curriculum}: UserProps) => {
 
     const mostrarCurriculum = () => {
         return (
-        <div className="curriculum-container">
+        <div>
             <h2 className="text-xl font-bold mb-4">Curriculum Vitae</h2>
             <p><b>RUT:</b> {curriculum?.rut_alumno}</p>
             <p><b>Nombre:</b> {curriculum?.nombres} {curriculum?.apellidos}</p>
@@ -59,6 +65,85 @@ export const PostulanteVista = ({user, alumno, curriculum}: UserProps) => {
             <p><b>Correo:</b> {curriculum?.correo}</p>
             <p><b>Carrera:</b> {curriculum?.carrera}</p>
             <p><b>Otros:</b> {curriculum?.otros}</p>
+
+            {ayudantias && ayudantias.length > 0 && (
+                <div>
+                <h3>Ayudantías Currículum</h3>
+                <ul>
+                    {ayudantias.map((a: any) => (
+                    <li key={a.id}>
+                        <p><b>Asignatura:</b> {a.nombre_asig}</p>
+                        <p><b>Coordinador:</b> {a.nombre_coordinador}</p>
+                        <p><b>Evaluación obtenida:</b> {a.evaluacion_obtenida}</p>
+                    </li>
+                    ))}
+                </ul>
+                </div>
+            )}
+
+            {ayudantiasAnteriores && ayudantiasAnteriores.length > 0 && (
+                <div>
+                <h3>Ayudantías Anteriores</h3>
+                <ul>
+                    {ayudantiasAnteriores.map((a: AyudantiasAnteriores) => (
+                    <li key={a.id}>
+                        <p><b>Asignatura: </b> {a.nombre_asig}</p>
+                        <p><b>Coordinador: </b> {a.nombre_coordinador} <b>rut: </b>{a.rut_coordinador_otro}</p>
+                        <p><b>Evaluación obtenida: </b> {a.evaluacion}</p>
+                    </li>
+                    ))}
+                </ul>
+                </div>
+            )}
+
+            {cursosTitulosGrados && cursosTitulosGrados.length > 0 && (
+                <div>
+                <h3>Cursos, Títulos y Grados</h3>
+                <ul>
+                    {cursosTitulosGrados.map((c: any) => (
+                    <li key={c.id}>
+                        <p><b>Nombre:</b> {c.nombre_asig}</p>
+                        <p><b>Coordinador:</b> {c.n_coordinador}</p>
+                        <p><b>Evaluación:</b> {c.evaluacion}</p>
+                    </li>
+                    ))}
+                </ul>
+                </div>
+            )}
+
+
+            {actividadesCientificas && actividadesCientificas.length > 0 && (
+                <div>
+                <h3>Actividades Científicas</h3>
+                <ul>
+                    {actividadesCientificas.map((a: any) => (
+                    <li key={a.id}>
+                        <p><b>Nombre:</b> {a.nombre}</p>
+                        <p><b>Descripción:</b> {a.descripcion}</p>
+                        <p><b>Periodo de participación:</b> {a.periodo_participacion}</p>
+                    </li>
+                    ))}
+                </ul>
+                </div>
+            )}
+
+
+            {actividadesExtracurriculares && actividadesExtracurriculares.length > 0 && (
+                <div>
+                <h3>Actividades Extracurriculares</h3>
+                <ul>
+                    {actividadesExtracurriculares.map((a: any) => (
+                    <li key={a.id}>
+                        <p><b>Nombre:</b> {a.nombre}</p>
+                        <p><b>Docente:</b> {a.docente}</p>
+                        <p><b>Descripción:</b> {a.descripcion}</p>
+                        <p><b>Periodo de participación:</b> {a.periodo_participacion}</p>
+                    </li>
+                    ))}
+                </ul>
+                </div>
+            )}
+
         </div>
         );
     }
@@ -69,7 +154,7 @@ export const PostulanteVista = ({user, alumno, curriculum}: UserProps) => {
             onClick={() => setMostrarPopup(false)}
         >
             <div
-                className="bg-white p-6 rounded-2xl shadow-2xl w-[90%] max-w-[700px] relative animate-fadeIn"
+                className="bg-white p-6 rounded-2xl shadow-2xl w-[90%] max-w-[700px] relative animate-fadeIn max-h-[80vh] overflow-y-auto"
                 onClick={(e) => e.stopPropagation()}
             >
                 <button
@@ -130,6 +215,11 @@ export const PostulanteVista = ({user, alumno, curriculum}: UserProps) => {
                     <p><b>Los siguientes datos son exclusivos de los Alumnos:</b></p>
                     <p><b>Año de ingreso:</b> vacío</p>
                     <p><b>Semestre actual:</b> vacío</p>
+                </div>
+                <div className="mt-4">
+                    <button onClick={() => setMostrarPopup(true)} className="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
+                        Ver documento
+                    </button>
                 </div>
             </div>
         </div>
@@ -340,6 +430,13 @@ export default function PostulantePage() {
     const { data: alumno, isLoading: cargaAlumno} = useAlumnoProfile(user?.rut);
     const { data: curriculum , isLoading: cargaCurriculum } = useComprobarCurriculum(user?.rut);
 
+    const { data: actividadesExtracurriculares } = useActividadesExtracurriculares(user?.rut);
+    const { data: actividadesCientificas } = useActividadescientificas(user?.rut);
+    const { data: cursosTitulosGrados } = usecursos_titulos_grados(user?.rut);
+    const { data: ayudantias } = useAyudantias(user?.rut);
+
+    const { data: ayudantiasAnteriores } = useAyudantiasPorAlumno(user?.rut);
+
     const router = useRouter();
 
     useEffect(() => {
@@ -370,5 +467,5 @@ export default function PostulantePage() {
         );
     }
 
-    return <PostulanteVista user={user} alumno={alumno} curriculum={curriculum}/>;
+    return <PostulanteVista user={user} alumno={alumno} curriculum={curriculum} actividadesExtracurriculares={actividadesExtracurriculares} actividadesCientificas={actividadesCientificas} cursosTitulosGrados={cursosTitulosGrados} ayudantias={ayudantias} ayudantiasAnteriores={ayudantiasAnteriores}/>;
 }

@@ -48,7 +48,7 @@ export function useComprobarCurriculum(rut_alumno?: string) {
     return useQuery({
         queryKey: ['curriculum', rut_alumno],
         queryFn: async() => {
-            const respuesta = await api.get(`/usuario/curriculum/${rut_alumno}`);
+            const respuesta = await api.get(`curriculum/${rut_alumno}`);
             return respuesta.data
         },
         enabled: !!rut_alumno,
@@ -60,11 +60,59 @@ export function useCrearCurriculum() {
     const clienteQuery = useQueryClient();
     return useMutation({
         mutationFn: async (curriculum: CurriculumData) => {
-            const respuesta = await api.post('/usuario/curriculum', curriculum);
+            const respuesta = await api.post('curriculum', curriculum);
             return respuesta.data;
         },
         onSuccess: (_data) => {
             clienteQuery.invalidateQueries({ queryKey: ['curriculum'] });
         },
     });
+}
+
+export function useActividadesExtracurriculares(rut_alumno?: string) {
+    return useQuery({
+        queryKey: ['curriculum', rut_alumno],
+        queryFn: async() => {
+            const respuesta = await api.get(`curriculum/extracurricular/${rut_alumno}`);
+            return respuesta.data
+        },
+        enabled: !!rut_alumno,
+        retry: false,
+    })
+}
+
+export function useActividadescientificas(rut_alumno?: string) {
+    return useQuery({
+        queryKey: ['curriculum', rut_alumno],
+        queryFn: async() => {
+            const respuesta = await api.get(`curriculum/cientificas/${rut_alumno}`);
+            return respuesta.data
+        },
+        enabled: !!rut_alumno,
+        retry: false,
+    })
+}
+
+export function usecursos_titulos_grados(rut_alumno?: string) {
+    return useQuery({
+        queryKey: ['curriculum', rut_alumno],
+        queryFn: async() => {
+            const respuesta = await api.get(`curriculum/cursos_titulos_grados/${rut_alumno}`);
+            return respuesta.data
+        },
+        enabled: !!rut_alumno,
+        retry: false,
+    })
+}
+
+export function useAyudantias(rut_alumno?: string) {
+    return useQuery({
+        queryKey: ['curriculum', rut_alumno],
+        queryFn: async() => {
+            const respuesta = await api.get(`curriculum/ayudantias/${rut_alumno}`);
+            return respuesta.data
+        },
+        enabled: !!rut_alumno,
+        retry: false,
+    })
 }
