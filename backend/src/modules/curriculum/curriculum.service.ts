@@ -50,7 +50,7 @@ export class CurriculumService {
     if (data.ayudantias?.length) {
       const ayudantias = data.ayudantias.map((a) =>
         this.ayudantiasCurriculumRepository.create({
-          curriculum,
+          usuario,
           nombre_asig: a.nombreAsig,
           n_coordinador: a.coordinador,
           evaluacion: a.evaluacion,
@@ -62,7 +62,7 @@ export class CurriculumService {
    if (data.cursos_titulos_grados?.length) {
       const titulos = data.cursos_titulos_grados.map((c) =>
         this.titulosCursoRepository.create({
-          curriculum,
+          usuario,
           nombre: c.nombre,
           institucion: c.institucion,
           ano: c.fecha,
@@ -73,7 +73,7 @@ export class CurriculumService {
      if (data.actividades_cientificas?.length) {
       const cientificas = data.actividades_cientificas.map((a) =>
         this.actividadesCientificaRepository.create({
-          curriculum,
+          usuario,
           nombre: a.nombre,
           descripcion: a.descripcion,
           periodo_participacion: a.periodoParticipacion,
@@ -84,8 +84,7 @@ export class CurriculumService {
     if (data.actividades_extracurriculares?.length) {
       const extra = data.actividades_extracurriculares.map((a) =>
         this.actividadesExtracurriculareRepository.create({
-          usuario: usuario,
-          curriculum,
+          usuario,
           nombre: a.nombre,
           docente: a.docenteInstitucion,
           descripcion: a.descripcion,
@@ -116,10 +115,10 @@ export class CurriculumService {
     where: { usuario: { rut } },
     relations: [
       'usuario',
-      'ayudantias',
-      'titulos',
-      'actividades_cientificas',
-      'actividades_extracurriculares',
+      'usuario.actividades_cientificas',
+      'usuario.actividades_extracurriculares',
+      'usuario.ayudantias',
+      'usuario.titulos',
     ],
   });
 

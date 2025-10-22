@@ -30,12 +30,5 @@ export class Curriculum {
     carrera: string;
     @Column()
     otros : string;
-    @OneToMany(() => AyudantiasCurriculum, (ayudantia) => ayudantia.curriculum, { cascade: true })
-    ayudantias: AyudantiasCurriculum[];
-    @OneToMany(() => ActividadesCientifica, (a) => a.curriculum, { cascade: true })
-    actividades_cientificas: ActividadesCientifica[];
-    @OneToMany(() => ActividadesExtracurriculare, (a) => a.curriculum, { cascade: true })
-    actividades_extracurriculares: ActividadesExtracurriculare[];
-    @OneToMany(() => TitulosCurso, (t) => t.curriculum, { cascade: true })
-    titulos: TitulosCurso[];
+ 
 }
