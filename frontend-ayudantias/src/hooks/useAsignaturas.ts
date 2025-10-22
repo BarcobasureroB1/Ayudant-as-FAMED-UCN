@@ -1,11 +1,11 @@
 import {useQuery} from '@tanstack/react-query';
 import api from '../api/axios';
 
-export function useTodasAsignaturas(){
+export function useAsignaturasDisponiblesPostulacion(rut_alumno: string){
     return useQuery({
-        queryKey:['asignaturas'],
+        queryKey:['asignaturas', rut_alumno],
         queryFn: async () => {
-            const respuesta = await api.get('/asignaturas');
+            const respuesta = await api.get(`asignaturas/${rut_alumno}`);
             return respuesta.data;
         },
     });

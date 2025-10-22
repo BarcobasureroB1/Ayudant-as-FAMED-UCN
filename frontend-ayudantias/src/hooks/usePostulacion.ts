@@ -4,6 +4,8 @@ import api from '../api/axios';
 export interface PostulacionData
 {
     id: number;
+    rut_alumno: string;
+    id_asignatura: string;
     nombre_asignatura: string;
     descripcion_carta: string;
     correo_profe: string;
@@ -39,8 +41,8 @@ export function useCancelarPostulacion(){
 export function useCrearSubjects() {
     const clienteQuery = useQueryClient();
     return useMutation({
-        mutationFn: async ({nombre_asignatura, descripcion_carta, correo_profe, actividad, metodologia, dia, bloque}:PostulacionData) => {
-            const respuesta = await api.post('asignatura',{nombre_asignatura, descripcion_carta, correo_profe, actividad, metodologia, dia, bloque});
+        mutationFn: async ({rut_alumno, id_asignatura, nombre_asignatura, descripcion_carta, correo_profe, actividad, metodologia, dia, bloque}:PostulacionData) => {
+            const respuesta = await api.post('postulaciones',{rut_alumno, id_asignatura, nombre_asignatura, descripcion_carta, correo_profe, actividad, metodologia, dia, bloque});
             return respuesta.data;
         },
         onSuccess: () => {
