@@ -7,6 +7,7 @@ import { useAlumnoProfile, AlumnoData } from '@/hooks/useAlumnoProfile';
 import { useComprobarCurriculum, useCrearCurriculum, CurriculumData, useActividadesExtracurriculares, useActividadescientificas, usecursos_titulos_grados, useAyudantias} from '@/hooks/useCurriculum';
 import { useAuth } from '@/context/AuthContext';
 import { AyudantiasAnteriores, useAyudantiasPorAlumno } from '@/hooks/useAyudantia';
+import { PostulacionData, usePostulacionesPorAlumno, useCancelarPostulacion } from '@/hooks/usePostulacion';
 
 interface UserProps {
     user: User;
@@ -17,15 +18,23 @@ interface UserProps {
     cursosTitulosGrados?: any;
     ayudantias?: any;
     ayudantiasAnteriores?: any;
+    postulaciones?: any;
+    cancelarPostulacion?: any;
 }
 
-export const PostulanteVista = ({user, alumno, curriculum, actividadesExtracurriculares, actividadesCientificas, cursosTitulosGrados, ayudantias, ayudantiasAnteriores}: UserProps) => {
+export const PostulanteVista = ({user, alumno, curriculum, actividadesExtracurriculares, actividadesCientificas, cursosTitulosGrados, ayudantias, ayudantiasAnteriores, postulaciones, cancelarPostulacion}: UserProps) => {
     const crearCurriculum = useCrearCurriculum();
     const router = useRouter();
     const { setToken } = useAuth();
 
-    const [paso, setPaso] = useState(1);
-    const [mostrarPopup, setMostrarPopup] = useState(false);
+    type Vista = 'perfil' | 'postular';
+    const [paso, setPaso] = useState<number>(1);
+    const [mostrarPopup, setMostrarPopup] = useState<boolean>(false);
+    const [mostrarPopupPostulaciones, setMostrarPopupPostulaciones] = useState<boolean>(false);
+    const [postulacionSeleccionada, setPostulacionSeleccionada] = useState<any>(null);
+    const [vista, setVista] = useState<Vista>('perfil');
+    const isPerfil = vista === 'perfil';
+    const isPostular = vista === 'postular';
   
     const [form, setForm] = useState({
         rut_alumno: user.rut || "",
@@ -148,6 +157,19 @@ export const PostulanteVista = ({user, alumno, curriculum, actividadesExtracurri
         );
     }
 
+    const mostrarPostulacion = () => {
+        if (!postulacionSeleccionada) return null;  
+        return (
+            <div>
+                <h2 className="text-xl font-bold mb-4">Postulación</h2>
+                <p><b>Asignatura:</b> {postulacionSeleccionada.nombre_asignatura}</p>
+                <p><b>Descripción carta:</b> {postulacionSeleccionada.descripcion_carta}</p>
+                <p><b>Correo del profesor:</b> {postulacionSeleccionada.correo_profe}</p>
+                <p><b>Actividad:</b> {postulacionSeleccionada.actividad}</p>
+            </div>
+        );
+    }
+
     {mostrarPopup && (
         <div
             className="fixed inset-0 flex items-center justify-center bg-black/60 backdrop-blur-sm z-50"
@@ -169,31 +191,97 @@ export const PostulanteVista = ({user, alumno, curriculum, actividadesExtracurri
         </div>
     )}
 
+    {mostrarPopupPostulaciones && postulacionSeleccionada && (
+        <div
+            className="fixed inset-0 flex items-center justify-center bg-black/60 backdrop-blur-sm z-50"
+            onClick={() => { setMostrarPopupPostulaciones(false); setPostulacionSeleccionada(null); }}
+        >
+            <div
+                className="bg-white p-6 rounded-2xl shadow-2xl w-[90%] max-w-[700px] relative animate-fadeIn max-h-[80vh] overflow-y-auto"
+                onClick={(e) => e.stopPropagation()}
+            >
+                <button
+                onClick={() => { setMostrarPopupPostulaciones(false); setPostulacionSeleccionada(null); }}
+                className="absolute top-3 right-3 text-gray-600 hover:text-gray-900 text-2xl"
+                >
+                ✕
+                </button>
+
+            {mostrarPostulacion()}
+            </div>
+        </div>
+    )}
+
     
+    //VISTAS PERFIL Y POSTULAR
+
     if (curriculum && alumno) {
         return (
-        <div className="min-h-screen bg-gray-50 p-6">
-            <div className="max-w-4xl mx-auto bg-white rounded-lg shadow-md p-6">
-                <div className="flex justify-between items-center mb-6">
-                    <h2 className="text-2xl font-bold text-gray-800">Perfil del Postulante</h2>
-                    <button onClick={logout} className="bg-gray-800 hover:bg-black text-white font-semibold py-2 px-4 rounded transition duration-200">
-                        Cerrar Sesión
-                    </button>
+            <div className="min-h-screen bg-gray-50 p-6">
+                <div className="max-w-4xl mx-auto bg-white rounded-lg shadow-md p-6">
+                    <div className="flex justify-between items-center mb-6">
+                        <div className="flex items-center space-x-2">
+                            <button onClick={() => setVista('perfil')} className={`py-2 px-4 rounded ${isPerfil ? 'bg-blue-600 text-white' : 'bg-gray-200 text-gray-800'}`}>
+                                Mi perfil
+                            </button>
+                            <button onClick={() => setVista('postular')} className={`py-2 px-4 rounded ${isPostular ? 'bg-blue-600 text-white' : 'bg-gray-200 text-gray-800'}`}>
+                                Postular
+                            </button>
+                        </div>
+                        <button onClick={logout} className="bg-gray-800 hover:bg-black text-white font-semibold py-2 px-4 rounded transition duration-200">
+                            Cerrar Sesión
+                        </button>
+                    </div>
+
+                    {vista === 'perfil' ? (
+                        <>
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+                                <p><b>RUT:</b> {user.rut}</p>
+                                <p><b>Nombre:</b> {user.nombres} {user.apellido}</p>
+                                <p><b>Correo:</b> {curriculum?.correo}</p>
+                                <p><b>Año de ingreso:</b> {alumno?.fecha_admision}</p>
+                                <p><b>Semestre actual:</b> {alumno?.nivel}</p>
+                            </div>
+                            <div className="mt-4">
+                                <button onClick={() => setMostrarPopup(true)} className="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
+                                    Ver documento
+                                </button>
+                            </div>
+
+                            <div className="mt-6">
+                                <h2>Postulaciones Activas</h2>
+                                <ul>
+                                    {postulaciones && postulaciones.length > 0 ? (
+                                        postulaciones.map((p: any) => (
+                                            <li key={p.id}>
+                                                <p><b>Asignatura: </b> {p.nombre_asignatura}</p>
+                                                <p><b>Descripción carta: </b>
+                                                    <button onClick={() => { setPostulacionSeleccionada(p); setMostrarPopupPostulaciones(true); }} className="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">Ver documento</button>
+                                                </p>
+                                                <p><b>Acción: </b> <button onClick={() => cancelarPostulacion.mutate({id: p.id})}>Cancelar postulación</button></p>
+                                            </li>
+                                        ))
+                                    ) : (
+                                        <p>No hay postulaciones activas.</p>
+                                    )}
+                                </ul>
+                            </div>
+                        </>
+                    ) : (
+                        <div>
+                            <h2 className="text-xl font-bold mb-4">Postular</h2>
+                            <div className="flex items-center space-x-2">
+                            <button onClick={() => setVista('perfil')} className={`py-2 px-4 rounded ${isPerfil ? 'bg-blue-600 text-white' : 'bg-gray-200 text-gray-800'}`}>
+                                Mi perfil
+                            </button>
+                            <button onClick={() => setVista('postular')} className={`py-2 px-4 rounded ${isPostular ? 'bg-blue-600 text-white' : 'bg-gray-200 text-gray-800'}`}>
+                                Postular
+                            </button>
+                        </div>
+                        </div>
+                    )}
                 </div>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
-                    <p><b>RUT:</b> {user.rut}</p>
-                    <p><b>Nombre:</b> {user.nombres} {user.apellido}</p>
-                    <p><b>Correo:</b> {curriculum.correo}</p>
-                    <p><b>Año de ingreso:</b> {alumno.fecha_admision}</p>
-                    <p><b>Semestre actual:</b> {alumno.nivel}</p>
-                </div>
-                <div className="mt-4">
-                    <button onClick={() => setMostrarPopup(true)} className="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
-                        Ver documento
-                    </button>
-                </div>
-            </div>       
-        </div>
+            </div>
         );
     }
 
@@ -203,24 +291,67 @@ export const PostulanteVista = ({user, alumno, curriculum, actividadesExtracurri
         <div className="min-h-screen bg-gray-50 p-6">
             <div className="max-w-4xl mx-auto bg-white rounded-lg shadow-md p-6">
                 <div className="flex justify-between items-center mb-6">
-                    <h2 className="text-2xl font-bold text-gray-800">Perfil del Postulante</h2>
+                    <div className="flex items-center space-x-2">
+                            <button onClick={() => setVista('perfil')} className={`py-2 px-4 rounded ${isPerfil ? 'bg-blue-600 text-white' : 'bg-gray-200 text-gray-800'}`}>
+                                Mi perfil
+                            </button>
+                            <button onClick={() => setVista('postular')} className={`py-2 px-4 rounded ${isPostular ? 'bg-blue-600 text-white' : 'bg-gray-200 text-gray-800'}`}>
+                                Postular
+                            </button>
+                        </div>
                     <button onClick={logout} className="bg-gray-800 hover:bg-black text-white font-semibold py-2 px-4 rounded transition duration-200">
                         Cerrar Sesión
                     </button>
                 </div>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <p><b>RUT:</b> {user.rut}</p>
-                    <p><b>Nombre:</b> {user.nombres} {user.apellido}</p>
-                    <p><b>Correo:</b> {curriculum.correo}</p>
-                    <p><b>Los siguientes datos son exclusivos de los Alumnos:</b></p>
-                    <p><b>Año de ingreso:</b> vacío</p>
-                    <p><b>Semestre actual:</b> vacío</p>
-                </div>
-                <div className="mt-4">
-                    <button onClick={() => setMostrarPopup(true)} className="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
-                        Ver documento
-                    </button>
-                </div>
+                
+                {vista === 'perfil' ? (
+                    <>
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+                            <p><b>RUT:</b> {user.rut}</p>
+                            <p><b>Nombre:</b> {user.nombres} {user.apellido}</p>
+                            <p><b>Correo:</b> {curriculum?.correo}</p>
+                            <p><b>Año de ingreso: </b>vacío</p>
+                            <p><b>Semestre actual: </b>vacío</p>
+                        </div>
+                        <div className="mt-4">
+                            <button onClick={() => setMostrarPopup(true)} className="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
+                                Ver documento
+                            </button>
+                        </div>
+
+                        <div className="mt-6">
+                            <h2>Postulaciones Activas</h2>
+                                <ul>
+                                    {postulaciones && postulaciones.length > 0 ? (
+                                        postulaciones.map((p: any) => (
+                                            <li key={p.id}>
+                                                <p><b>Asignatura: </b> {p.nombre_asignatura}</p>
+                                                <p><b>Descripción carta: </b>
+                                                    <button onClick={() => { setPostulacionSeleccionada(p); setMostrarPopupPostulaciones(true); }} className="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">Ver documento</button>
+                                                </p>
+                                                <p><b>Acción: </b> <button onClick={() => cancelarPostulacion.mutate({id: p.id})}>Cancelar postulación</button></p>
+                                            </li>
+                                        ))
+                                    ) : (
+                                        <p>No hay postulaciones activas.</p>
+                                    )}
+                                </ul>
+                        </div>
+                    </>
+                    ) : (
+                        <div>
+                            <h2 className="text-xl font-bold mb-4">Postular</h2>
+                            <div className="flex items-center space-x-2 mb-4">
+                                <button onClick={() => setVista('perfil')} className={`py-2 px-4 rounded ${isPerfil ? 'bg-blue-600 text-white' : 'bg-gray-200 text-gray-800'}`}>
+                                    Mi perfil
+                                </button>
+                                <button onClick={() => setVista('postular')} className={`py-2 px-4 rounded ${isPostular ? 'bg-blue-600 text-white' : 'bg-gray-200 text-gray-800'}`}>
+                                    Postular
+                                </button>
+                            </div>
+                            
+                        </div>
+                    )}
             </div>
         </div>
         );
@@ -228,6 +359,8 @@ export const PostulanteVista = ({user, alumno, curriculum, actividadesExtracurri
     }
 
     
+
+    //VISTA CREAR CURRICULUM
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
         setForm({ ...form, [e.target.name]: e.target.value });
@@ -437,6 +570,10 @@ export default function PostulantePage() {
 
     const { data: ayudantiasAnteriores } = useAyudantiasPorAlumno(user?.rut);
 
+    const { data: postulaciones } = usePostulacionesPorAlumno(user?.rut);
+
+    const cancelarPostulacion = useCancelarPostulacion();
+
     const router = useRouter();
 
     useEffect(() => {
@@ -467,5 +604,5 @@ export default function PostulantePage() {
         );
     }
 
-    return <PostulanteVista user={user} alumno={alumno} curriculum={curriculum} actividadesExtracurriculares={actividadesExtracurriculares} actividadesCientificas={actividadesCientificas} cursosTitulosGrados={cursosTitulosGrados} ayudantias={ayudantias} ayudantiasAnteriores={ayudantiasAnteriores}/>;
+    return <PostulanteVista user={user} alumno={alumno} curriculum={curriculum} actividadesExtracurriculares={actividadesExtracurriculares} actividadesCientificas={actividadesCientificas} cursosTitulosGrados={cursosTitulosGrados} ayudantias={ayudantias} ayudantiasAnteriores={ayudantiasAnteriores} postulaciones={postulaciones} cancelarPostulacion={cancelarPostulacion} />;
 }
