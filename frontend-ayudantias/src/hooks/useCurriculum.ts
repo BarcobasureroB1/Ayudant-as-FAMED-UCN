@@ -121,3 +121,15 @@ export function useAyudantias(rut_alumno?: string) {
     })
 }
 
+export function useEditarCurriculum(){
+    const clienteQuery = useQueryClient();
+    return useMutation({
+        mutationFn: async ({id}:{id: number}) => {
+            await api.patch(`curriculum/${id}`)
+        },
+        onSuccess: (_data) => {
+            clienteQuery.invalidateQueries({queryKey:['curriculum']});
+        }                        
+    });
+
+}

@@ -62,3 +62,16 @@ export function useCrearPostulacion() {
         },
     });
 }
+
+export function useEditarPostulacion() {
+    const clienteQuery = useQueryClient();
+    return useMutation({
+        mutationFn: async ({id}:{id: number}) => {
+            await api.patch(`postulaciones/editar/${id}`)
+        },
+        onSuccess: (_data) => {
+            clienteQuery.invalidateQueries({queryKey:['postulaciones']});
+        }                        
+    });
+
+}
