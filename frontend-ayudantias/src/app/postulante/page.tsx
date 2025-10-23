@@ -262,10 +262,6 @@ export const PostulanteVista = ({user, alumno, curriculum, actividadesExtracurri
     ) : null;
 
     
-
-    
-
-    
     //VISTAS PERFIL Y POSTULAR
 
     if (curriculum && alumno) {
