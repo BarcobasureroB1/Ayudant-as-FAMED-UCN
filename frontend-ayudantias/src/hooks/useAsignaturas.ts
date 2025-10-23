@@ -11,3 +11,12 @@ export function useAsignaturasDisponiblesPostulacion(rut_alumno: string){
     });
 }
 
+export function useTodasAsignaturas(){
+    return useQuery({
+        queryKey:['asignaturas'],
+        queryFn: async () => {
+            const respuesta = await api.get('asignaturas');
+            return respuesta.data;
+        },
+    });
+}

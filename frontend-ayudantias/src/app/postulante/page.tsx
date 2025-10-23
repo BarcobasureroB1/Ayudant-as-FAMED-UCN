@@ -8,7 +8,7 @@ import { useComprobarCurriculum, useCrearCurriculum, CurriculumData, useActivida
 import { useAuth } from '@/context/AuthContext';
 import { AyudantiasAnteriores, useAyudantiasPorAlumno } from '@/hooks/useAyudantia';
 import { PostulacionData, usePostulacionesPorAlumno, useCancelarPostulacion, useCrearPostulacion } from '@/hooks/usePostulacion';
-import { useAsignaturasDisponiblesPostulacion } from '@/hooks/useAsignaturas';
+import { useAsignaturasDisponiblesPostulacion, useTodasAsignaturas } from '@/hooks/useAsignaturas';
 import Cookies from 'js-cookie';
 
 interface UserProps {
@@ -23,9 +23,10 @@ interface UserProps {
     postulaciones?: any;
     cancelarPostulacion?: any;
     asignaturasDisponibles?: any;
+    asignaturasTodas?: any;
 }
 
-export const PostulanteVista = ({user, alumno, curriculum, actividadesExtracurriculares, actividadesCientificas, cursosTitulosGrados, ayudantias, ayudantiasAnteriores, postulaciones, cancelarPostulacion, asignaturasDisponibles}: UserProps) => {
+export const PostulanteVista = ({user, alumno, curriculum, actividadesExtracurriculares, actividadesCientificas, cursosTitulosGrados, ayudantias, ayudantiasAnteriores, postulaciones, cancelarPostulacion, asignaturasDisponibles, asignaturasTodas}: UserProps) => {
     const crearCurriculum = useCrearCurriculum();
     const crearPostulacion = useCrearPostulacion();
     const router = useRouter();
@@ -511,8 +512,8 @@ export const PostulanteVista = ({user, alumno, curriculum, actividadesExtracurri
                                                 className="w-full px-3 py-2 border border-gray-300 rounded bg-white"
                                             >
                                                 <option value="">Seleccione una asignatura</option>
-                                                {asignaturasDisponibles && asignaturasDisponibles.length > 0 ? (
-                                                    asignaturasDisponibles.map((a: any) => (
+                                                {asignaturasTodas && asignaturasTodas.length > 0 ? (
+                                                    asignaturasTodas.map((a: any) => (
                                                         <option key={a.id} value={String(a.id)}>{a.nombre}</option>
                                                     ))
                                                 ) : (
@@ -804,6 +805,7 @@ export default function PostulantePage() {
     const { data: postulaciones } = usePostulacionesPorAlumno(user?.rut);
 
     const { data: asignaturasDisponibles } = useAsignaturasDisponiblesPostulacion(user?.rut);
+    const { data: asignaturasTodas } = useTodasAsignaturas();
 
     const cancelarPostulacion = useCancelarPostulacion();
 
@@ -837,5 +839,5 @@ export default function PostulantePage() {
         );
     }
 
-    return <PostulanteVista user={user} alumno={alumno} curriculum={curriculum} actividadesExtracurriculares={actividadesExtracurriculares} actividadesCientificas={actividadesCientificas} cursosTitulosGrados={cursosTitulosGrados} ayudantias={ayudantias} ayudantiasAnteriores={ayudantiasAnteriores} postulaciones={postulaciones} cancelarPostulacion={cancelarPostulacion} asignaturasDisponibles={asignaturasDisponibles} />;
+    return <PostulanteVista user={user} alumno={alumno} curriculum={curriculum} actividadesExtracurriculares={actividadesExtracurriculares} actividadesCientificas={actividadesCientificas} cursosTitulosGrados={cursosTitulosGrados} ayudantias={ayudantias} ayudantiasAnteriores={ayudantiasAnteriores} postulaciones={postulaciones} cancelarPostulacion={cancelarPostulacion} asignaturasDisponibles={asignaturasDisponibles} asignaturasTodas={asignaturasTodas} />;
 }
