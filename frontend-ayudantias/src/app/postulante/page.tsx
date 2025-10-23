@@ -7,7 +7,8 @@ import { useAlumnoProfile, AlumnoData } from '@/hooks/useAlumnoProfile';
 import { useComprobarCurriculum, useCrearCurriculum, CurriculumData, useActividadesExtracurriculares, useActividadescientificas, usecursos_titulos_grados, useAyudantias} from '@/hooks/useCurriculum';
 import { useAuth } from '@/context/AuthContext';
 import { AyudantiasAnteriores, useAyudantiasPorAlumno } from '@/hooks/useAyudantia';
-import { PostulacionData, usePostulacionesPorAlumno, useCancelarPostulacion } from '@/hooks/usePostulacion';
+import { PostulacionData, usePostulacionesPorAlumno, useCancelarPostulacion, useCrearPostulacion } from '@/hooks/usePostulacion';
+import { useAsignaturasDisponiblesPostulacion } from '@/hooks/useAsignaturas';
 
 interface UserProps {
     user: User;
@@ -20,10 +21,12 @@ interface UserProps {
     ayudantiasAnteriores?: any;
     postulaciones?: any;
     cancelarPostulacion?: any;
+    asignaturasDisponibles?: any;
 }
 
-export const PostulanteVista = ({user, alumno, curriculum, actividadesExtracurriculares, actividadesCientificas, cursosTitulosGrados, ayudantias, ayudantiasAnteriores, postulaciones, cancelarPostulacion}: UserProps) => {
+export const PostulanteVista = ({user, alumno, curriculum, actividadesExtracurriculares, actividadesCientificas, cursosTitulosGrados, ayudantias, ayudantiasAnteriores, postulaciones, cancelarPostulacion, asignaturasDisponibles}: UserProps) => {
     const crearCurriculum = useCrearCurriculum();
+    const crearPostulacion = useCrearPostulacion();
     const router = useRouter();
     const { setToken } = useAuth();
 
@@ -53,6 +56,18 @@ export const PostulanteVista = ({user, alumno, curriculum, actividadesExtracurri
         actividades_extracurriculares: [
         { nombre: "", docenteInstitucion: "", descripcion: "", periodoParticipacion: "" },
         ],
+    });
+
+    const [formPostulacion, setFormPostulacion] = useState({
+        rut_alumno: "",
+        id_asignatura: "",
+        nombre_asignatura: "",
+        descripcion_carta: "",
+        correo_profe: "",
+        actividad: "",
+        metodologia: "",
+        dia: "",
+        bloque: "",
     });
 
     const logout = () => {
@@ -170,6 +185,24 @@ export const PostulanteVista = ({user, alumno, curriculum, actividadesExtracurri
         );
     }
 
+    const handleSubmitPostulacion = (e: SyntheticEvent) => {
+        e.preventDefault();
+        
+        crearPostulacion.mutate({ ...formPostulacion, rut_alumno: user.rut });
+        
+        setFormPostulacion({
+            rut_alumno: "",
+            id_asignatura: "",
+            nombre_asignatura: "",
+            descripcion_carta: "",
+            correo_profe: "",
+            actividad: "",
+            metodologia: "",
+            dia: "",
+            bloque: "",
+        });
+    };
+
     {mostrarPopup && (
         <div
             className="fixed inset-0 flex items-center justify-center bg-black/60 backdrop-blur-sm z-50"
@@ -271,13 +304,103 @@ export const PostulanteVista = ({user, alumno, curriculum, actividadesExtracurri
                         <div>
                             <h2 className="text-xl font-bold mb-4">Postular</h2>
                             <div className="flex items-center space-x-2">
-                            <button onClick={() => setVista('perfil')} className={`py-2 px-4 rounded ${isPerfil ? 'bg-blue-600 text-white' : 'bg-gray-200 text-gray-800'}`}>
-                                Mi perfil
-                            </button>
-                            <button onClick={() => setVista('postular')} className={`py-2 px-4 rounded ${isPostular ? 'bg-blue-600 text-white' : 'bg-gray-200 text-gray-800'}`}>
-                                Postular
-                            </button>
-                        </div>
+                                <button onClick={() => setVista('perfil')} className={`py-2 px-4 rounded ${isPerfil ? 'bg-blue-600 text-white' : 'bg-gray-200 text-gray-800'}`}>
+                                    Mi perfil
+                                </button>
+                                <button onClick={() => setVista('postular')} className={`py-2 px-4 rounded ${isPostular ? 'bg-blue-600 text-white' : 'bg-gray-200 text-gray-800'}`}>
+                                    Postular
+                                </button>
+                            </div>
+
+                            <div className="mt-6">
+                                <h3 className="text-xl font-bold mb-4">Datos de Postulación</h3>
+                                <form onSubmit={handleSubmitPostulacion} className="space-y-4">
+                                    <div className="grid grid-cols-1 gap-4">
+                                        <div>
+                                            <label className="block text-sm font-medium text-gray-700">Asignatura</label>
+                                            <select
+                                                name="id_asignatura"
+                                                value={formPostulacion.id_asignatura}
+                                                onChange={(e) => {
+                                                    const selectedId = e.target.value;
+                                                    const found = asignaturasDisponibles?.find((a: any) => String(a.id) === String(selectedId));
+                                                    setFormPostulacion({
+                                                        ...formPostulacion,
+                                                        id_asignatura: selectedId,
+                                                        nombre_asignatura: found?.nombre
+                                                    });
+                                                }}
+                                                className="w-full px-3 py-2 border border-gray-300 rounded bg-white"
+                                            >
+                                                <option value="">Seleccione una asignatura</option>
+                                                {asignaturasDisponibles && asignaturasDisponibles.length > 0 ? (
+                                                    asignaturasDisponibles.map((a: any) => (
+                                                        <option key={a.id} value={String(a.id)}>{a.nombre}</option>
+                                                    ))
+                                                ) : (
+                                                    <option value="">No hay asignaturas disponibles</option>
+                                                )}
+                                            </select>
+                                        </div>
+                                    </div>
+
+                                    <div>
+                                        <label className="block text-sm font-medium text-gray-700">Escriba Carta de interés: </label>
+                                        <textarea name="descripcion_carta" value={formPostulacion.descripcion_carta} onChange={(e) => setFormPostulacion({ ...formPostulacion, [e.target.name]: e.target.value })} className="w-full px-3 py-2 border border-gray-300 rounded h-28" />
+                                    </div>
+
+                                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                                        <div>
+                                            <label className="block text-sm font-medium text-gray-700">Correo del profesor para recomendación: </label>
+                                            <input name="correo_profe" value={formPostulacion.correo_profe} onChange={(e) => setFormPostulacion({ ...formPostulacion, [e.target.name]: e.target.value })} className="w-full px-3 py-2 border border-gray-300 rounded" />
+                                        </div>
+                                        <div>
+                                            <label className="block text-sm font-medium text-gray-700">Actividad Propuesta: </label>
+                                            <input name="actividad" value={formPostulacion.actividad} onChange={(e) => setFormPostulacion({ ...formPostulacion, [e.target.name]: e.target.value })} className="w-full px-3 py-2 border border-gray-300 rounded" />
+                                        </div>
+                                        <div>
+                                            <label className="block text-sm font-medium text-gray-700">Metodología: </label>
+                                            <input name="metodologia" value={formPostulacion.metodologia} onChange={(e) => setFormPostulacion({ ...formPostulacion, [e.target.name]: e.target.value })} className="w-full px-3 py-2 border border-gray-300 rounded" />
+                                        </div>
+                                    </div>
+
+                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                        <div>
+                                            <label className="block text-sm font-medium text-gray-700">Día</label>
+                                            <select name="dia" value={formPostulacion.dia} onChange={(e) => setFormPostulacion({ ...formPostulacion, [e.target.name]: e.target.value })} className="w-full px-3 py-2 border border-gray-300 rounded bg-white">
+                                                <option value="">Seleccione un día</option>
+                                                <option value="Lunes">Lunes</option>
+                                                <option value="Martes">Martes</option>
+                                                <option value="Miércoles">Miércoles</option>
+                                                <option value="Jueves">Jueves</option>
+                                                <option value="Viernes">Viernes</option>
+                                                <option value="Sábado">Sábado</option>
+                                                <option value="Domingo">Domingo</option>
+                                            </select>
+                                        </div>
+                                        <div>
+                                            <label className="block text-sm font-medium text-gray-700">Bloque</label>
+                                            <select name="bloque" value={formPostulacion.bloque} onChange={(e) => setFormPostulacion({ ...formPostulacion, [e.target.name]: e.target.value })} className="w-full px-3 py-2 border border-gray-300 rounded bg-white">
+                                                <option value="">Seleccione un bloque</option>
+                                                <option value="A">A</option>
+                                                <option value="B">B</option>
+                                                <option value="C">C</option>
+                                                <option value="C2">C2</option>
+                                                <option value="D">D</option>
+                                                <option value="E">E</option>
+                                                <option value="F">F</option>
+                                                <option value="G">G</option>
+                                                <option value="H">H</option>
+                                            </select>
+                                        </div>
+                                    </div>
+
+                                    <div className="flex items-center space-x-3 pt-2">
+                                        <button type="submit" className="bg-green-600 hover:bg-green-700 text-white font-semibold py-2 px-4 rounded">Enviar Postulación</button>
+                                        <button type="button" onClick={() => setFormPostulacion({ rut_alumno: '', id_asignatura: '', nombre_asignatura: '', descripcion_carta: '', correo_profe: '', actividad: '', metodologia: '', dia: '', bloque: '' })} className="bg-gray-300 hover:bg-gray-400 text-gray-800 py-2 px-4 rounded">Limpiar</button>
+                                    </div>
+                                </form>
+                            </div>
                         </div>
                     )}
                 </div>
@@ -292,13 +415,13 @@ export const PostulanteVista = ({user, alumno, curriculum, actividadesExtracurri
             <div className="max-w-4xl mx-auto bg-white rounded-lg shadow-md p-6">
                 <div className="flex justify-between items-center mb-6">
                     <div className="flex items-center space-x-2">
-                            <button onClick={() => setVista('perfil')} className={`py-2 px-4 rounded ${isPerfil ? 'bg-blue-600 text-white' : 'bg-gray-200 text-gray-800'}`}>
-                                Mi perfil
-                            </button>
-                            <button onClick={() => setVista('postular')} className={`py-2 px-4 rounded ${isPostular ? 'bg-blue-600 text-white' : 'bg-gray-200 text-gray-800'}`}>
-                                Postular
-                            </button>
-                        </div>
+                         <button onClick={() => setVista('perfil')} className={`py-2 px-4 rounded ${isPerfil ? 'bg-blue-600 text-white' : 'bg-gray-200 text-gray-800'}`}>
+                            Mi perfil
+                        </button>
+                        <button onClick={() => setVista('postular')} className={`py-2 px-4 rounded ${isPostular ? 'bg-blue-600 text-white' : 'bg-gray-200 text-gray-800'}`}>
+                            Postular
+                        </button>
+                    </div>
                     <button onClick={logout} className="bg-gray-800 hover:bg-black text-white font-semibold py-2 px-4 rounded transition duration-200">
                         Cerrar Sesión
                     </button>
@@ -349,7 +472,101 @@ export const PostulanteVista = ({user, alumno, curriculum, actividadesExtracurri
                                     Postular
                                 </button>
                             </div>
-                            
+                            <button onClick={logout} className="bg-gray-800 hover:bg-black text-white font-semibold py-2 px-4 rounded transition duration-200">
+                                Cerrar Sesión
+                            </button>
+
+                                    <div className="mt-6">
+                                <h3 className="text-xl font-bold mb-4">Datos de Postulación</h3>
+                                <form onSubmit={handleSubmitPostulacion} className="space-y-4">
+                                    <div className="grid grid-cols-1 gap-4">
+                                        <div>
+                                            <label className="block text-sm font-medium text-gray-700">Asignatura</label>
+                                            <select
+                                                name="id_asignatura"
+                                                value={formPostulacion.id_asignatura}
+                                                onChange={(e) => {
+                                                    const selectedId = e.target.value;
+                                                    const found = asignaturasDisponibles?.find((a: any) => String(a.id) === String(selectedId));
+                                                    setFormPostulacion({
+                                                        ...formPostulacion,
+                                                        id_asignatura: selectedId,
+                                                        nombre_asignatura: found?.nombre
+                                                    });
+                                                }}
+                                                className="w-full px-3 py-2 border border-gray-300 rounded bg-white"
+                                            >
+                                                <option value="">Seleccione una asignatura</option>
+                                                {asignaturasDisponibles && asignaturasDisponibles.length > 0 ? (
+                                                    asignaturasDisponibles.map((a: any) => (
+                                                        <option key={a.id} value={String(a.id)}>{a.nombre}</option>
+                                                    ))
+                                                ) : (
+                                                    <option value="">No hay asignaturas disponibles</option>
+                                                )}
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div>
+                                        <label className="block text-sm font-medium text-gray-700">Escriba Carta de interés: </label>
+                                        <textarea name="descripcion_carta" value={formPostulacion.descripcion_carta} onChange={(e) => setFormPostulacion({ ...formPostulacion, [e.target.name]: e.target.value })} className="w-full px-3 py-2 border border-gray-300 rounded h-28" />
+                                    </div>
+
+                                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                                        <div>
+                                            <label className="block text-sm font-medium text-gray-700">Correo del profesor para recomendación: </label>
+                                            <input name="correo_profe" type="email" value={formPostulacion.correo_profe} onChange={(e) => setFormPostulacion({ ...formPostulacion, [e.target.name]: e.target.value })} className="w-full px-3 py-2 border border-gray-300 rounded" />
+                                        </div>
+
+                                        <h3 className="text-xl font-bold mb-4">Plan de trabajo</h3>
+
+                                        <div>
+                                            <label className="block text-sm font-medium text-gray-700">Actividad propuesta: </label>
+                                            <input name="actividad" value={formPostulacion.actividad} onChange={(e) => setFormPostulacion({ ...formPostulacion, [e.target.name]: e.target.value })} className="w-full px-3 py-2 border border-gray-300 rounded" />
+                                        </div>
+                                        <div>
+                                            <label className="block text-sm font-medium text-gray-700">Metodología: </label>
+                                            <input name="metodologia" value={formPostulacion.metodologia} onChange={(e) => setFormPostulacion({ ...formPostulacion, [e.target.name]: e.target.value })} className="w-full px-3 py-2 border border-gray-300 rounded" />
+                                        </div>
+                                    </div>
+
+                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                        <div>
+                                            <label className="block text-sm font-medium text-gray-700">Día</label>
+                                            <select name="dia" value={formPostulacion.dia} onChange={(e) => setFormPostulacion({ ...formPostulacion, [e.target.name]: e.target.value })} className="w-full px-3 py-2 border border-gray-300 rounded bg-white">
+                                                <option value="">Seleccione un día</option>
+                                                <option value="Lunes">Lunes</option>
+                                                <option value="Martes">Martes</option>
+                                                <option value="Miércoles">Miércoles</option>
+                                                <option value="Jueves">Jueves</option>
+                                                <option value="Viernes">Viernes</option>
+                                                <option value="Sábado">Sábado</option>
+                                                <option value="Domingo">Domingo</option>
+                                            </select>
+                                        </div>
+                                        <div>
+                                            <label className="block text-sm font-medium text-gray-700">Bloque</label>
+                                            <select name="bloque" value={formPostulacion.bloque} onChange={(e) => setFormPostulacion({ ...formPostulacion, [e.target.name]: e.target.value })} className="w-full px-3 py-2 border border-gray-300 rounded bg-white">
+                                                <option value="">Seleccione un bloque</option>
+                                                <option value="A">A</option>
+                                                <option value="B">B</option>
+                                                <option value="C">C</option>
+                                                <option value="C2">C2</option>
+                                                <option value="D">D</option>
+                                                <option value="E">E</option>
+                                                <option value="F">F</option>
+                                                <option value="G">G</option>
+                                                <option value="H">H</option>
+                                            </select>
+                                        </div>
+                                    </div>
+
+                                    <div className="flex items-center space-x-3 pt-2">
+                                        <button type="submit" className="bg-green-600 hover:bg-green-700 text-white font-semibold py-2 px-4 rounded">Enviar Postulación</button>
+                                        <button type="button" onClick={() => setFormPostulacion({ rut_alumno: '', id_asignatura: '', nombre_asignatura: '', descripcion_carta: '', correo_profe: '', actividad: '', metodologia: '', dia: '', bloque: '' })} className="bg-gray-300 hover:bg-gray-400 text-gray-800 py-2 px-4 rounded">Limpiar</button>
+                                    </div>
+                                </form>
+                            </div>
                         </div>
                     )}
             </div>
@@ -572,6 +789,8 @@ export default function PostulantePage() {
 
     const { data: postulaciones } = usePostulacionesPorAlumno(user?.rut);
 
+    const { data: asignaturasDisponibles } = useAsignaturasDisponiblesPostulacion(user?.rut);
+
     const cancelarPostulacion = useCancelarPostulacion();
 
     const router = useRouter();
@@ -604,5 +823,5 @@ export default function PostulantePage() {
         );
     }
 
-    return <PostulanteVista user={user} alumno={alumno} curriculum={curriculum} actividadesExtracurriculares={actividadesExtracurriculares} actividadesCientificas={actividadesCientificas} cursosTitulosGrados={cursosTitulosGrados} ayudantias={ayudantias} ayudantiasAnteriores={ayudantiasAnteriores} postulaciones={postulaciones} cancelarPostulacion={cancelarPostulacion} />;
+    return <PostulanteVista user={user} alumno={alumno} curriculum={curriculum} actividadesExtracurriculares={actividadesExtracurriculares} actividadesCientificas={actividadesCientificas} cursosTitulosGrados={cursosTitulosGrados} ayudantias={ayudantias} ayudantiasAnteriores={ayudantiasAnteriores} postulaciones={postulaciones} cancelarPostulacion={cancelarPostulacion} asignaturasDisponibles={asignaturasDisponibles} />;
 }

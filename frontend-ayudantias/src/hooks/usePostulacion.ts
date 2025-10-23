@@ -6,6 +6,18 @@ export interface PostulacionData
     id: number;
     rut_alumno: string;
     id_asignatura: string;
+    descripcion_carta: string;
+    correo_profe: string;
+    actividad: string;
+    metodologia: string;
+    dia: string;
+    bloque: string;
+}
+
+export interface CrearPostulacion
+{
+    rut_alumno: string;
+    id_asignatura: string;
     nombre_asignatura: string;
     descripcion_carta: string;
     correo_profe: string;
@@ -38,15 +50,15 @@ export function useCancelarPostulacion(){
 
 }
 
-export function useCrearSubjects() {
+export function useCrearPostulacion() {
     const clienteQuery = useQueryClient();
     return useMutation({
-        mutationFn: async ({rut_alumno, id_asignatura, nombre_asignatura, descripcion_carta, correo_profe, actividad, metodologia, dia, bloque}:PostulacionData) => {
-            const respuesta = await api.post('postulaciones',{rut_alumno, id_asignatura, nombre_asignatura, descripcion_carta, correo_profe, actividad, metodologia, dia, bloque});
+        mutationFn: async (postulacion: CrearPostulacion) => {
+            const respuesta = await api.post('postulaciones', postulacion);
             return respuesta.data;
         },
         onSuccess: () => {
-            clienteQuery.invalidateQueries({queryKey:['subjects']});
+            clienteQuery.invalidateQueries({queryKey:['postulaciones']});
         },
     });
 }
