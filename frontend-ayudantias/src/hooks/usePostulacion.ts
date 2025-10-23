@@ -31,7 +31,7 @@ export function usePostulacionesPorAlumno(rut_alumno?: string){
     return useQuery<PostulacionData, Error>({
         queryKey:['postulaciones', rut_alumno],
         queryFn: async () => {
-            const respuesta = await api.get(`asignatura-alumno/${rut_alumno}`);
+            const respuesta = await api.get(`postulacion/${rut_alumno}`);
             return respuesta.data;
         },
     });
@@ -54,7 +54,7 @@ export function useCrearPostulacion() {
     const clienteQuery = useQueryClient();
     return useMutation({
         mutationFn: async (postulacion: CrearPostulacion) => {
-            const respuesta = await api.post('asignatura-alumno', postulacion);
+            const respuesta = await api.post('postulacion', postulacion);
             return respuesta.data;
         },
         onSuccess: () => {

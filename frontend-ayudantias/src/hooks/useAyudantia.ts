@@ -20,7 +20,7 @@ export function useAyudantiasPorAlumno(rut_alumno?: string){
     return useQuery<AyudantiasAnteriores, Error>({
         queryKey:['ayudantias', rut_alumno],
         queryFn: async () => {
-            const respuesta = await api.get(`ayudantias/${rut_alumno}`);
+            const respuesta = await api.get(`ayudantia/${rut_alumno}`);
             return respuesta.data;
         },
     });

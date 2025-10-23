@@ -52,11 +52,11 @@ export const PostulanteVista = ({user, alumno, curriculum, actividadesExtracurri
         correo: "",
         carrera: "",
         otros: "",
-        ayudantias: [{ nombreAsig: "", coordinador: "", evaluacion: "" }],
-        cursos_titulos_grados: [{ nombre: "", institucion: "", fecha: "" }],
-        actividades_cientificas: [{ nombre: "", descripcion: "", periodoParticipacion: "" }],
+        ayudantias: [{ nombre_asig: "", nombre_coordinador: "", evaluacion_obtenida: "" }],
+        cursos_titulos_grados: [{ nombre_asig: "", n_coordinador: "", evaluacion: "" }],
+        actividades_cientificas: [{ nombre: "", descripcion: "", periodo_participacion: "" }],
         actividades_extracurriculares: [
-        { nombre: "", docenteInstitucion: "", descripcion: "", periodoParticipacion: "" },
+        { nombre: "", docente: "", descripcion: "", periodo_participacion: "" },
         ],
     });
 
@@ -699,10 +699,10 @@ export const PostulanteVista = ({user, alumno, curriculum, actividadesExtracurri
                         <div>
                             <h4 className="text-lg font-medium text-gray-700 mb-3">Ayudantías Previas</h4>
                             {form.ayudantias.map((a, i) => (
-                                <div key={ayudantias.nombre} className="grid grid-cols-1 md:grid-cols-4 gap-3 mb-3 p-3 border rounded bg-gray-50">
-                                    <input placeholder="Nombre asignatura" name="nombreAsig" value={a.nombreAsig} onChange={(e) => handleArrayChange(e, "ayudantias", i)} className="px-3 py-2 border border-gray-300 rounded focus:ring-blue-500 focus:border-blue-500 text-gray-800"/>
-                                    <input placeholder="Coordinador" name="coordinador" value={a.coordinador} onChange={(e) => handleArrayChange(e, "ayudantias", i)} className="px-3 py-2 border border-gray-300 rounded focus:ring-blue-500 focus:border-blue-500 text-gray-800"/>
-                                    <input placeholder="Evaluación" name="evaluacion" value={a.evaluacion} onChange={(e) => handleArrayChange(e, "ayudantias", i)} className="px-3 py-2 border border-gray-300 rounded focus:ring-blue-500 focus:border-blue-500 text-gray-800"/>
+                                <div key={`ayudantia-${i}`} className="grid grid-cols-1 md:grid-cols-4 gap-3 mb-3 p-3 border rounded bg-gray-50">
+                                    <input placeholder="Nombre asignatura" name="nombre_asig" value={a.nombre_asig} onChange={(e) => handleArrayChange(e, "ayudantias", i)} className="px-3 py-2 border border-gray-300 rounded focus:ring-blue-500 focus:border-blue-500 text-gray-800"/>
+                                    <input placeholder="Coordinador" name="nombre_coordinador" value={a.nombre_coordinador} onChange={(e) => handleArrayChange(e, "ayudantias", i)} className="px-3 py-2 border border-gray-300 rounded focus:ring-blue-500 focus:border-blue-500 text-gray-800"/>
+                                    <input placeholder="Evaluación" name="evaluacion_obtenida" value={a.evaluacion_obtenida} onChange={(e) => handleArrayChange(e, "ayudantias", i)} className="px-3 py-2 border border-gray-300 rounded focus:ring-blue-500 focus:border-blue-500 text-gray-800"/>
                                     <button type="button" onClick={() => removeItem("ayudantias", i)} className="bg-red-500 hover:bg-red-600 text-white py-2 px-3 rounded text-sm">
                                         Eliminar
                                     </button>
@@ -716,10 +716,10 @@ export const PostulanteVista = ({user, alumno, curriculum, actividadesExtracurri
                         <div>
                             <h4 className="text-lg font-medium text-gray-700 mb-3">Cursos, Títulos y Grados</h4>
                             {form.cursos_titulos_grados.map((c, i) => (
-                                <div key={cursosTitulosGrados.nombre} className="grid grid-cols-1 md:grid-cols-4 gap-3 mb-3 p-3 border rounded bg-gray-50">
-                                    <input placeholder="Nombre" name="nombre" value={c.nombre} onChange={(e) => handleArrayChange(e, "cursos_titulos_grados", i)} className="px-3 py-2 border border-gray-300 rounded focus:ring-blue-500 focus:border-blue-500 text-gray-800"/>
-                                    <input placeholder="Institución" name="institucion" value={c.institucion} onChange={(e) => handleArrayChange(e, "cursos_titulos_grados", i)} className="px-3 py-2 border border-gray-300 rounded focus:ring-blue-500 focus:border-blue-500 text-gray-800"/>
-                                    <input type="date" name="fecha" value={c.fecha} onChange={(e) => handleArrayChange(e, "cursos_titulos_grados", i)} className="px-3 py-2 border border-gray-300 rounded focus:ring-blue-500 focus:border-blue-500 text-gray-800"/>
+                                <div key={`curso-${i}`} className="grid grid-cols-1 md:grid-cols-4 gap-3 mb-3 p-3 border rounded bg-gray-50">
+                                    <input placeholder="Nombre título" name="nombre_asig" value={c.nombre_asig} onChange={(e) => handleArrayChange(e, "cursos_titulos_grados", i)} className="px-3 py-2 border border-gray-300 rounded focus:ring-blue-500 focus:border-blue-500 text-gray-800"/>
+                                    <input placeholder="Institución" name="n_coordinador" value={c.n_coordinador} onChange={(e) => handleArrayChange(e, "cursos_titulos_grados", i)} className="px-3 py-2 border border-gray-300 rounded focus:ring-blue-500 focus:border-blue-500 text-gray-800"/>
+                                    <input type="date" placeholder="Fecha" name="evaluacion" value={c.evaluacion} onChange={(e) => handleArrayChange(e, "cursos_titulos_grados", i)} className="px-3 py-2 border border-gray-300 rounded focus:ring-blue-500 focus:border-blue-500 text-gray-800"/>
                                     <button type="button" onClick={() => removeItem("cursos_titulos_grados", i)} className="bg-red-500 hover:bg-red-600 text-white py-2 px-3 rounded text-sm">
                                         Eliminar
                                     </button>
@@ -733,10 +733,10 @@ export const PostulanteVista = ({user, alumno, curriculum, actividadesExtracurri
                         <div>
                             <h4 className="text-lg font-medium text-gray-700 mb-3">Actividades Científicas</h4>
                             {form.actividades_cientificas.map((a, i) => (
-                                <div key={actividadesCientificas.nombre} className="grid grid-cols-1 md:grid-cols-4 gap-3 mb-3 p-3 border rounded bg-gray-50">
+                                <div key={`actividad-${i}`} className="grid grid-cols-1 md:grid-cols-4 gap-3 mb-3 p-3 border rounded bg-gray-50">
                                     <input placeholder="Nombre" name="nombre" value={a.nombre} onChange={(e) => handleArrayChange(e, "actividades_cientificas", i)} className="px-3 py-2 border border-gray-300 rounded focus:ring-blue-500 focus:border-blue-500 text-gray-800"/>
                                     <input placeholder="Descripción" name="descripcion" value={a.descripcion} onChange={(e) => handleArrayChange(e, "actividades_cientificas", i)} className="px-3 py-2 border border-gray-300 rounded focus:ring-blue-500 focus:border-blue-500 text-gray-800"/>
-                                    <input placeholder="Periodo de participación" name="periodoParticipacion" value={a.periodoParticipacion} onChange={(e) => handleArrayChange(e, "actividades_cientificas", i)} className="px-3 py-2 border border-gray-300 rounded focus:ring-blue-500 focus:border-blue-500 text-gray-800"/>
+                                    <input placeholder="Periodo de participación" name="periodoParticipacion" value={a.periodo_participacion} onChange={(e) => handleArrayChange(e, "actividades_cientificas", i)} className="px-3 py-2 border border-gray-300 rounded focus:ring-blue-500 focus:border-blue-500 text-gray-800"/>
                                     <button type="button" onClick={() => removeItem("actividades_cientificas", i)} className="bg-red-500 hover:bg-red-600 text-white py-2 px-3 rounded text-sm">
                                         Eliminar
                                     </button>
@@ -750,11 +750,11 @@ export const PostulanteVista = ({user, alumno, curriculum, actividadesExtracurri
                         <div>
                             <h4 className="text-lg font-medium text-gray-700 mb-3">Actividades Extracurriculares</h4>
                             {form.actividades_extracurriculares.map((a, i) => (
-                                <div key={actividadesExtracurriculares.nombre} className="grid grid-cols-1 md:grid-cols-5 gap-3 mb-3 p-3 border rounded bg-gray-50">
+                                <div key={`actividad-${i}`} className="grid grid-cols-1 md:grid-cols-5 gap-3 mb-3 p-3 border rounded bg-gray-50">
                                     <input placeholder="Nombre" name="nombre" value={a.nombre} onChange={(e) => handleArrayChange(e, "actividades_extracurriculares", i)} className="px-3 py-2 border border-gray-300 rounded focus:ring-blue-500 focus:border-blue-500 text-gray-800"/>
-                                    <input placeholder="Docente o institución" name="docenteInstitucion" value={a.docenteInstitucion} onChange={(e) => handleArrayChange(e, "actividades_extracurriculares", i)} className="px-3 py-2 border border-gray-300 rounded focus:ring-blue-500 focus:border-blue-500 text-gray-800"/>
+                                    <input placeholder="Docente o institución" name="docenteInstitucion" value={a.docente} onChange={(e) => handleArrayChange(e, "actividades_extracurriculares", i)} className="px-3 py-2 border border-gray-300 rounded focus:ring-blue-500 focus:border-blue-500 text-gray-800"/>
                                     <input placeholder="Descripción" name="descripcion" value={a.descripcion} onChange={(e) => handleArrayChange(e, "actividades_extracurriculares", i)} className="px-3 py-2 border border-gray-300 rounded focus:ring-blue-500 focus:border-blue-500 text-gray-800"/>
-                                    <input placeholder="Periodo de participación" name="periodoParticipacion" value={a.periodoParticipacion} onChange={(e) => handleArrayChange(e, "actividades_extracurriculares", i)} className="px-3 py-2 border border-gray-300 rounded focus:ring-blue-500 focus:border-blue-500 text-gray-800"/>
+                                    <input placeholder="Periodo de participación" name="periodoParticipacion" value={a.periodo_participacion} onChange={(e) => handleArrayChange(e, "actividades_extracurriculares", i)} className="px-3 py-2 border border-gray-300 rounded focus:ring-blue-500 focus:border-blue-500 text-gray-800"/>
                                     <button type="button" onClick={() => removeItem("actividades_extracurriculares", i)}className="bg-red-500 hover:bg-red-600 text-white py-2 px-3 rounded text-sm">
                                         Eliminar
                                     </button>

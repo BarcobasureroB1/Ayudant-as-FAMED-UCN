@@ -2,28 +2,28 @@ import {useQuery,useMutation,useQueryClient} from '@tanstack/react-query';
 import api from '@/api/axios';
 
 interface Ayudantia {
-  nombreAsig: string;
-  coordinador: string;
-  evaluacion: string;
+  nombre_asig: string;
+  nombre_coordinador: string;
+  evaluacion_obtenida: string;
 }
 
 interface CursoTituloGrado {
-  nombre: string;
-  institucion: string;
-  fecha: string;
+  nombre_asig: string;
+  n_coordinador: string;
+  evaluacion: string;
 }
 
 interface ActividadCientifica {
   nombre: string;
   descripcion: string;
-  periodoParticipacion: string;
+  periodo_participacion: string;
 }
 
 interface ActividadExtracurricular {
   nombre: string;
-  docenteInstitucion: string;
+  docente: string;
   descripcion: string;
-  periodoParticipacion: string;
+  periodo_participacion: string;
 }
 
 export interface CurriculumData {
