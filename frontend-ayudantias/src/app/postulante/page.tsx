@@ -218,6 +218,49 @@ export const PostulanteVista = ({user, alumno, curriculum, actividadesExtracurri
     };
 
     
+    const popupCurriculum = mostrarPopup ? (
+        <div
+            className="fixed inset-0 flex items-center justify-center bg-black/60 backdrop-blur-sm z-50"
+            onClick={() => setMostrarPopup(false)}
+        >
+            <div
+                className="bg-white p-6 rounded-2xl shadow-2xl w-[90%] max-w-[700px] relative animate-fadeIn max-h-[80vh] overflow-y-auto"
+                onClick={(e) => e.stopPropagation()}
+            >
+                <button
+                    onClick={() => setMostrarPopup(false)}
+                    className="absolute top-3 right-3 text-gray-600 hover:text-gray-900 text-2xl"
+                >
+                    ✕
+                </button>
+
+                {mostrarCurriculum()}
+            </div>
+        </div>
+    ) : null;
+
+    const popupPostulacion = (mostrarPopupPostulaciones && postulacionSeleccionada) ? (
+        <div
+            className="fixed inset-0 flex items-center justify-center bg-black/60 backdrop-blur-sm z-50"
+            onClick={() => { setMostrarPopupPostulaciones(false); setPostulacionSeleccionada(null); }}
+        >
+            <div
+                className="bg-white p-6 rounded-2xl shadow-2xl w-[90%] max-w-[700px] relative animate-fadeIn max-h-[80vh] overflow-y-auto"
+                onClick={(e) => e.stopPropagation()}
+            >
+                <button
+                    onClick={() => { setMostrarPopupPostulaciones(false); setPostulacionSeleccionada(null); }}
+                    className="absolute top-3 right-3 text-gray-600 hover:text-gray-900 text-2xl"
+                >
+                    ✕
+                </button>
+
+                {mostrarPostulacion()}
+            </div>
+        </div>
+    ) : null;
+
+    
 
     
 
@@ -255,26 +298,7 @@ export const PostulanteVista = ({user, alumno, curriculum, actividadesExtracurri
                                 <button onClick={() => setMostrarPopup(true)} className="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
                                     Ver documento
                                 </button>
-                                {mostrarPopup && (
-                                    <div
-                                        className="fixed inset-0 flex items-center justify-center bg-black/60 backdrop-blur-sm z-50"
-                                        onClick={() => setMostrarPopup(false)}
-                                    >
-                                        <div
-                                            className="bg-white p-6 rounded-2xl shadow-2xl w-[90%] max-w-[700px] relative animate-fadeIn max-h-[80vh] overflow-y-auto"
-                                            onClick={(e) => e.stopPropagation()}
-                                        >
-                                            <button
-                                            onClick={() => setMostrarPopup(false)}
-                                            className="absolute top-3 right-3 text-gray-600 hover:text-gray-900 text-2xl"
-                                            >
-                                            ✕
-                                            </button>
-
-                                        {mostrarCurriculum()}
-                                        </div>
-                                    </div>
-                                )}
+                                {popupCurriculum}
                             </div>
                             
 
@@ -296,26 +320,7 @@ export const PostulanteVista = ({user, alumno, curriculum, actividadesExtracurri
                                     )}
                                 </ul>
 
-                                {mostrarPopupPostulaciones && postulacionSeleccionada && (
-                                    <div
-                                        className="fixed inset-0 flex items-center justify-center bg-black/60 backdrop-blur-sm z-50"
-                                        onClick={() => { setMostrarPopupPostulaciones(false); setPostulacionSeleccionada(null); }}
-                                    >
-                                        <div
-                                            className="bg-white p-6 rounded-2xl shadow-2xl w-[90%] max-w-[700px] relative animate-fadeIn max-h-[80vh] overflow-y-auto"
-                                            onClick={(e) => e.stopPropagation()}
-                                        >
-                                            <button
-                                            onClick={() => { setMostrarPopupPostulaciones(false); setPostulacionSeleccionada(null); }}
-                                            className="absolute top-3 right-3 text-gray-600 hover:text-gray-900 text-2xl"
-                                            >
-                                            ✕
-                                            </button>
-
-                                        {mostrarPostulacion()}
-                                        </div>
-                                    </div>
-                                )}
+                                {popupPostulacion}
 
                             </div>
                         </>
@@ -453,26 +458,7 @@ export const PostulanteVista = ({user, alumno, curriculum, actividadesExtracurri
                             <button onClick={() => setMostrarPopup(true)} className="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
                                 Ver documento
                             </button>
-                            {mostrarPopup && (
-                                    <div
-                                        className="fixed inset-0 flex items-center justify-center bg-black/60 backdrop-blur-sm z-50"
-                                        onClick={() => setMostrarPopup(false)}
-                                    >
-                                        <div
-                                            className="bg-white p-6 rounded-2xl shadow-2xl w-[90%] max-w-[700px] relative animate-fadeIn max-h-[80vh] overflow-y-auto"
-                                            onClick={(e) => e.stopPropagation()}
-                                        >
-                                            <button
-                                            onClick={() => setMostrarPopup(false)}
-                                            className="absolute top-3 right-3 text-gray-600 hover:text-gray-900 text-2xl"
-                                            >
-                                            ✕
-                                            </button>
-
-                                        {mostrarCurriculum()}
-                                        </div>
-                                    </div>
-                            )}
+                            {popupCurriculum}
                         </div>
 
                         <div className="mt-6">
@@ -493,26 +479,7 @@ export const PostulanteVista = ({user, alumno, curriculum, actividadesExtracurri
                                     )}
                                 </ul>
 
-                                {mostrarPopupPostulaciones && postulacionSeleccionada && (
-                                    <div
-                                        className="fixed inset-0 flex items-center justify-center bg-black/60 backdrop-blur-sm z-50"
-                                        onClick={() => { setMostrarPopupPostulaciones(false); setPostulacionSeleccionada(null); }}
-                                    >
-                                        <div
-                                            className="bg-white p-6 rounded-2xl shadow-2xl w-[90%] max-w-[700px] relative animate-fadeIn max-h-[80vh] overflow-y-auto"
-                                            onClick={(e) => e.stopPropagation()}
-                                        >
-                                            <button
-                                            onClick={() => { setMostrarPopupPostulaciones(false); setPostulacionSeleccionada(null); }}
-                                            className="absolute top-3 right-3 text-gray-600 hover:text-gray-900 text-2xl"
-                                            >
-                                            ✕
-                                            </button>
-
-                                        {mostrarPostulacion()}
-                                        </div>
-                                    </div>
-                                )}
+                                {popupPostulacion}
 
 
                         </div>
