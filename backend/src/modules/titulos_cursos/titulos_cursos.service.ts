@@ -1,26 +1,23 @@
 import { Injectable } from '@nestjs/common';
 import { CreateTitulosCursoDto } from './dto/create-titulos_curso.dto';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
+import { TitulosCurso } from './entities/titulos_curso.entity';
 
 
 @Injectable()
 export class TitulosCursosService {
-  create(createTitulosCursoDto: CreateTitulosCursoDto) {
-    return 'This action adds a new titulosCurso';
-  }
-
-  findAll() {
-    return `This action returns all titulosCursos`;
-  }
-
-  findOne(id: number) {
-    return `This action returns a #${id} titulosCurso`;
-  }
-
-  update(id: number) {
-    return `This action updates a #${id} titulosCurso`;
-  }
-
-  remove(id: number) {
-    return `This action removes a #${id} titulosCurso`;
+ constructor(
+  @InjectRepository(TitulosCurso)
+  private readonly titulosCursosRepository: Repository<TitulosCurso>,
+ ) {}
+  async findByUsuario(rut: string) {
+    const titulos = await this.titulosCursosRepository.find({
+      where: { usuario: { rut } },
+    });
+    if (!titulos) {
+      return null;
+    }
+    return titulos;
   }
 }

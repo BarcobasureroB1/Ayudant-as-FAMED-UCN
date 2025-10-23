@@ -1,5 +1,6 @@
 import { ActividadesCientifica } from 'src/modules/actividades_cientificas/entities/actividades_cientifica.entity';
 import { ActividadesExtracurriculare } from 'src/modules/actividades_extracurriculares/entities/actividades_extracurriculare.entity';
+import { Ayudantia } from 'src/modules/ayudantia/entities/ayudantia.entity';
 import { AyudantiasCurriculum } from 'src/modules/ayudantias_curriculum/entities/ayudantias_curriculum.entity';
 import { Departamento } from 'src/modules/departamento/entities/departamento.entity';
 import { TitulosCurso } from 'src/modules/titulos_cursos/entities/titulos_curso.entity';
@@ -22,7 +23,6 @@ export class Usuario {
     deshabilitado: boolean;
     @ManyToMany((nullable: true) => Departamento, (departamento) => departamento.secretarias)
     departamentos: Departamento[];
-
     @OneToMany(() => ActividadesCientifica, (actividadesCientifica) => actividadesCientifica.usuario)
     actividades_cientificas: ActividadesCientifica[];
     @OneToMany(() => AyudantiasCurriculum, (ayudantiasCurriculum) => ayudantiasCurriculum.usuario)
@@ -31,5 +31,10 @@ export class Usuario {
     titulos: TitulosCurso[];
     @OneToMany(() => ActividadesExtracurriculare, (actividadesExtracurriculare) => actividadesExtracurriculare.usuario)
     actividades_extracurriculares: ActividadesExtracurriculare[];
+    @OneToMany(() => Ayudantia, (ayudantia) => ayudantia.alumno)
+    ayudantias_como_alumno: Ayudantia[];
+
+    @OneToMany(() => Ayudantia, (ayudantia) => ayudantia.coordinador)
+    ayudantias_como_coordinador: Ayudantia[];
 
 }

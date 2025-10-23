@@ -6,26 +6,9 @@ import { CreateAyudantiasCurriculumDto } from './dto/create-ayudantias_curriculu
 @Controller('ayudantias-curriculum')
 export class AyudantiasCurriculumController {
   constructor(private readonly ayudantiasCurriculumService: AyudantiasCurriculumService) {}
-
-  @Post()
-  create(@Body() createAyudantiasCurriculumDto: CreateAyudantiasCurriculumDto) {
-    return this.ayudantiasCurriculumService.create(createAyudantiasCurriculumDto);
+  @Get(':rut')
+  findByUsuario(@Param('rut') rut: string) {
+    return this.ayudantiasCurriculumService.findByUsuario(rut);
   }
-
-  @Get()
-  findAll() {
-    return this.ayudantiasCurriculumService.findAll();
-  }
-
-  @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.ayudantiasCurriculumService.findOne(+id);
-  }
-
-
-
-  @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.ayudantiasCurriculumService.remove(+id);
-  }
+ 
 }
