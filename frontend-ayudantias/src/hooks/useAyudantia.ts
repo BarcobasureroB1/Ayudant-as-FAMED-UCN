@@ -21,7 +21,6 @@ export function useAyudantiasPorAlumno(rut_alumno?: string){
         queryKey:['ayudantias', rut_alumno],
         queryFn: async () => {
             const respuesta = await api.get(`ayudantias/${rut_alumno}`);
-            console.log("datos  ", respuesta.data);
             return respuesta.data;
         },
     });

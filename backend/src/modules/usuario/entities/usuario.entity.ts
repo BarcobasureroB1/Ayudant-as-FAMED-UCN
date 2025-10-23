@@ -1,5 +1,11 @@
+import { ActividadesCientifica } from 'src/modules/actividades_cientificas/entities/actividades_cientifica.entity';
+import { ActividadesExtracurriculare } from 'src/modules/actividades_extracurriculares/entities/actividades_extracurriculare.entity';
+import { Ayudantia } from 'src/modules/ayudantia/entities/ayudantia.entity';
+import { AyudantiasCurriculum } from 'src/modules/ayudantias_curriculum/entities/ayudantias_curriculum.entity';
 import { Departamento } from 'src/modules/departamento/entities/departamento.entity';
-import { Column, Entity, ManyToMany, PrimaryColumn } from 'typeorm';
+import { Postulacion } from 'src/modules/postulacion/entities/postulacion.entity';
+import { TitulosCurso } from 'src/modules/titulos_cursos/entities/titulos_curso.entity';
+import { Column, Entity, ManyToMany, OneToMany, PrimaryColumn } from 'typeorm';
 @Entity()
 export class Usuario {
     @PrimaryColumn()
@@ -18,6 +24,20 @@ export class Usuario {
     deshabilitado: boolean;
     @ManyToMany((nullable: true) => Departamento, (departamento) => departamento.secretarias)
     departamentos: Departamento[];
+    @OneToMany(() => ActividadesCientifica, (actividadesCientifica) => actividadesCientifica.usuario)
+    actividades_cientificas: ActividadesCientifica[];
+    @OneToMany(() => AyudantiasCurriculum, (ayudantiasCurriculum) => ayudantiasCurriculum.usuario)
+    ayudantias: AyudantiasCurriculum[];
+    @OneToMany(() => TitulosCurso, (titulosCurso) => titulosCurso.usuario)
+    titulos: TitulosCurso[];
+    @OneToMany(() => ActividadesExtracurriculare, (actividadesExtracurriculare) => actividadesExtracurriculare.usuario)
+    actividades_extracurriculares: ActividadesExtracurriculare[];
+    @OneToMany(() => Ayudantia, (ayudantia) => ayudantia.alumno)
+    ayudantias_como_alumno: Ayudantia[];
 
+    @OneToMany(() => Ayudantia, (ayudantia) => ayudantia.coordinador)
+    ayudantias_como_coordinador: Ayudantia[];
+    @OneToMany(() => Postulacion, (postulacion) => postulacion.usuario)
+    postulaciones: Postulacion[];
 
 }

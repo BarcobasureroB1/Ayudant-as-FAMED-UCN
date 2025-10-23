@@ -12,19 +12,5 @@ export class AsignaturaController {
     return this.asignaturaService.create(createAsignaturaDto);
   }
 
-  @Get()
-  findAll() {
-    return this.asignaturaService.findAll();
-  }
-
-  @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.asignaturaService.findOne(+id);
-  }
-
-
-  @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.asignaturaService.remove(+id);
-  }
+  
 }

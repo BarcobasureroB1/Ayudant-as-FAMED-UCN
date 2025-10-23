@@ -11,20 +11,13 @@ export class PostulacionController {
   create(@Body() createPostulacionDto: CreatePostulacionDto) {
     return this.postulacionService.create(createPostulacionDto);
   }
-
-  @Get()
-  findAll() {
-    return this.postulacionService.findAll();
+  @Patch(':id')
+  update(@Param('id') id: string) {
+    return this.postulacionService.cancel(+id);
+  }
+  @Get(':rut_alumno')
+  findOne(@Param('rut_alumno') rut_alumno: string) {
+    return this.postulacionService.findcurrent(rut_alumno);
   }
 
-  @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.postulacionService.findOne(+id);
-  }
-
-
-  @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.postulacionService.remove(+id);
-  }
 }

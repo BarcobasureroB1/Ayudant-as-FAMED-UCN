@@ -1,26 +1,24 @@
 import { Injectable } from '@nestjs/common';
 import { CreateAyudantiasCurriculumDto } from './dto/create-ayudantias_curriculum.dto';
+import { AyudantiasCurriculum } from './entities/ayudantias_curriculum.entity';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
 
 
 @Injectable()
 export class AyudantiasCurriculumService {
-  create(createAyudantiasCurriculumDto: CreateAyudantiasCurriculumDto) {
-    return 'This action adds a new ayudantiasCurriculum';
-  }
+  constructor(
+    @InjectRepository(AyudantiasCurriculum)
+    private readonly ayudantiasCurriculumRepository: Repository<AyudantiasCurriculum>,
+  ) {}
 
-  findAll() {
-    return `This action returns all ayudantiasCurriculum`;
-  }
-
-  findOne(id: number) {
-    return `This action returns a #${id} ayudantiasCurriculum`;
-  }
-
-  update(id: number) {
-    return `This action updates a #${id} ayudantiasCurriculum`;
-  }
-
-  remove(id: number) {
-    return `This action removes a #${id} ayudantiasCurriculum`;
+  async findByUsuario(rut: string) {
+    const ayudantias = await this.ayudantiasCurriculumRepository.find({
+      where: { usuario: { rut } },
+    });
+    if (!ayudantias) {
+      return null;
+    }
+    return ayudantias;
   }
 }

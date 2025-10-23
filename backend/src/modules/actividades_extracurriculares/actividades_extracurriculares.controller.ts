@@ -3,29 +3,13 @@ import { ActividadesExtracurricularesService } from './actividades_extracurricul
 import { CreateActividadesExtracurriculareDto } from './dto/create-actividades_extracurriculare.dto';
 
 
-@Controller('actividades-extracurriculares')
+@Controller('extracurriculares')
 export class ActividadesExtracurricularesController {
   constructor(private readonly actividadesExtracurricularesService: ActividadesExtracurricularesService) {}
 
-  @Post()
-  create(@Body() createActividadesExtracurriculareDto: CreateActividadesExtracurriculareDto) {
-    return this.actividadesExtracurricularesService.create(createActividadesExtracurriculareDto);
+  @Get(':rut')
+  findByUsuario(@Param('rut') rut: string) {
+    return this.actividadesExtracurricularesService.findByUsuario(rut);
   }
 
-  @Get()
-  findAll() {
-    return this.actividadesExtracurricularesService.findAll();
-  }
-
-  @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.actividadesExtracurricularesService.findOne(+id);
-  }
-
-
-
-  @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.actividadesExtracurricularesService.remove(+id);
-  }
 }

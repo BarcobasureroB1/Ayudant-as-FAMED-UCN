@@ -65,15 +65,19 @@ export function useCrearCurriculum() {
         },
         onSuccess: (_data) => {
             clienteQuery.invalidateQueries({ queryKey: ['curriculum'] });
+            clienteQuery.invalidateQueries({ queryKey: ['curriculum_ayudantias'] });
+            clienteQuery.invalidateQueries({ queryKey: ['curriculum_cursos_titulos_grados'] });
+            clienteQuery.invalidateQueries({ queryKey: ['curriculum_actividades_cientificas'] });
+            clienteQuery.invalidateQueries({ queryKey: ['curriculum_extracurricular'] });
         },
     });
 }
 
 export function useActividadesExtracurriculares(rut_alumno?: string) {
     return useQuery({
-        queryKey: ['curriculum', rut_alumno],
+        queryKey: ['curriculum_extracurricular', rut_alumno],
         queryFn: async() => {
-            const respuesta = await api.get(`curriculum/extracurricular/${rut_alumno}`);
+            const respuesta = await api.get(`extracurricular/${rut_alumno}`);
             return respuesta.data
         },
         enabled: !!rut_alumno,
@@ -83,9 +87,9 @@ export function useActividadesExtracurriculares(rut_alumno?: string) {
 
 export function useActividadescientificas(rut_alumno?: string) {
     return useQuery({
-        queryKey: ['curriculum', rut_alumno],
+        queryKey: ['curriculum_actividades_cientificas', rut_alumno],
         queryFn: async() => {
-            const respuesta = await api.get(`curriculum/cientificas/${rut_alumno}`);
+            const respuesta = await api.get(`cientificas/${rut_alumno}`);
             return respuesta.data
         },
         enabled: !!rut_alumno,
@@ -95,9 +99,9 @@ export function useActividadescientificas(rut_alumno?: string) {
 
 export function usecursos_titulos_grados(rut_alumno?: string) {
     return useQuery({
-        queryKey: ['curriculum', rut_alumno],
+        queryKey: ['curriculum_cursos_titulos_grados', rut_alumno],
         queryFn: async() => {
-            const respuesta = await api.get(`curriculum/cursos_titulos_grados/${rut_alumno}`);
+            const respuesta = await api.get(`titulos_cursos/${rut_alumno}`);
             return respuesta.data
         },
         enabled: !!rut_alumno,
@@ -107,12 +111,25 @@ export function usecursos_titulos_grados(rut_alumno?: string) {
 
 export function useAyudantias(rut_alumno?: string) {
     return useQuery({
-        queryKey: ['curriculum', rut_alumno],
+        queryKey: ['curriculum_ayudantias', rut_alumno],
         queryFn: async() => {
-            const respuesta = await api.get(`curriculum/ayudantias/${rut_alumno}`);
+            const respuesta = await api.get(`ayudantias-curriculum/${rut_alumno}`);
             return respuesta.data
         },
         enabled: !!rut_alumno,
         retry: false,
     })
+}
+
+export function useEditarCurriculum(){
+    const clienteQuery = useQueryClient();
+    return useMutation({
+        mutationFn: async ({id}:{id: number}) => {
+            await api.patch(`curriculum/${id}`)
+        },
+        onSuccess: (_data) => {
+            clienteQuery.invalidateQueries({queryKey:['curriculum']});
+        }                        
+    });
+
 }

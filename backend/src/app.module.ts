@@ -19,6 +19,9 @@ import { ParticipantesActaModule } from './modules/participantes_acta/participan
 import { PostulacionModule } from './modules/postulacion/postulacion.module';
 import { TitulosCursosModule } from './modules/titulos_cursos/titulos_cursos.module';
 import { AuthModule } from './modules/auth/auth.module';
+import { AlumnoModule } from './modules/alumno/alumno.module';
+import { LlamadoPostulacionModule } from './modules/llamado_postulacion/llamado_postulacion.module';
+import { AsignaturaAlumnoModule } from './modules/asignatura_alumno/asignatura_alumno.module';
 
 
 
@@ -53,6 +56,9 @@ import { AuthModule } from './modules/auth/auth.module';
     PostulacionModule,
     TitulosCursosModule,
     AuthModule,
+    AlumnoModule,
+    LlamadoPostulacionModule,
+    AsignaturaAlumnoModule,
     
 
 

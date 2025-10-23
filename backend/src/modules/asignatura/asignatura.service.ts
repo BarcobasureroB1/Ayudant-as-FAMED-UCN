@@ -1,26 +1,22 @@
 import { Injectable } from '@nestjs/common';
 import { CreateAsignaturaDto } from './dto/create-asignatura.dto';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
+import { Asignatura } from './entities/asignatura.entity';
 
 
 @Injectable()
 export class AsignaturaService {
+  constructor( 
+    @InjectRepository(Asignatura)
+    private readonly asignaturaRepository: Repository<Asignatura>,
+  ) {}
   create(createAsignaturaDto: CreateAsignaturaDto) {
-    return 'This action adds a new asignatura';
+    const asignatura = this.asignaturaRepository.create(createAsignaturaDto);
+    return this.asignaturaRepository.save(asignatura);
   }
 
-  findAll() {
-    return `This action returns all asignatura`;
-  }
-
-  findOne(id: number) {
-    return `This action returns a #${id} asignatura`;
-  }
-
-  update(id: number) {
-    return `This action updates a #${id} asignatura`;
-  }
-
-  remove(id: number) {
-    return `This action removes a #${id} asignatura`;
+  findAvaibleAsignaturas() {
+    return ;
   }
 }
