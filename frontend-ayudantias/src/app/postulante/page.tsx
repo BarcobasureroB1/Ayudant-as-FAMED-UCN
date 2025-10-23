@@ -9,6 +9,7 @@ import { useAuth } from '@/context/AuthContext';
 import { AyudantiasAnteriores, useAyudantiasPorAlumno } from '@/hooks/useAyudantia';
 import { PostulacionData, usePostulacionesPorAlumno, useCancelarPostulacion, useCrearPostulacion } from '@/hooks/usePostulacion';
 import { useAsignaturasDisponiblesPostulacion } from '@/hooks/useAsignaturas';
+import Cookies from 'js-cookie';
 
 interface UserProps {
     user: User;
@@ -28,7 +29,7 @@ export const PostulanteVista = ({user, alumno, curriculum, actividadesExtracurri
     const crearCurriculum = useCrearCurriculum();
     const crearPostulacion = useCrearPostulacion();
     const router = useRouter();
-    const { setToken } = useAuth();
+    const { setToken, setUsertipo } = useAuth();
 
     type Vista = 'perfil' | 'postular';
     const [paso, setPaso] = useState<number>(1);
@@ -72,6 +73,9 @@ export const PostulanteVista = ({user, alumno, curriculum, actividadesExtracurri
 
     const logout = () => {
         setToken(null); //elimina la cookie
+        setUsertipo(null);
+        Cookies.remove('token');
+        Cookies.remove('tipoUser');
         router.push('/login');
         router.refresh(); //pa recargar la pagina
     }
@@ -90,22 +94,24 @@ export const PostulanteVista = ({user, alumno, curriculum, actividadesExtracurri
             <p><b>Carrera:</b> {curriculum?.carrera}</p>
             <p><b>Otros:</b> {curriculum?.otros}</p>
 
-            {ayudantias && ayudantias.length > 0 && (
+            {ayudantias && ayudantias.length == 0 ? (
                 <div>
-                <h3>Ayudantías Currículum</h3>
-                <ul>
-                    {ayudantias.map((a: any) => (
-                    <li key={a.id}>
-                        <p><b>Asignatura:</b> {a.nombre_asig}</p>
-                        <p><b>Coordinador:</b> {a.nombre_coordinador}</p>
-                        <p><b>Evaluación obtenida:</b> {a.evaluacion_obtenida}</p>
-                    </li>
-                    ))}
-                </ul>
+                    <h3>Ayudantías Currículum</h3>
+                    <ul>
+                        {ayudantias.map((a: any) => (
+                        <li key={a.id}>
+                            <p><b>Asignatura:</b> {a.nombre_asig}</p>
+                            <p><b>Coordinador:</b> {a.nombre_coordinador}</p>
+                            <p><b>Evaluación obtenida:</b> {a.evaluacion_obtenida}</p>
+                        </li>
+                        ))}
+                    </ul>
                 </div>
+            ) : (
+                <p>No hay ayudantias.</p>
             )}
 
-            {ayudantiasAnteriores && ayudantiasAnteriores.length > 0 && (
+            {ayudantiasAnteriores && ayudantiasAnteriores.length > 0 ? (
                 <div>
                 <h3>Ayudantías Anteriores</h3>
                 <ul>
@@ -118,9 +124,11 @@ export const PostulanteVista = ({user, alumno, curriculum, actividadesExtracurri
                     ))}
                 </ul>
                 </div>
+            ) : (
+                <p>No hay ayudantias anteriores.</p>
             )}
 
-            {cursosTitulosGrados && cursosTitulosGrados.length > 0 && (
+            {cursosTitulosGrados && cursosTitulosGrados.length > 0 ? (
                 <div>
                 <h3>Cursos, Títulos y Grados</h3>
                 <ul>
@@ -133,10 +141,12 @@ export const PostulanteVista = ({user, alumno, curriculum, actividadesExtracurri
                     ))}
                 </ul>
                 </div>
+            ) : (
+                <p>No hay cursos, Titulos o grados.</p>
             )}
 
 
-            {actividadesCientificas && actividadesCientificas.length > 0 && (
+            {actividadesCientificas && actividadesCientificas.length > 0 ? (
                 <div>
                 <h3>Actividades Científicas</h3>
                 <ul>
@@ -149,10 +159,12 @@ export const PostulanteVista = ({user, alumno, curriculum, actividadesExtracurri
                     ))}
                 </ul>
                 </div>
+            ): (
+                <p>No hay actividades cientificas.</p>
             )}
 
 
-            {actividadesExtracurriculares && actividadesExtracurriculares.length > 0 && (
+            {actividadesExtracurriculares && actividadesExtracurriculares.length > 0 ? (
                 <div>
                 <h3>Actividades Extracurriculares</h3>
                 <ul>
@@ -166,6 +178,8 @@ export const PostulanteVista = ({user, alumno, curriculum, actividadesExtracurri
                     ))}
                 </ul>
                 </div>
+            ): (
+                <p>No hay actividades extracurriculares</p>
             )}
 
         </div>
@@ -203,47 +217,9 @@ export const PostulanteVista = ({user, alumno, curriculum, actividadesExtracurri
         });
     };
 
-    {mostrarPopup && (
-        <div
-            className="fixed inset-0 flex items-center justify-center bg-black/60 backdrop-blur-sm z-50"
-            onClick={() => setMostrarPopup(false)}
-        >
-            <div
-                className="bg-white p-6 rounded-2xl shadow-2xl w-[90%] max-w-[700px] relative animate-fadeIn max-h-[80vh] overflow-y-auto"
-                onClick={(e) => e.stopPropagation()}
-            >
-                <button
-                onClick={() => setMostrarPopup(false)}
-                className="absolute top-3 right-3 text-gray-600 hover:text-gray-900 text-2xl"
-                >
-                ✕
-                </button>
+    
 
-            {mostrarCurriculum()}
-            </div>
-        </div>
-    )}
-
-    {mostrarPopupPostulaciones && postulacionSeleccionada && (
-        <div
-            className="fixed inset-0 flex items-center justify-center bg-black/60 backdrop-blur-sm z-50"
-            onClick={() => { setMostrarPopupPostulaciones(false); setPostulacionSeleccionada(null); }}
-        >
-            <div
-                className="bg-white p-6 rounded-2xl shadow-2xl w-[90%] max-w-[700px] relative animate-fadeIn max-h-[80vh] overflow-y-auto"
-                onClick={(e) => e.stopPropagation()}
-            >
-                <button
-                onClick={() => { setMostrarPopupPostulaciones(false); setPostulacionSeleccionada(null); }}
-                className="absolute top-3 right-3 text-gray-600 hover:text-gray-900 text-2xl"
-                >
-                ✕
-                </button>
-
-            {mostrarPostulacion()}
-            </div>
-        </div>
-    )}
+    
 
     
     //VISTAS PERFIL Y POSTULAR
@@ -268,7 +244,7 @@ export const PostulanteVista = ({user, alumno, curriculum, actividadesExtracurri
 
                     {vista === 'perfil' ? (
                         <>
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6 ">
                                 <p><b>RUT:</b> {user.rut}</p>
                                 <p><b>Nombre:</b> {user.nombres} {user.apellido}</p>
                                 <p><b>Correo:</b> {curriculum?.correo}</p>
@@ -279,7 +255,28 @@ export const PostulanteVista = ({user, alumno, curriculum, actividadesExtracurri
                                 <button onClick={() => setMostrarPopup(true)} className="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
                                     Ver documento
                                 </button>
+                                {mostrarPopup && (
+                                    <div
+                                        className="fixed inset-0 flex items-center justify-center bg-black/60 backdrop-blur-sm z-50"
+                                        onClick={() => setMostrarPopup(false)}
+                                    >
+                                        <div
+                                            className="bg-white p-6 rounded-2xl shadow-2xl w-[90%] max-w-[700px] relative animate-fadeIn max-h-[80vh] overflow-y-auto"
+                                            onClick={(e) => e.stopPropagation()}
+                                        >
+                                            <button
+                                            onClick={() => setMostrarPopup(false)}
+                                            className="absolute top-3 right-3 text-gray-600 hover:text-gray-900 text-2xl"
+                                            >
+                                            ✕
+                                            </button>
+
+                                        {mostrarCurriculum()}
+                                        </div>
+                                    </div>
+                                )}
                             </div>
+                            
 
                             <div className="mt-6">
                                 <h2>Postulaciones Activas</h2>
@@ -298,18 +295,34 @@ export const PostulanteVista = ({user, alumno, curriculum, actividadesExtracurri
                                         <p>No hay postulaciones activas.</p>
                                     )}
                                 </ul>
+
+                                {mostrarPopupPostulaciones && postulacionSeleccionada && (
+                                    <div
+                                        className="fixed inset-0 flex items-center justify-center bg-black/60 backdrop-blur-sm z-50"
+                                        onClick={() => { setMostrarPopupPostulaciones(false); setPostulacionSeleccionada(null); }}
+                                    >
+                                        <div
+                                            className="bg-white p-6 rounded-2xl shadow-2xl w-[90%] max-w-[700px] relative animate-fadeIn max-h-[80vh] overflow-y-auto"
+                                            onClick={(e) => e.stopPropagation()}
+                                        >
+                                            <button
+                                            onClick={() => { setMostrarPopupPostulaciones(false); setPostulacionSeleccionada(null); }}
+                                            className="absolute top-3 right-3 text-gray-600 hover:text-gray-900 text-2xl"
+                                            >
+                                            ✕
+                                            </button>
+
+                                        {mostrarPostulacion()}
+                                        </div>
+                                    </div>
+                                )}
+
                             </div>
                         </>
                     ) : (
                         <div>
                             <h2 className="text-xl font-bold mb-4">Postular</h2>
                             <div className="flex items-center space-x-2">
-                                <button onClick={() => setVista('perfil')} className={`py-2 px-4 rounded ${isPerfil ? 'bg-blue-600 text-white' : 'bg-gray-200 text-gray-800'}`}>
-                                    Mi perfil
-                                </button>
-                                <button onClick={() => setVista('postular')} className={`py-2 px-4 rounded ${isPostular ? 'bg-blue-600 text-white' : 'bg-gray-200 text-gray-800'}`}>
-                                    Postular
-                                </button>
                             </div>
 
                             <div className="mt-6">
@@ -440,6 +453,26 @@ export const PostulanteVista = ({user, alumno, curriculum, actividadesExtracurri
                             <button onClick={() => setMostrarPopup(true)} className="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
                                 Ver documento
                             </button>
+                            {mostrarPopup && (
+                                    <div
+                                        className="fixed inset-0 flex items-center justify-center bg-black/60 backdrop-blur-sm z-50"
+                                        onClick={() => setMostrarPopup(false)}
+                                    >
+                                        <div
+                                            className="bg-white p-6 rounded-2xl shadow-2xl w-[90%] max-w-[700px] relative animate-fadeIn max-h-[80vh] overflow-y-auto"
+                                            onClick={(e) => e.stopPropagation()}
+                                        >
+                                            <button
+                                            onClick={() => setMostrarPopup(false)}
+                                            className="absolute top-3 right-3 text-gray-600 hover:text-gray-900 text-2xl"
+                                            >
+                                            ✕
+                                            </button>
+
+                                        {mostrarCurriculum()}
+                                        </div>
+                                    </div>
+                            )}
                         </div>
 
                         <div className="mt-6">
@@ -459,23 +492,37 @@ export const PostulanteVista = ({user, alumno, curriculum, actividadesExtracurri
                                         <p>No hay postulaciones activas.</p>
                                     )}
                                 </ul>
+
+                                {mostrarPopupPostulaciones && postulacionSeleccionada && (
+                                    <div
+                                        className="fixed inset-0 flex items-center justify-center bg-black/60 backdrop-blur-sm z-50"
+                                        onClick={() => { setMostrarPopupPostulaciones(false); setPostulacionSeleccionada(null); }}
+                                    >
+                                        <div
+                                            className="bg-white p-6 rounded-2xl shadow-2xl w-[90%] max-w-[700px] relative animate-fadeIn max-h-[80vh] overflow-y-auto"
+                                            onClick={(e) => e.stopPropagation()}
+                                        >
+                                            <button
+                                            onClick={() => { setMostrarPopupPostulaciones(false); setPostulacionSeleccionada(null); }}
+                                            className="absolute top-3 right-3 text-gray-600 hover:text-gray-900 text-2xl"
+                                            >
+                                            ✕
+                                            </button>
+
+                                        {mostrarPostulacion()}
+                                        </div>
+                                    </div>
+                                )}
+
+
                         </div>
                     </>
                     ) : (
                         <div>
                             <h2 className="text-xl font-bold mb-4">Postular</h2>
                             <div className="flex items-center space-x-2 mb-4">
-                                <button onClick={() => setVista('perfil')} className={`py-2 px-4 rounded ${isPerfil ? 'bg-blue-600 text-white' : 'bg-gray-200 text-gray-800'}`}>
-                                    Mi perfil
-                                </button>
-                                <button onClick={() => setVista('postular')} className={`py-2 px-4 rounded ${isPostular ? 'bg-blue-600 text-white' : 'bg-gray-200 text-gray-800'}`}>
-                                    Postular
-                                </button>
+                               
                             </div>
-                            <button onClick={logout} className="bg-gray-800 hover:bg-black text-white font-semibold py-2 px-4 rounded transition duration-200">
-                                Cerrar Sesión
-                            </button>
-
                                     <div className="mt-6">
                                 <h3 className="text-xl font-bold mb-4">Datos de Postulación</h3>
                                 <form onSubmit={handleSubmitPostulacion} className="space-y-4">
@@ -688,7 +735,7 @@ export const PostulanteVista = ({user, alumno, curriculum, actividadesExtracurri
                         <div>
                             <h4 className="text-lg font-medium text-gray-700 mb-3">Ayudantías Previas</h4>
                             {form.ayudantias.map((a, i) => (
-                                <div key={`ayudantia-${i}-${a.nombreAsig}`} className="grid grid-cols-1 md:grid-cols-4 gap-3 mb-3 p-3 border rounded bg-gray-50">
+                                <div key={ayudantias.nombre} className="grid grid-cols-1 md:grid-cols-4 gap-3 mb-3 p-3 border rounded bg-gray-50">
                                     <input placeholder="Nombre asignatura" name="nombreAsig" value={a.nombreAsig} onChange={(e) => handleArrayChange(e, "ayudantias", i)} className="px-3 py-2 border border-gray-300 rounded focus:ring-blue-500 focus:border-blue-500 text-gray-800"/>
                                     <input placeholder="Coordinador" name="coordinador" value={a.coordinador} onChange={(e) => handleArrayChange(e, "ayudantias", i)} className="px-3 py-2 border border-gray-300 rounded focus:ring-blue-500 focus:border-blue-500 text-gray-800"/>
                                     <input placeholder="Evaluación" name="evaluacion" value={a.evaluacion} onChange={(e) => handleArrayChange(e, "ayudantias", i)} className="px-3 py-2 border border-gray-300 rounded focus:ring-blue-500 focus:border-blue-500 text-gray-800"/>
@@ -705,7 +752,7 @@ export const PostulanteVista = ({user, alumno, curriculum, actividadesExtracurri
                         <div>
                             <h4 className="text-lg font-medium text-gray-700 mb-3">Cursos, Títulos y Grados</h4>
                             {form.cursos_titulos_grados.map((c, i) => (
-                                <div key={`curso-${i}-${c.nombre}`} className="grid grid-cols-1 md:grid-cols-4 gap-3 mb-3 p-3 border rounded bg-gray-50">
+                                <div key={cursosTitulosGrados.nombre} className="grid grid-cols-1 md:grid-cols-4 gap-3 mb-3 p-3 border rounded bg-gray-50">
                                     <input placeholder="Nombre" name="nombre" value={c.nombre} onChange={(e) => handleArrayChange(e, "cursos_titulos_grados", i)} className="px-3 py-2 border border-gray-300 rounded focus:ring-blue-500 focus:border-blue-500 text-gray-800"/>
                                     <input placeholder="Institución" name="institucion" value={c.institucion} onChange={(e) => handleArrayChange(e, "cursos_titulos_grados", i)} className="px-3 py-2 border border-gray-300 rounded focus:ring-blue-500 focus:border-blue-500 text-gray-800"/>
                                     <input type="date" name="fecha" value={c.fecha} onChange={(e) => handleArrayChange(e, "cursos_titulos_grados", i)} className="px-3 py-2 border border-gray-300 rounded focus:ring-blue-500 focus:border-blue-500 text-gray-800"/>
@@ -722,7 +769,7 @@ export const PostulanteVista = ({user, alumno, curriculum, actividadesExtracurri
                         <div>
                             <h4 className="text-lg font-medium text-gray-700 mb-3">Actividades Científicas</h4>
                             {form.actividades_cientificas.map((a, i) => (
-                                <div key={`cientifica-${i}-${a.nombre}`} className="grid grid-cols-1 md:grid-cols-4 gap-3 mb-3 p-3 border rounded bg-gray-50">
+                                <div key={actividadesCientificas.nombre} className="grid grid-cols-1 md:grid-cols-4 gap-3 mb-3 p-3 border rounded bg-gray-50">
                                     <input placeholder="Nombre" name="nombre" value={a.nombre} onChange={(e) => handleArrayChange(e, "actividades_cientificas", i)} className="px-3 py-2 border border-gray-300 rounded focus:ring-blue-500 focus:border-blue-500 text-gray-800"/>
                                     <input placeholder="Descripción" name="descripcion" value={a.descripcion} onChange={(e) => handleArrayChange(e, "actividades_cientificas", i)} className="px-3 py-2 border border-gray-300 rounded focus:ring-blue-500 focus:border-blue-500 text-gray-800"/>
                                     <input placeholder="Periodo de participación" name="periodoParticipacion" value={a.periodoParticipacion} onChange={(e) => handleArrayChange(e, "actividades_cientificas", i)} className="px-3 py-2 border border-gray-300 rounded focus:ring-blue-500 focus:border-blue-500 text-gray-800"/>
@@ -739,7 +786,7 @@ export const PostulanteVista = ({user, alumno, curriculum, actividadesExtracurri
                         <div>
                             <h4 className="text-lg font-medium text-gray-700 mb-3">Actividades Extracurriculares</h4>
                             {form.actividades_extracurriculares.map((a, i) => (
-                                <div key={`extracurricular-${i}-${a.nombre}`} className="grid grid-cols-1 md:grid-cols-5 gap-3 mb-3 p-3 border rounded bg-gray-50">
+                                <div key={actividadesExtracurriculares.nombre} className="grid grid-cols-1 md:grid-cols-5 gap-3 mb-3 p-3 border rounded bg-gray-50">
                                     <input placeholder="Nombre" name="nombre" value={a.nombre} onChange={(e) => handleArrayChange(e, "actividades_extracurriculares", i)} className="px-3 py-2 border border-gray-300 rounded focus:ring-blue-500 focus:border-blue-500 text-gray-800"/>
                                     <input placeholder="Docente o institución" name="docenteInstitucion" value={a.docenteInstitucion} onChange={(e) => handleArrayChange(e, "actividades_extracurriculares", i)} className="px-3 py-2 border border-gray-300 rounded focus:ring-blue-500 focus:border-blue-500 text-gray-800"/>
                                     <input placeholder="Descripción" name="descripcion" value={a.descripcion} onChange={(e) => handleArrayChange(e, "actividades_extracurriculares", i)} className="px-3 py-2 border border-gray-300 rounded focus:ring-blue-500 focus:border-blue-500 text-gray-800"/>
