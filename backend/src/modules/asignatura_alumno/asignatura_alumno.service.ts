@@ -21,7 +21,7 @@ export class AsignaturaAlumnoService {
       .innerJoinAndSelect('aa.asignatura', 'asignatura')
       .innerJoinAndSelect('aa.alumno', 'alumno')
       .where('alumno.rut_alumno = :rut', { rut: rut_alumno })
-      .andWhere('asignatura.abierta_postulacion = true')
+      .andWhere('asignatura.estado = :estado', { estado: 'abierta' })
       .andWhere('aa.nota IS NOT NULL')
       .getMany();
   }

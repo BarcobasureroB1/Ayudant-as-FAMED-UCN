@@ -51,9 +51,9 @@ export class CurriculumService {
       const ayudantias = data.ayudantias.map((a) =>
         this.ayudantiasCurriculumRepository.create({
           usuario,
-          nombre_asig: a.nombreAsig,
-          n_coordinador: a.coordinador,
-          evaluacion: a.evaluacion,
+          nombre_asig: a.nombre_asig,
+          n_coordinador: a.nombre_coordinador,
+          evaluacion: a.evaluacion_obtenida
         }),
       );
       await this.ayudantiasCurriculumRepository.save(ayudantias);
@@ -63,9 +63,9 @@ export class CurriculumService {
       const titulos = data.cursos_titulos_grados.map((c) =>
         this.titulosCursoRepository.create({
           usuario,
-          nombre: c.nombre,
-          institucion: c.institucion,
-          ano: c.fecha,
+          nombre: c.nombre_asig,
+          institucion: c.n_coordinador,
+          ano: c.evaluacion,
         }),
       );
       await this.titulosCursoRepository.save(titulos);
@@ -76,7 +76,8 @@ export class CurriculumService {
           usuario,
           nombre: a.nombre,
           descripcion: a.descripcion,
-          periodo_participacion: a.periodoParticipacion,
+
+          periodo_participacion: a.periodo_participacion,
         }),
       );
       await this.actividadesCientificaRepository.save(cientificas);
@@ -86,9 +87,9 @@ export class CurriculumService {
         this.actividadesExtracurriculareRepository.create({
           usuario,
           nombre: a.nombre,
-          docente: a.docenteInstitucion,
+          docente: a.docente,
           descripcion: a.descripcion,
-          periodo_participacion: a.periodoParticipacion,
+          periodo_participacion: a.periodo_participacion,
         }),
       );
       await this.actividadesExtracurriculareRepository.save(extra);

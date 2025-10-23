@@ -3,28 +3,28 @@ import { IsString, IsOptional, IsArray, ValidateNested } from 'class-validator';
 import { Type } from 'class-transformer';
 
 class AyudantiaDto {
-  @IsString() nombreAsig: string;
-  @IsString() coordinador: string;
-  @IsString() evaluacion: string;
+  @IsString() nombre_asig: string;
+  @IsString() nombre_coordinador: string;
+  @IsString() evaluacion_obtenida: string;
 }
 
 class CursoTituloGradoDto {
-  @IsString() nombre: string;
-  @IsString() institucion: string;
-  @IsString() fecha: string;
+  @IsString() nombre_asig: string;
+  @IsString() n_coordinador: string;
+  @IsString() evaluacion: string;
 }
 
 class ActividadCientificaDto {
   @IsString() nombre: string;
   @IsString() descripcion: string;
-  @IsString() periodoParticipacion: string;
+  @IsString() periodo_participacion: string;
 }
 
 class ActividadExtracurricularDto {
   @IsString() nombre: string;
-  @IsString() docenteInstitucion: string;
+  @IsString() docente: string;
   @IsString() descripcion: string;
-  @IsString() periodoParticipacion: string;
+  @IsString() periodo_participacion: string;
 }
 
 export class CreateCurriculumDto {

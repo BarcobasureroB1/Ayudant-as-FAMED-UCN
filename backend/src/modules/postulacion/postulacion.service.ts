@@ -46,7 +46,7 @@ export class PostulacionService {
   }
 
   async findcurrent(rut_alumno: string) {
-    const Usuario = await this.usuarioRepository.findOneBy({ rut: rut_alumno });
+    const Usuario = await this.usuarioRepository.findBy({ rut: rut_alumno });
     if (!Usuario) {
       return null;
     }

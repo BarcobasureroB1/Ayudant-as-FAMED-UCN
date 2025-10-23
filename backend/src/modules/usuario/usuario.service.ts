@@ -3,6 +3,7 @@ import { CreateUsuarioDto } from './dto/create-usuario.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Usuario } from './entities/usuario.entity';
 import { Repository } from 'typeorm';
+import { Alumno } from '../alumno/entities/alumno.entity';
 
 
 @Injectable()
@@ -10,6 +11,8 @@ export class UsuarioService {
   constructor(
     @InjectRepository(Usuario)
     private usuarioRepository: Repository<Usuario>,
+    @InjectRepository(Alumno)
+    private alrepo : Repository<Alumno>
   ) {}
 
 async create(createUsuarioDto: CreateUsuarioDto) {
@@ -35,7 +38,7 @@ async create(createUsuarioDto: CreateUsuarioDto) {
   }
   
   async findalumno(rut: string) {
-    const usuario = await this.usuarioRepository.findOneBy({ rut, tipo: 'alumno' });
+    const usuario = await this.alrepo.findOneBy({ rut_alumno: rut });
     if (!usuario) {
       return null;
     }
@@ -44,9 +47,17 @@ async create(createUsuarioDto: CreateUsuarioDto) {
   async guardar(usuario: Usuario) {
     return await this.usuarioRepository.save(usuario);
   }
-  
 
-
+  async findnivel(rut_alumno: string) {
+    const alumno = await this.alrepo.findOneBy({ rut_alumno });
+    if (!alumno) {
+      return null;
+    }
+    const AlumnoData = { nivel: alumno.nivel,
+      fecha_admision: alumno.fecha_admision
+     };
+    return AlumnoData;
+  }
 
 
 }
