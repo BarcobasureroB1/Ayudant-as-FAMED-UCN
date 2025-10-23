@@ -30,8 +30,8 @@ export class AsignaturaService {
     return await this.asignaturaRepository.save(asignatura);
   }
 
-  findAvaibleAsignaturas() {
-    return ;
+  async findAvaibleAsignaturas(rut_alumno) {
+    return null ;
   }
   async findAll() {
     return await this.asignaturaRepository.find();
