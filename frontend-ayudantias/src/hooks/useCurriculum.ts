@@ -77,7 +77,7 @@ export function useActividadesExtracurriculares(rut_alumno?: string) {
     return useQuery({
         queryKey: ['curriculum_extracurricular', rut_alumno],
         queryFn: async() => {
-            const respuesta = await api.get(`curriculum/extracurricular/${rut_alumno}`);
+            const respuesta = await api.get(`extracurricular/${rut_alumno}`);
             return respuesta.data
         },
         enabled: !!rut_alumno,
@@ -89,7 +89,7 @@ export function useActividadescientificas(rut_alumno?: string) {
     return useQuery({
         queryKey: ['curriculum_actividades_cientificas', rut_alumno],
         queryFn: async() => {
-            const respuesta = await api.get(`curriculum/cientificas/${rut_alumno}`);
+            const respuesta = await api.get(`cientificas/${rut_alumno}`);
             return respuesta.data
         },
         enabled: !!rut_alumno,
@@ -101,7 +101,7 @@ export function usecursos_titulos_grados(rut_alumno?: string) {
     return useQuery({
         queryKey: ['curriculum_cursos_titulos_grados', rut_alumno],
         queryFn: async() => {
-            const respuesta = await api.get(`curriculum/cursos_titulos_grados/${rut_alumno}`);
+            const respuesta = await api.get(`titulos_cursos/${rut_alumno}`);
             return respuesta.data
         },
         enabled: !!rut_alumno,
@@ -113,7 +113,7 @@ export function useAyudantias(rut_alumno?: string) {
     return useQuery({
         queryKey: ['curriculum_ayudantias', rut_alumno],
         queryFn: async() => {
-            const respuesta = await api.get(`curriculum/ayudantias/${rut_alumno}`);
+            const respuesta = await api.get(`ayudantias-curriculum/${rut_alumno}`);
             return respuesta.data
         },
         enabled: !!rut_alumno,

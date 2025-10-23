@@ -31,7 +31,7 @@ export function usePostulacionesPorAlumno(rut_alumno?: string){
     return useQuery<PostulacionData, Error>({
         queryKey:['postulaciones', rut_alumno],
         queryFn: async () => {
-            const respuesta = await api.get(`postulaciones/${rut_alumno}`);
+            const respuesta = await api.get(`asignatura-alumno/${rut_alumno}`);
             return respuesta.data;
         },
     });
@@ -41,7 +41,7 @@ export function useCancelarPostulacion(){
     const clienteQuery = useQueryClient();
     return useMutation({
         mutationFn: async ({id}:{id: number}) => {
-            await api.patch(`postulaciones/${id}`)
+            await api.patch(`postulacion/${id}`)
         },
         onSuccess: (_data) => {
             clienteQuery.invalidateQueries({queryKey:['postulaciones']});
@@ -54,7 +54,7 @@ export function useCrearPostulacion() {
     const clienteQuery = useQueryClient();
     return useMutation({
         mutationFn: async (postulacion: CrearPostulacion) => {
-            const respuesta = await api.post('postulaciones', postulacion);
+            const respuesta = await api.post('asignatura-alumno', postulacion);
             return respuesta.data;
         },
         onSuccess: () => {
@@ -67,7 +67,7 @@ export function useEditarPostulacion() {
     const clienteQuery = useQueryClient();
     return useMutation({
         mutationFn: async ({id}:{id: number}) => {
-            await api.patch(`postulaciones/editar/${id}`)
+            await api.patch(`postulacion/editar/${id}`)
         },
         onSuccess: (_data) => {
             clienteQuery.invalidateQueries({queryKey:['postulaciones']});
