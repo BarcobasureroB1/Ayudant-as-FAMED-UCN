@@ -2,7 +2,6 @@
 
 import { SyntheticEvent, useState } from "react";
 import { useRouter } from "next/navigation";
-import { useAuth } from "@/context/AuthContext";
 import { useRegister } from "@/hooks/useRegister";
 
 

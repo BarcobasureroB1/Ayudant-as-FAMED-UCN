@@ -7,6 +7,7 @@ import { useAlumnoProfile, AlumnoData } from '@/hooks/useAlumnoProfile';
 import { useComprobarCurriculum, useCrearCurriculum, CurriculumData, useActividadesExtracurriculares, useActividadescientificas, usecursos_titulos_grados, useAyudantias} from '@/hooks/useCurriculum';
 import { useAuth } from '@/context/AuthContext';
 import { AyudantiasAnteriores, useAyudantiasPorAlumno } from '@/hooks/useAyudantia';
+import Cookies from 'js-cookie';
 
 interface UserProps {
     user: User;
@@ -22,7 +23,7 @@ interface UserProps {
 export const PostulanteVista = ({user, alumno, curriculum, actividadesExtracurriculares, actividadesCientificas, cursosTitulosGrados, ayudantias, ayudantiasAnteriores}: UserProps) => {
     const crearCurriculum = useCrearCurriculum();
     const router = useRouter();
-    const { setToken } = useAuth();
+    const { setToken, setUsertipo } = useAuth();
 
     const [paso, setPaso] = useState(1);
     const [mostrarPopup, setMostrarPopup] = useState(false);
@@ -48,6 +49,9 @@ export const PostulanteVista = ({user, alumno, curriculum, actividadesExtracurri
 
     const logout = () => {
         setToken(null); //elimina la cookie
+        setUsertipo(null);
+        Cookies.remove('token');
+        Cookies.remove('tipoUser');
         router.push('/login');
         router.refresh(); //pa recargar la pagina
     }
@@ -338,7 +342,7 @@ export const PostulanteVista = ({user, alumno, curriculum, actividadesExtracurri
                         <div>
                             <h4 className="text-lg font-medium text-gray-700 mb-3">Ayudantías Previas</h4>
                             {form.ayudantias.map((a, i) => (
-                                <div key={`ayudantia-${i}-${a.nombreAsig}`} className="grid grid-cols-1 md:grid-cols-4 gap-3 mb-3 p-3 border rounded bg-gray-50">
+                                <div key={ayudantias.id} className="grid grid-cols-1 md:grid-cols-4 gap-3 mb-3 p-3 border rounded bg-gray-50">
                                     <input placeholder="Nombre asignatura" name="nombreAsig" value={a.nombreAsig} onChange={(e) => handleArrayChange(e, "ayudantias", i)} className="px-3 py-2 border border-gray-300 rounded focus:ring-blue-500 focus:border-blue-500 text-gray-800"/>
                                     <input placeholder="Coordinador" name="coordinador" value={a.coordinador} onChange={(e) => handleArrayChange(e, "ayudantias", i)} className="px-3 py-2 border border-gray-300 rounded focus:ring-blue-500 focus:border-blue-500 text-gray-800"/>
                                     <input placeholder="Evaluación" name="evaluacion" value={a.evaluacion} onChange={(e) => handleArrayChange(e, "ayudantias", i)} className="px-3 py-2 border border-gray-300 rounded focus:ring-blue-500 focus:border-blue-500 text-gray-800"/>
@@ -355,7 +359,7 @@ export const PostulanteVista = ({user, alumno, curriculum, actividadesExtracurri
                         <div>
                             <h4 className="text-lg font-medium text-gray-700 mb-3">Cursos, Títulos y Grados</h4>
                             {form.cursos_titulos_grados.map((c, i) => (
-                                <div key={`curso-${i}-${c.nombre}`} className="grid grid-cols-1 md:grid-cols-4 gap-3 mb-3 p-3 border rounded bg-gray-50">
+                                <div key={cursosTitulosGrados.id} className="grid grid-cols-1 md:grid-cols-4 gap-3 mb-3 p-3 border rounded bg-gray-50">
                                     <input placeholder="Nombre" name="nombre" value={c.nombre} onChange={(e) => handleArrayChange(e, "cursos_titulos_grados", i)} className="px-3 py-2 border border-gray-300 rounded focus:ring-blue-500 focus:border-blue-500 text-gray-800"/>
                                     <input placeholder="Institución" name="institucion" value={c.institucion} onChange={(e) => handleArrayChange(e, "cursos_titulos_grados", i)} className="px-3 py-2 border border-gray-300 rounded focus:ring-blue-500 focus:border-blue-500 text-gray-800"/>
                                     <input type="date" name="fecha" value={c.fecha} onChange={(e) => handleArrayChange(e, "cursos_titulos_grados", i)} className="px-3 py-2 border border-gray-300 rounded focus:ring-blue-500 focus:border-blue-500 text-gray-800"/>
@@ -372,10 +376,10 @@ export const PostulanteVista = ({user, alumno, curriculum, actividadesExtracurri
                         <div>
                             <h4 className="text-lg font-medium text-gray-700 mb-3">Actividades Científicas</h4>
                             {form.actividades_cientificas.map((a, i) => (
-                                <div key={`cientifica-${i}-${a.nombre}`} className="grid grid-cols-1 md:grid-cols-4 gap-3 mb-3 p-3 border rounded bg-gray-50">
+                                <div key={actividadesCientificas.id} className="grid grid-cols-1 md:grid-cols-4 gap-3 mb-3 p-3 border rounded bg-gray-50">
                                     <input placeholder="Nombre" name="nombre" value={a.nombre} onChange={(e) => handleArrayChange(e, "actividades_cientificas", i)} className="px-3 py-2 border border-gray-300 rounded focus:ring-blue-500 focus:border-blue-500 text-gray-800"/>
                                     <input placeholder="Descripción" name="descripcion" value={a.descripcion} onChange={(e) => handleArrayChange(e, "actividades_cientificas", i)} className="px-3 py-2 border border-gray-300 rounded focus:ring-blue-500 focus:border-blue-500 text-gray-800"/>
-                                    <input placeholder="Periodo de participación" name="periodoParticipacion" value={a.periodoParticipacion} onChange={(e) => handleArrayChange(e, "actividades_cientificas", i)} className="px-3 py-2 border border-gray-300 rounded focus:ring-blue-500 focus:border-blue-500 text-gray-800"/>
+                                    <input type="month" placeholder="Periodo de participación" name="periodoParticipacion" value={a.periodoParticipacion} onChange={(e) => handleArrayChange(e, "actividades_cientificas", i)} className="px-3 py-2 border border-gray-300 rounded focus:ring-blue-500 focus:border-blue-500 text-gray-800"/>
                                     <button type="button" onClick={() => removeItem("actividades_cientificas", i)} className="bg-red-500 hover:bg-red-600 text-white py-2 px-3 rounded text-sm">
                                         Eliminar
                                     </button>
@@ -389,7 +393,7 @@ export const PostulanteVista = ({user, alumno, curriculum, actividadesExtracurri
                         <div>
                             <h4 className="text-lg font-medium text-gray-700 mb-3">Actividades Extracurriculares</h4>
                             {form.actividades_extracurriculares.map((a, i) => (
-                                <div key={`extracurricular-${i}-${a.nombre}`} className="grid grid-cols-1 md:grid-cols-5 gap-3 mb-3 p-3 border rounded bg-gray-50">
+                                <div key={actividadesExtracurriculares.id} className="grid grid-cols-1 md:grid-cols-5 gap-3 mb-3 p-3 border rounded bg-gray-50">
                                     <input placeholder="Nombre" name="nombre" value={a.nombre} onChange={(e) => handleArrayChange(e, "actividades_extracurriculares", i)} className="px-3 py-2 border border-gray-300 rounded focus:ring-blue-500 focus:border-blue-500 text-gray-800"/>
                                     <input placeholder="Docente o institución" name="docenteInstitucion" value={a.docenteInstitucion} onChange={(e) => handleArrayChange(e, "actividades_extracurriculares", i)} className="px-3 py-2 border border-gray-300 rounded focus:ring-blue-500 focus:border-blue-500 text-gray-800"/>
                                     <input placeholder="Descripción" name="descripcion" value={a.descripcion} onChange={(e) => handleArrayChange(e, "actividades_extracurriculares", i)} className="px-3 py-2 border border-gray-300 rounded focus:ring-blue-500 focus:border-blue-500 text-gray-800"/>

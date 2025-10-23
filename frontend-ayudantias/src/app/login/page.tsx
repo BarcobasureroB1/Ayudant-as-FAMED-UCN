@@ -10,10 +10,12 @@ export default function LoginPage() {
     const [password, setPassword] = useState("");
     const [errorMsg, setErrorMsg] = useState("");
     const router = useRouter();
-    const { setToken } = useAuth();
+    const { setToken, setUsertipo } = useAuth();
 
-    const login = useLogin( async (access_token: string) => {
-        setToken(access_token)
+    const login = useLogin( async (data) => {
+        setToken(data.access_token);
+        setUsertipo(data.user.tipo);
+
         router.push("/dashboard");
     },
     (error) => {
