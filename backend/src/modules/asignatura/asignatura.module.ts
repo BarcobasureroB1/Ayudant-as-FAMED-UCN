@@ -4,10 +4,13 @@ import { AsignaturaController } from './asignatura.controller';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { Asignatura } from './entities/asignatura.entity';
 import { DepartamentoModule } from '../departamento/departamento.module';
+import { Departamento } from '../departamento/entities/departamento.entity';
+import { Usuario } from '../usuario/entities/usuario.entity';
+import { UsuarioModule } from '../usuario/usuario.module';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([Asignatura]),
-DepartamentoModule],
+  imports: [TypeOrmModule.forFeature([Asignatura,Departamento,Usuario]),
+DepartamentoModule,UsuarioModule],
   controllers: [AsignaturaController],
   providers: [AsignaturaService],
 })
