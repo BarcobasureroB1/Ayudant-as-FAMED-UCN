@@ -1,12 +1,16 @@
 import { Injectable } from '@nestjs/common';
 import { CreateActividadesCientificaDto } from './dto/create-actividades_cientifica.dto';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
+import { ActividadesCientifica } from './entities/actividades_cientifica.entity';
 
 
 @Injectable()
 export class ActividadesCientificasService {
-  create(createActividadesCientificaDto: CreateActividadesCientificaDto) {
-    return 'This action adds a new actividadesCientifica';
-  }
+  constructor(
+    @InjectRepository(ActividadesCientifica)
+    private readonly actividadesCientificaRepository: Repository<ActividadesCientifica>,
+  ) {}
 
   findAll() {
     return `This action returns all actividadesCientificas`;
@@ -16,11 +20,13 @@ export class ActividadesCientificasService {
     return `This action returns a #${id} actividadesCientifica`;
   }
 
-  update(id: number) {
-    return `This action updates a #${id} actividadesCientifica`;
-  }
-
-  remove(id: number) {
-    return `This action removes a #${id} actividadesCientifica`;
+  async findByUsuario(rut: string) {
+    const actividades = await this.actividadesCientificaRepository.find({
+      where: { usuario: { rut } },
+    });
+    if (!actividades) {
+      return null;
+    }
+    return actividades;
   }
 }

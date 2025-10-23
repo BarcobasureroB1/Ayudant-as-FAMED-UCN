@@ -1,14 +1,16 @@
+import { Ayudantia } from 'src/modules/ayudantia/entities/ayudantia.entity';
 import { Consanguineo } from 'src/modules/consanguineo/entities/consanguineo.entity';
 import { Usuario } from 'src/modules/usuario/entities/usuario.entity';
-import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
+import { Column, Entity, ManyToOne, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
 @Entity()
 export class Postulacion {
     @PrimaryGeneratedColumn()
     id: number;
-    @OneToMany(() => Usuario, (usuario) => usuario.rut)
-    rut_alumno: string;
-    @Column()
-    asignatura: string;
+    @ManyToOne(() => Usuario, (usuario) => usuario.rut)
+    usuario: Usuario;
+
+    @ManyToOne(() => Ayudantia, (ayudantia) => ayudantia.postulacion)
+    ayudantia: Ayudantia;
     @Column()
     descripcion_carta: string;
     @Column()
@@ -21,15 +23,22 @@ export class Postulacion {
     dia : string;
     @Column()
     bloque : string;
+    @Column({ default: false })
+    cancelada_por_usuario: boolean;
     @Column()
-    cancelada : boolean;
+    puntuacion_etapa1: number;
     @Column()
-    puntuacion : number;
+    puntuacion_etapa2: number;
+    @Column({ default: false })
+    rechazada_por_jefatura: boolean;
     @Column()
-    puntuacion_2 : number;
-
+    motivo_descarte: string;
+    @Column()
+    fecha_descarte: string;
+    @Column({ default: true })
+    es_actual: boolean;
     @OneToMany(() => Consanguineo, (consanguineo) => consanguineo.postulacion)
-consanguineos: Consanguineo[];
+    consanguineos: Consanguineo[];
     
 }
 
