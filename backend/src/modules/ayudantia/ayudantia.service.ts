@@ -12,6 +12,7 @@ export class AyudantiaService {
     private readonly ayudantiaRepository: Repository<Ayudantia>,
   ) {}
 
+  
   async findByUsuario(rut: string) {
     const ayudantias = await this.ayudantiaRepository.find({
       where: { alumno: { rut } },

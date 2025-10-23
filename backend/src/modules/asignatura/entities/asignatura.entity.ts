@@ -7,13 +7,13 @@ export class Asignatura {
     id: number;
     @Column()
     nombre: string;
-    @Column()
+    @Column({default: "cerrada"})
     estado: string;
     @Column()
     semestre: number;
     @Column()
     nrc: string;
-    @ManyToMany(() => Departamento, (departamento) => departamento.asignaturas)
+    @OneToMany(() => Departamento, (departamento) => departamento.asignaturas)
     departamentos: Departamento[];
     
      @OneToMany(() => AsignaturaAlumno, (aa) => aa.asignatura)

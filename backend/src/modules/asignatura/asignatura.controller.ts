@@ -11,6 +11,10 @@ export class AsignaturaController {
   create(@Body() createAsignaturaDto: CreateAsignaturaDto) {
     return this.asignaturaService.create(createAsignaturaDto);
   }
+  @Get()
+  findall(){
+    return this.asignaturaService.findAll()
+  }
 
   
 }

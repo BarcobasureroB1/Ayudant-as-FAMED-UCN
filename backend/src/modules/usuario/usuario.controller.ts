@@ -24,9 +24,9 @@ export class UsuarioController {
   }
 
 
-  @Get('alumno/:rut')
-  findAlumno(@Param('rut') rut: string) {
-    return this.usuarioService.findalumno(rut);
+  @Get('alumno/:rut_alumno')
+  findAlumno(@Param('rut_alumno') rut_alumno: string) {
+    return this.usuarioService.findnivel(rut_alumno);
   }
   @Post('Registro')
   register(@Body() usuario: Usuario) {
