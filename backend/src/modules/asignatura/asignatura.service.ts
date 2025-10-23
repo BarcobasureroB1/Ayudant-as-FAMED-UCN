@@ -17,15 +17,16 @@ export class AsignaturaService {
     private readonly depaservice: UsuarioService
   ) {}
   async create(createAsignaturaDto: CreateAsignaturaDto) {
-    const departamento = await this.depa.find({where:{nombre:createAsignaturaDto.Departamento} })
-    if(!departamento){
-      return null
+    const departamento = await this.depa.findOne({ where: { nombre: createAsignaturaDto.Departamento } });
+    if (!departamento) {
+      return null;
     }
-    const asignatura = new Asignatura()
-    asignatura.nombre = createAsignaturaDto.nombre
-    asignatura.nrc = createAsignaturaDto.nrc
-    asignatura.semestre = createAsignaturaDto.semestre
-    asignatura.departamentos = departamento
+    const asignatura = new Asignatura();
+    asignatura.nombre = createAsignaturaDto.nombre;
+    asignatura.nrc = createAsignaturaDto.nrc;
+    asignatura.semestre = createAsignaturaDto.semestre;
+    // ManyToMany relation expects an array of departamentos
+    asignatura.departamentos = [departamento];
 
     return await this.asignaturaRepository.save(asignatura);
   }

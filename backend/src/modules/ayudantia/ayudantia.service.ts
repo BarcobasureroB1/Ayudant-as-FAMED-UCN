@@ -12,7 +12,10 @@ export class AyudantiaService {
     private readonly ayudantiaRepository: Repository<Ayudantia>,
   ) {}
 
-  
+  async create(dto:CreateAyudantiaDto){
+    return await this.ayudantiaRepository.create(dto)
+  }
+
   async findByUsuario(rut: string) {
     const ayudantias = await this.ayudantiaRepository.find({
       where: { alumno: { rut } },

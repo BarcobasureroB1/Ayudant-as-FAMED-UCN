@@ -24,7 +24,7 @@ export class Alumno {
     nivel: string;
     @Column()
     periodo: string;
-     @OneToMany(() => AsignaturaAlumno, (aa) => aa.alumno)
+  @OneToMany(() => AsignaturaAlumno, (aa) => aa.alumno)
   asignaturasAlumno: AsignaturaAlumno[];
    
 }

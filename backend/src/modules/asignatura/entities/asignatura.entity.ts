@@ -13,10 +13,10 @@ export class Asignatura {
     semestre: number;
     @Column()
     nrc: string;
-    @OneToMany(() => Departamento, (departamento) => departamento.asignaturas)
+    @ManyToMany(() => Departamento, (departamento) => departamento.asignaturas)
     departamentos: Departamento[];
     
-     @OneToMany(() => AsignaturaAlumno, (aa) => aa.asignatura)
+    @OneToMany(() => AsignaturaAlumno, (aa) => aa.asignatura)
     asignaturasAlumnos: AsignaturaAlumno[];
 }
 
