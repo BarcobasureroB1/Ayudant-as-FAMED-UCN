@@ -3,6 +3,7 @@ import { ActividadesExtracurriculare } from 'src/modules/actividades_extracurric
 import { Ayudantia } from 'src/modules/ayudantia/entities/ayudantia.entity';
 import { AyudantiasCurriculum } from 'src/modules/ayudantias_curriculum/entities/ayudantias_curriculum.entity';
 import { Departamento } from 'src/modules/departamento/entities/departamento.entity';
+import { Postulacion } from 'src/modules/postulacion/entities/postulacion.entity';
 import { TitulosCurso } from 'src/modules/titulos_cursos/entities/titulos_curso.entity';
 import { Column, Entity, ManyToMany, OneToMany, PrimaryColumn } from 'typeorm';
 @Entity()
@@ -36,5 +37,7 @@ export class Usuario {
 
     @OneToMany(() => Ayudantia, (ayudantia) => ayudantia.coordinador)
     ayudantias_como_coordinador: Ayudantia[];
+    @OneToMany(() => Postulacion, (postulacion) => postulacion.usuario)
+    postulaciones: Postulacion[];
 
 }

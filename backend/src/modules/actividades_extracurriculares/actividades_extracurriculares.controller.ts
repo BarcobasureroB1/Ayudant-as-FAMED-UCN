@@ -3,7 +3,7 @@ import { ActividadesExtracurricularesService } from './actividades_extracurricul
 import { CreateActividadesExtracurriculareDto } from './dto/create-actividades_extracurriculare.dto';
 
 
-@Controller('actividades-extracurriculares')
+@Controller('extracurriculares')
 export class ActividadesExtracurricularesController {
   constructor(private readonly actividadesExtracurricularesService: ActividadesExtracurricularesService) {}
 

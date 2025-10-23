@@ -1,7 +1,4 @@
-import { ActividadesCientifica } from 'src/modules/actividades_cientificas/entities/actividades_cientifica.entity';
-import { ActividadesExtracurriculare } from 'src/modules/actividades_extracurriculares/entities/actividades_extracurriculare.entity';
-import { AyudantiasCurriculum } from 'src/modules/ayudantias_curriculum/entities/ayudantias_curriculum.entity';
-import { TitulosCurso } from 'src/modules/titulos_cursos/entities/titulos_curso.entity';
+
 import { Usuario } from 'src/modules/usuario/entities/usuario.entity';
 import { Column, Entity, JoinColumn, OneToMany, OneToOne, PrimaryGeneratedColumn } from 'typeorm';
 @Entity()

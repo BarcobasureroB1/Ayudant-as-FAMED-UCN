@@ -1,5 +1,6 @@
+import { AsignaturaAlumno } from 'src/modules/asignatura_alumno/entities/asignatura_alumno.entity';
 import { Departamento } from 'src/modules/departamento/entities/departamento.entity';
-import { Column, Entity, ManyToMany, PrimaryGeneratedColumn } from 'typeorm';
+import { Column, Entity, ManyToMany, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
 @Entity()
 export class Asignatura {
     @PrimaryGeneratedColumn()
@@ -14,6 +15,9 @@ export class Asignatura {
     nrc: string;
     @ManyToMany(() => Departamento, (departamento) => departamento.asignaturas)
     departamentos: Departamento[];
+    
+     @OneToMany(() => AsignaturaAlumno, (aa) => aa.asignatura)
+    asignaturasAlumnos: AsignaturaAlumno[];
 }
 
 

@@ -1,4 +1,5 @@
 import { Asignatura } from 'src/modules/asignatura/entities/asignatura.entity';
+import { Postulacion } from 'src/modules/postulacion/entities/postulacion.entity';
 import { Usuario } from 'src/modules/usuario/entities/usuario.entity';
 import { Column, Entity, JoinColumn, ManyToOne, OneToOne, PrimaryGeneratedColumn } from 'typeorm';
 @Entity()
@@ -20,5 +21,7 @@ export class Ayudantia {
     periodo: string;
     @Column()
     remunerada: string;
+    @ManyToOne(() => Postulacion, (postulacion) => postulacion.id)
+    postulacion: Postulacion;
 
 }
