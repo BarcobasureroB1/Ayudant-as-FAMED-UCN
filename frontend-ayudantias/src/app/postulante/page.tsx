@@ -4,7 +4,7 @@ import React, { SyntheticEvent, useEffect, useState } from 'react';
 import { useRouter } from "next/navigation";
 import { useUserProfile, User } from '@/hooks/useUserProfile';
 import { useAlumnoProfile, AlumnoData } from '@/hooks/useAlumnoProfile';
-import { useComprobarCurriculum, useCrearCurriculum, CurriculumData, useActividadesExtracurriculares, useActividadescientificas, useCursos_titulos_grados, useAyudantias} from '@/hooks/useCurriculum';
+import { useComprobarCurriculum, useCrearCurriculum, CurriculumResponse, useActividadesExtracurriculares, useActividadescientificas, useCursos_titulos_grados, useAyudantias} from '@/hooks/useCurriculum';
 import { useAuth } from '@/context/AuthContext';
 import { AyudantiasAnteriores, useAyudantiasPorAlumno } from '@/hooks/useAyudantia';
 import { PostulacionData, usePostulacionesPorAlumno, useCancelarPostulacion, useCrearPostulacion } from '@/hooks/usePostulacion';
@@ -14,7 +14,7 @@ import Cookies from 'js-cookie';
 interface UserProps {
     user: User;
     alumno?: AlumnoData;
-    curriculum?: CurriculumData;
+    curriculum?: CurriculumResponse;
     actividadesExtracurriculares?: any;
     actividadesCientificas?: any;
     cursosTitulosGrados?: any;
@@ -102,7 +102,7 @@ export const PostulanteVista = ({user, alumno, curriculum, actividadesExtracurri
                         {ayudantias.map((a: any) => (
                         <li key={a.id}>
                             <p><b>Asignatura:</b> {a.nombre_asig}</p>
-                            <p><b>Coordinador:</b> {a.n_coordinador}</p>
+                            <p><b>Coordinador:</b> {a.nombre_coordinador}</p>
                             <p><b>Evaluación obtenida:</b> {a.evaluacion}</p>
                         </li>
                         ))}
@@ -135,9 +135,9 @@ export const PostulanteVista = ({user, alumno, curriculum, actividadesExtracurri
                 <ul>
                     {cursosTitulosGrados.map((c: any) => (
                     <li key={c.id}>
-                        <p><b>Nombre:</b> {c.nombre}</p>
-                        <p><b>Coordinador:</b> {c.institucion}</p>
-                        <p><b>Evaluación:</b> {c.ano}</p>
+                        <p><b>Nombre:</b> {c.nombre_asig}</p>
+                        <p><b>Coordinador:</b> {c.n_coordinador}</p>
+                        <p><b>Evaluación:</b> {c.evaluacion}</p>
                     </li>
                     ))}
                 </ul>
@@ -196,6 +196,9 @@ export const PostulanteVista = ({user, alumno, curriculum, actividadesExtracurri
                 <p><b>Descripción carta:</b> {postulacionSeleccionada.descripcion_carta}</p>
                 <p><b>Correo del profesor:</b> {postulacionSeleccionada.correo_profe}</p>
                 <p><b>Actividad:</b> {postulacionSeleccionada.actividad}</p>
+                <p><b>Metodología:</b> {postulacionSeleccionada.metodologia}</p>
+                <p><b>Día:</b> {postulacionSeleccionada.dia}</p>
+                <p><b>Bloque:</b> {postulacionSeleccionada.bloque}</p>
             </div>
         );
     }
@@ -708,7 +711,7 @@ export const PostulanteVista = ({user, alumno, curriculum, actividadesExtracurri
                                     </button>
                                 </div>
                             ))}
-                            <button type="button" onClick={() => addItem("ayudantias", { nombreAsig: "", coordinador: "", evaluacion: "" })} className="bg-green-500 hover:bg-green-600 text-white py-2 px-4 rounded text-sm font-medium">
+                            <button type="button" onClick={() => addItem("ayudantias", { nombre_asig: "", nombre_coordinador: "", evaluacion_obtenida: "" })} className="bg-green-500 hover:bg-green-600 text-white py-2 px-4 rounded text-sm font-medium">
                                 + Agregar Ayudantía
                             </button>
                         </div>
@@ -725,7 +728,7 @@ export const PostulanteVista = ({user, alumno, curriculum, actividadesExtracurri
                                     </button>
                                 </div>
                             ))}
-                            <button type="button" onClick={() => addItem("cursos_titulos_grados", { nombre: "", institucion: "", fecha: "" })} className="bg-green-500 hover:bg-green-600 text-white py-2 px-4 rounded text-sm font-medium">
+                            <button type="button" onClick={() => addItem("cursos_titulos_grados", { nombre_asig: "", n_coordinador: "", evaluacion: "" })} className="bg-green-500 hover:bg-green-600 text-white py-2 px-4 rounded text-sm font-medium">
                                 + Agregar Curso/Título
                             </button>
                         </div>
@@ -742,7 +745,7 @@ export const PostulanteVista = ({user, alumno, curriculum, actividadesExtracurri
                                     </button>
                                 </div>
                             ))}
-                            <button type="button" onClick={() => addItem("actividades_cientificas", { nombre: "", descripcion: "", periodoParticipacion: "" })} className="bg-green-500 hover:bg-green-600 text-white py-2 px-4 rounded text-sm font-medium">
+                            <button type="button" onClick={() => addItem("actividades_cientificas", { nombre: "", descripcion: "", periodo_participacion: "" })} className="bg-green-500 hover:bg-green-600 text-white py-2 px-4 rounded text-sm font-medium">
                                 + Agregar Actividad Científica
                             </button>
                         </div>
@@ -760,7 +763,7 @@ export const PostulanteVista = ({user, alumno, curriculum, actividadesExtracurri
                                     </button>
                                 </div>
                             ))}
-                            <button type="button" onClick={() => addItem("actividades_extracurriculares", { nombre: "", docenteInstitucion: "", descripcion: "", periodoParticipacion: "" })} className="bg-green-500 hover:bg-green-600 text-white py-2 px-4 rounded text-sm font-medium">
+                            <button type="button" onClick={() => addItem("actividades_extracurriculares", { nombre: "", docente: "", descripcion: "", periodo_participacion: "" })} className="bg-green-500 hover:bg-green-600 text-white py-2 px-4 rounded text-sm font-medium">
                                 + Agregar Actividad Extracurricular
                             </button>
                         </div>
