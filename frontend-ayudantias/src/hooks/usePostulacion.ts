@@ -31,6 +31,7 @@ export function usePostulacionesPorAlumno(rut_alumno?: string){
     return useQuery<PostulacionData, Error>({
         queryKey:['postulaciones', rut_alumno],
         queryFn: async () => {
+            console.log("rut: ", rut_alumno);
             const respuesta = await api.get(`postulacion/${rut_alumno}`);
             return respuesta.data;
         },

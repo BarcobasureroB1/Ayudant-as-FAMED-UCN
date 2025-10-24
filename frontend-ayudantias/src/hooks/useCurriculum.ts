@@ -27,13 +27,13 @@ interface ActividadExtracurricular {
 }
 
 export interface CurriculumData {
-  rut_alumno: string;
+  usuario: {rut: string};
   nombres: string;
   apellidos: string;
   fecha_nacimiento: string;
   comuna: string;
   ciudad: string;
-  num_celular: string;
+  Num_Celular: string;
   correo: string;
   carrera: string;
   otros?: string;
@@ -49,6 +49,7 @@ export function useComprobarCurriculum(rut_alumno?: string) {
         queryKey: ['curriculum', rut_alumno],
         queryFn: async() => {
             const respuesta = await api.get(`curriculum/${rut_alumno}`);
+            console.log("rut: ", respuesta.data)
             return respuesta.data
         },
         enabled: !!rut_alumno,
@@ -77,7 +78,7 @@ export function useActividadesExtracurriculares(rut_alumno?: string) {
     return useQuery({
         queryKey: ['curriculum_extracurricular', rut_alumno],
         queryFn: async() => {
-            const respuesta = await api.get(`extracurricular/${rut_alumno}`);
+            const respuesta = await api.get(`extracurriculares/${rut_alumno}`);
             return respuesta.data
         },
         enabled: !!rut_alumno,
@@ -97,11 +98,11 @@ export function useActividadescientificas(rut_alumno?: string) {
     })
 }
 
-export function usecursos_titulos_grados(rut_alumno?: string) {
+export function useCursos_titulos_grados(rut_alumno?: string) {
     return useQuery({
         queryKey: ['curriculum_cursos_titulos_grados', rut_alumno],
         queryFn: async() => {
-            const respuesta = await api.get(`titulos_cursos/${rut_alumno}`);
+            const respuesta = await api.get(`titulos-cursos/${rut_alumno}`);
             return respuesta.data
         },
         enabled: !!rut_alumno,

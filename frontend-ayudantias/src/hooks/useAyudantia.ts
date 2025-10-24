@@ -9,7 +9,7 @@ export interface AyudantiasAnteriores
     nombre_alumno: string;
     id_asignatura: string;
     nombre_asig: string;
-    nombre_coordinador: string;
+    n_coordinador: string;
     evaluacion: number;
     rut_coordinador_otro: string;
     periodo: string;

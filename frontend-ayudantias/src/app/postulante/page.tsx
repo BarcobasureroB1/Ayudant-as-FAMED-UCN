@@ -4,7 +4,7 @@ import React, { SyntheticEvent, useEffect, useState } from 'react';
 import { useRouter } from "next/navigation";
 import { useUserProfile, User } from '@/hooks/useUserProfile';
 import { useAlumnoProfile, AlumnoData } from '@/hooks/useAlumnoProfile';
-import { useComprobarCurriculum, useCrearCurriculum, CurriculumData, useActividadesExtracurriculares, useActividadescientificas, usecursos_titulos_grados, useAyudantias} from '@/hooks/useCurriculum';
+import { useComprobarCurriculum, useCrearCurriculum, CurriculumData, useActividadesExtracurriculares, useActividadescientificas, useCursos_titulos_grados, useAyudantias} from '@/hooks/useCurriculum';
 import { useAuth } from '@/context/AuthContext';
 import { AyudantiasAnteriores, useAyudantiasPorAlumno } from '@/hooks/useAyudantia';
 import { PostulacionData, usePostulacionesPorAlumno, useCancelarPostulacion, useCrearPostulacion } from '@/hooks/usePostulacion';
@@ -85,25 +85,25 @@ export const PostulanteVista = ({user, alumno, curriculum, actividadesExtracurri
         return (
         <div>
             <h2 className="text-xl font-bold mb-4">Curriculum Vitae</h2>
-            <p><b>RUT:</b> {curriculum?.rut_alumno}</p>
+            <p><b>RUT:</b> {curriculum?.usuario.rut}</p>
             <p><b>Nombre:</b> {curriculum?.nombres} {curriculum?.apellidos}</p>
             <p><b>Fecha de nacimiento:</b> {curriculum?.fecha_nacimiento}</p>
             <p><b>Comuna:</b> {curriculum?.comuna}</p>
             <p><b>Ciudad:</b> {curriculum?.ciudad}</p>
-            <p><b>Número de celular:</b> {curriculum?.num_celular}</p>
+            <p><b>Número de celular:</b> {curriculum?.Num_Celular}</p>
             <p><b>Correo:</b> {curriculum?.correo}</p>
             <p><b>Carrera:</b> {curriculum?.carrera}</p>
             <p><b>Otros:</b> {curriculum?.otros}</p>
 
-            {ayudantias && ayudantias.length == 0 ? (
+            {ayudantias && Array.isArray(ayudantias) && ayudantias.length > 0 ? (
                 <div>
                     <h3>Ayudantías Currículum</h3>
                     <ul>
                         {ayudantias.map((a: any) => (
                         <li key={a.id}>
                             <p><b>Asignatura:</b> {a.nombre_asig}</p>
-                            <p><b>Coordinador:</b> {a.nombre_coordinador}</p>
-                            <p><b>Evaluación obtenida:</b> {a.evaluacion_obtenida}</p>
+                            <p><b>Coordinador:</b> {a.n_coordinador}</p>
+                            <p><b>Evaluación obtenida:</b> {a.evaluacion}</p>
                         </li>
                         ))}
                     </ul>
@@ -112,14 +112,14 @@ export const PostulanteVista = ({user, alumno, curriculum, actividadesExtracurri
                 <p>No hay ayudantias.</p>
             )}
 
-            {ayudantiasAnteriores && ayudantiasAnteriores.length > 0 ? (
+            {ayudantiasAnteriores && Array.isArray(ayudantiasAnteriores) && ayudantiasAnteriores.length > 0 ? (
                 <div>
                 <h3>Ayudantías Anteriores</h3>
                 <ul>
                     {ayudantiasAnteriores.map((a: AyudantiasAnteriores) => (
                     <li key={a.id}>
                         <p><b>Asignatura: </b> {a.nombre_asig}</p>
-                        <p><b>Coordinador: </b> {a.nombre_coordinador} <b>rut: </b>{a.rut_coordinador_otro}</p>
+                        <p><b>Coordinador: </b> {a.n_coordinador} <b>rut: </b>{a.rut_coordinador_otro}</p>
                         <p><b>Evaluación obtenida: </b> {a.evaluacion}</p>
                     </li>
                     ))}
@@ -129,15 +129,15 @@ export const PostulanteVista = ({user, alumno, curriculum, actividadesExtracurri
                 <p>No hay ayudantias anteriores.</p>
             )}
 
-            {cursosTitulosGrados && cursosTitulosGrados.length > 0 ? (
+            {cursosTitulosGrados && Array.isArray(cursosTitulosGrados) && cursosTitulosGrados.length > 0 ? (
                 <div>
                 <h3>Cursos, Títulos y Grados</h3>
                 <ul>
                     {cursosTitulosGrados.map((c: any) => (
                     <li key={c.id}>
-                        <p><b>Nombre:</b> {c.nombre_asig}</p>
-                        <p><b>Coordinador:</b> {c.n_coordinador}</p>
-                        <p><b>Evaluación:</b> {c.evaluacion}</p>
+                        <p><b>Nombre:</b> {c.nombre}</p>
+                        <p><b>Coordinador:</b> {c.institucion}</p>
+                        <p><b>Evaluación:</b> {c.ano}</p>
                     </li>
                     ))}
                 </ul>
@@ -147,7 +147,7 @@ export const PostulanteVista = ({user, alumno, curriculum, actividadesExtracurri
             )}
 
 
-            {actividadesCientificas && actividadesCientificas.length > 0 ? (
+            {actividadesCientificas && Array.isArray(actividadesCientificas) && actividadesCientificas.length > 0 ? (
                 <div>
                 <h3>Actividades Científicas</h3>
                 <ul>
@@ -165,7 +165,7 @@ export const PostulanteVista = ({user, alumno, curriculum, actividadesExtracurri
             )}
 
 
-            {actividadesExtracurriculares && actividadesExtracurriculares.length > 0 ? (
+            {actividadesExtracurriculares && Array.isArray(actividadesExtracurriculares) && actividadesExtracurriculares.length > 0 ? (
                 <div>
                 <h3>Actividades Extracurriculares</h3>
                 <ul>
@@ -736,7 +736,7 @@ export const PostulanteVista = ({user, alumno, curriculum, actividadesExtracurri
                                 <div key={`actividad-${i}`} className="grid grid-cols-1 md:grid-cols-4 gap-3 mb-3 p-3 border rounded bg-gray-50">
                                     <input placeholder="Nombre" name="nombre" value={a.nombre} onChange={(e) => handleArrayChange(e, "actividades_cientificas", i)} className="px-3 py-2 border border-gray-300 rounded focus:ring-blue-500 focus:border-blue-500 text-gray-800"/>
                                     <input placeholder="Descripción" name="descripcion" value={a.descripcion} onChange={(e) => handleArrayChange(e, "actividades_cientificas", i)} className="px-3 py-2 border border-gray-300 rounded focus:ring-blue-500 focus:border-blue-500 text-gray-800"/>
-                                    <input placeholder="Periodo de participación" name="periodoParticipacion" value={a.periodo_participacion} onChange={(e) => handleArrayChange(e, "actividades_cientificas", i)} className="px-3 py-2 border border-gray-300 rounded focus:ring-blue-500 focus:border-blue-500 text-gray-800"/>
+                                    <input placeholder="Periodo de participación" name="periodo_participacion" value={a.periodo_participacion} onChange={(e) => handleArrayChange(e, "actividades_cientificas", i)} className="px-3 py-2 border border-gray-300 rounded focus:ring-blue-500 focus:border-blue-500 text-gray-800"/>
                                     <button type="button" onClick={() => removeItem("actividades_cientificas", i)} className="bg-red-500 hover:bg-red-600 text-white py-2 px-3 rounded text-sm">
                                         Eliminar
                                     </button>
@@ -752,9 +752,9 @@ export const PostulanteVista = ({user, alumno, curriculum, actividadesExtracurri
                             {form.actividades_extracurriculares.map((a, i) => (
                                 <div key={`actividad-${i}`} className="grid grid-cols-1 md:grid-cols-5 gap-3 mb-3 p-3 border rounded bg-gray-50">
                                     <input placeholder="Nombre" name="nombre" value={a.nombre} onChange={(e) => handleArrayChange(e, "actividades_extracurriculares", i)} className="px-3 py-2 border border-gray-300 rounded focus:ring-blue-500 focus:border-blue-500 text-gray-800"/>
-                                    <input placeholder="Docente o institución" name="docenteInstitucion" value={a.docente} onChange={(e) => handleArrayChange(e, "actividades_extracurriculares", i)} className="px-3 py-2 border border-gray-300 rounded focus:ring-blue-500 focus:border-blue-500 text-gray-800"/>
+                                    <input placeholder="Docente o institución" name="docente" value={a.docente} onChange={(e) => handleArrayChange(e, "actividades_extracurriculares", i)} className="px-3 py-2 border border-gray-300 rounded focus:ring-blue-500 focus:border-blue-500 text-gray-800"/>
                                     <input placeholder="Descripción" name="descripcion" value={a.descripcion} onChange={(e) => handleArrayChange(e, "actividades_extracurriculares", i)} className="px-3 py-2 border border-gray-300 rounded focus:ring-blue-500 focus:border-blue-500 text-gray-800"/>
-                                    <input placeholder="Periodo de participación" name="periodoParticipacion" value={a.periodo_participacion} onChange={(e) => handleArrayChange(e, "actividades_extracurriculares", i)} className="px-3 py-2 border border-gray-300 rounded focus:ring-blue-500 focus:border-blue-500 text-gray-800"/>
+                                    <input placeholder="Periodo de participación" name="periodo_participacion" value={a.periodo_participacion} onChange={(e) => handleArrayChange(e, "actividades_extracurriculares", i)} className="px-3 py-2 border border-gray-300 rounded focus:ring-blue-500 focus:border-blue-500 text-gray-800"/>
                                     <button type="button" onClick={() => removeItem("actividades_extracurriculares", i)}className="bg-red-500 hover:bg-red-600 text-white py-2 px-3 rounded text-sm">
                                         Eliminar
                                     </button>
@@ -793,7 +793,7 @@ export default function PostulantePage() {
 
     const { data: actividadesExtracurriculares } = useActividadesExtracurriculares(user?.rut);
     const { data: actividadesCientificas } = useActividadescientificas(user?.rut);
-    const { data: cursosTitulosGrados } = usecursos_titulos_grados(user?.rut);
+    const { data: cursosTitulosGrados } = useCursos_titulos_grados(user?.rut);
     const { data: ayudantias } = useAyudantias(user?.rut);
 
     const { data: ayudantiasAnteriores } = useAyudantiasPorAlumno(user?.rut);

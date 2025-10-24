@@ -5,7 +5,7 @@ export function useAsignaturasDisponiblesPostulacion(rut_alumno: string){
     return useQuery({
         queryKey:['asignaturas', rut_alumno],
         queryFn: async () => {
-            const respuesta = await api.get(`asignaturas/${rut_alumno}`);
+            const respuesta = await api.get(`asignatura/${rut_alumno}`);
             return respuesta.data;
         },
     });
@@ -15,7 +15,7 @@ export function useTodasAsignaturas(){
     return useQuery({
         queryKey:['asignaturas'],
         queryFn: async () => {
-            const respuesta = await api.get('asignaturas');
+            const respuesta = await api.get('asignatura');
             return respuesta.data;
         },
     });
