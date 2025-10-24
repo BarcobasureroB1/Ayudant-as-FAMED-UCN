@@ -27,13 +27,13 @@ interface ActividadExtracurricular {
 }
 
 export interface CurriculumData {
-  usuario: {rut: string};
+  rut_alumno: string;
   nombres: string;
   apellidos: string;
   fecha_nacimiento: string;
   comuna: string;
   ciudad: string;
-  Num_Celular: string;
+  num_celular: string;
   correo: string;
   carrera: string;
   otros?: string;
@@ -43,6 +43,66 @@ export interface CurriculumData {
   actividades_cientificas?: ActividadCientifica[];
   actividades_extracurriculares?: ActividadExtracurricular[];
 }
+
+export interface CurriculumResponse {
+    
+    "id": number;
+    "usuario": {
+        "rut": string,
+        "nombres": string,
+        "apellidos": string,
+        "password": string,
+        "tipo": string,
+        "c_ayudantias": number,
+        "deshabilitado": boolean,
+        "actividades_cientificas": [
+            {
+                "id": number,
+                "nombre": string,
+                "descripcion": string,
+                "periodo_participacion": string
+            }
+        ],
+        "ayudantias": [
+            {
+                "id": number,
+                "nombre_asig": string,
+                "nombre_coordinador": string,
+                "evaluacion": string
+            }
+        ],
+        "titulos": [
+            {
+                "id": number,
+                "nombre_asig": string,
+                "n_coordinador": string,
+                "evaluacion": string
+            }
+        ],
+        "actividades_extracurriculares": [
+            {
+                "id": number,
+                "nombre": string,
+                "docente": string,
+                "descripcion": string,
+                "periodo_participacion": string
+            }
+        ]
+    },
+    "nombres": string,
+    "apellidos": string,
+    "fecha_nacimiento": string,
+    "comuna": string,
+    "ciudad": string,
+    "Num_Celular": string,
+    "correo": string,
+    "carrera": string,
+    "otros": string
+}
+
+
+
+
 
 export function useComprobarCurriculum(rut_alumno?: string) {
     return useQuery({
