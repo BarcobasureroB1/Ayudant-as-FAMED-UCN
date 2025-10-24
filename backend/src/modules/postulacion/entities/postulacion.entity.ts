@@ -1,3 +1,4 @@
+import { Asignatura } from 'src/modules/asignatura/entities/asignatura.entity';
 import { Ayudantia } from 'src/modules/ayudantia/entities/ayudantia.entity';
 import { Consanguineo } from 'src/modules/consanguineo/entities/consanguineo.entity';
 import { Usuario } from 'src/modules/usuario/entities/usuario.entity';
@@ -9,8 +10,8 @@ export class Postulacion {
     @ManyToOne(() => Usuario, (usuario) => usuario.rut)
     usuario: Usuario;
 
-    @ManyToOne(() => Ayudantia, (ayudantia) => ayudantia.postulacion)
-    ayudantia: Ayudantia;
+    @ManyToOne(() => Asignatura, (asignatura) => asignatura.postulaciones)
+    asignatura: Asignatura;
     @Column()
     descripcion_carta: string;
     @Column()
@@ -25,15 +26,15 @@ export class Postulacion {
     bloque : string;
     @Column({ default: false })
     cancelada_por_usuario: boolean;
-    @Column()
+    @Column({ default: 0 },)
     puntuacion_etapa1: number;
-    @Column()
+    @Column({ default: 0 })
     puntuacion_etapa2: number;
     @Column({ default: false })
     rechazada_por_jefatura: boolean;
-    @Column()
+    @Column({ default: '' })
     motivo_descarte: string;
-    @Column()
+    @Column({ default: '' })
     fecha_descarte: string;
     @Column({ default: true })
     es_actual: boolean;

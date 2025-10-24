@@ -16,7 +16,7 @@ export class AsignaturaAlumnoService {
     return this.asignaturaAlumnoRepository.save(asignaturaAlumno);
   }
   async findPostulablesByRut(rut_alumno: string) {
-    return this.asignaturaAlumnoRepository
+    return await this.asignaturaAlumnoRepository
       .createQueryBuilder('aa')
       .innerJoinAndSelect('aa.asignatura', 'asignatura')
       .innerJoinAndSelect('aa.alumno', 'alumno')

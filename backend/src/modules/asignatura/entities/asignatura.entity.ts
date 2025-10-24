@@ -1,5 +1,6 @@
 import { AsignaturaAlumno } from 'src/modules/asignatura_alumno/entities/asignatura_alumno.entity';
 import { Departamento } from 'src/modules/departamento/entities/departamento.entity';
+import { Postulacion } from 'src/modules/postulacion/entities/postulacion.entity';
 import { Column, Entity, ManyToMany, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
 @Entity()
 export class Asignatura {
@@ -18,6 +19,8 @@ export class Asignatura {
     
     @OneToMany(() => AsignaturaAlumno, (aa) => aa.asignatura)
     asignaturasAlumnos: AsignaturaAlumno[];
+    @OneToMany(() => Postulacion, (postulacion) => postulacion.asignatura)
+    postulaciones: Postulacion[];
 }
 
 

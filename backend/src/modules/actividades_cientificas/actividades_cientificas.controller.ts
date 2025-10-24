@@ -14,8 +14,6 @@ export class ActividadesCientificasController {
     return this.actividadesCientificasService.findAll();
   }
 
-  
-
   @Get(':rut')
   findByUsuario(@Param('rut') rut: string) {
     return this.actividadesCientificasService.findByUsuario(rut);
