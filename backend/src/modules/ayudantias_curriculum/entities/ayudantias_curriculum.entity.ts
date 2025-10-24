@@ -11,7 +11,7 @@ export class AyudantiasCurriculum {
     @Column()
     nombre_asig: string;
     @Column()
-    n_coordinador: string
+    nombre_coordinador: string
     @Column()
     evaluacion: string;
     

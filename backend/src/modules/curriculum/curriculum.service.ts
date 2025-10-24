@@ -48,11 +48,12 @@ export class CurriculumService {
     const rut = data.rut_alumno;
 
     if (data.ayudantias?.length) {
+      console.log('Ayudantias data:', data.ayudantias);
       const ayudantias = data.ayudantias.map((a) =>
         this.ayudantiasCurriculumRepository.create({
           usuario,
           nombre_asig: a.nombre_asig,
-          n_coordinador: a.nombre_coordinador,
+          nombre_coordinador: a.nombre_coordinador,
           evaluacion: a.evaluacion_obtenida
         }),
       );
@@ -63,9 +64,9 @@ export class CurriculumService {
       const titulos = data.cursos_titulos_grados.map((c) =>
         this.titulosCursoRepository.create({
           usuario,
-          nombre: c.nombre_asig,
-          institucion: c.n_coordinador,
-          ano: c.evaluacion,
+          nombre_asig: c.nombre_asig,
+          n_coordinador: c.n_coordinador,
+          evaluacion: c.evaluacion,
         }),
       );
       await this.titulosCursoRepository.save(titulos);
@@ -76,7 +77,6 @@ export class CurriculumService {
           usuario,
           nombre: a.nombre,
           descripcion: a.descripcion,
-
           periodo_participacion: a.periodo_participacion,
         }),
       );

@@ -25,6 +25,9 @@ export class AsignaturaService {
     asignatura.nombre = createAsignaturaDto.nombre;
     asignatura.nrc = createAsignaturaDto.nrc;
     asignatura.semestre = createAsignaturaDto.semestre;
+    if (createAsignaturaDto.estado) {
+      asignatura.estado = createAsignaturaDto.estado;
+    }
     // ManyToMany relation expects an array of departamentos
     asignatura.departamentos = [departamento];
 
