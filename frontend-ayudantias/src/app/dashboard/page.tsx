@@ -5,6 +5,7 @@ import PostulantePage from "../postulante/page";
 import AdminPage from "../adminDashboard/page";
 import { useRouter } from "next/navigation";
 import { useEffect } from "react";
+import SecretariaDeptoPage from "../secretaria-depto/page";
 
 export default function DashboardPage() {
     const router = useRouter();
@@ -33,6 +34,9 @@ export default function DashboardPage() {
                 case 'postulante':
                     router.push("/postulante");
                     break;
+                case 'secretariaDepto':
+                    router.push("/secretaria-depto");
+                    break;
             }
         }
     }, [user, isLoading, rutaActual, router])
@@ -46,6 +50,11 @@ export default function DashboardPage() {
     if (rutaActual.startsWith("/adminDashboard"))
     {
         return <AdminPage/>;
+    }
+
+    if (rutaActual.startsWith("/secretaria-depto"))
+    {
+        return <SecretariaDeptoPage/>;
     }
 
     if (isLoading)
