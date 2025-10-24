@@ -52,7 +52,7 @@ export const PostulanteVista = ({user, alumno, curriculum, actividadesExtracurri
         correo: "",
         carrera: "",
         otros: "",
-        ayudantias: [{ nombre_asig: "", nombre_coordinador: "", evaluacion_obtenida: "" }],
+        ayudantias: [{ nombre_asig: "", nombre_coordinador: "", evaluacion: "" }],
         cursos_titulos_grados: [{ nombre_asig: "", n_coordinador: "", evaluacion: "" }],
         actividades_cientificas: [{ nombre: "", descripcion: "", periodo_participacion: "" }],
         actividades_extracurriculares: [
@@ -83,8 +83,8 @@ export const PostulanteVista = ({user, alumno, curriculum, actividadesExtracurri
 
     const mostrarCurriculum = () => {
         return (
-        <div>
-            <h2 className="text-xl font-bold mb-4">Curriculum Vitae</h2>
+        <div className="text-black"> 
+            <h2 className="text-xl font-bold mb-4 ">Curriculum Vitae</h2>
             <p><b>RUT:</b> {curriculum?.usuario.rut}</p>
             <p><b>Nombre:</b> {curriculum?.nombres} {curriculum?.apellidos}</p>
             <p><b>Fecha de nacimiento:</b> {curriculum?.fecha_nacimiento}</p>
@@ -283,8 +283,8 @@ export const PostulanteVista = ({user, alumno, curriculum, actividadesExtracurri
                     </div>
 
                     {vista === 'perfil' ? (
-                        <>
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6 ">
+                        <div className="text-black">
+                            <div className="text-xl grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
                                 <p><b>RUT:</b> {user.rut}</p>
                                 <p><b>Nombre:</b> {user.nombres} {user.apellido}</p>
                                 <p><b>Correo:</b> {curriculum?.correo}</p>
@@ -320,9 +320,9 @@ export const PostulanteVista = ({user, alumno, curriculum, actividadesExtracurri
                                 {popupPostulacion}
 
                             </div>
-                        </>
+                        </div>
                     ) : (
-                        <div>
+                        <div className="text-black">
                             <h2 className="text-xl font-bold mb-4">Postular</h2>
                             <div className="flex items-center space-x-2">
                             </div>
@@ -332,7 +332,7 @@ export const PostulanteVista = ({user, alumno, curriculum, actividadesExtracurri
                                 <form onSubmit={handleSubmitPostulacion} className="space-y-4">
                                     <div className="grid grid-cols-1 gap-4">
                                         <div>
-                                            <label className="block text-sm font-medium text-gray-700">Asignatura</label>
+                                            <label className="block text-sm font-medium text-black">Asignatura</label>
                                             <select
                                                 name="id_asignatura"
                                                 value={formPostulacion.id_asignatura}
@@ -360,28 +360,28 @@ export const PostulanteVista = ({user, alumno, curriculum, actividadesExtracurri
                                     </div>
 
                                     <div>
-                                        <label className="block text-sm font-medium text-gray-700">Escriba Carta de interés: </label>
+                                        <label className="block text-sm font-medium text-black">Escriba Carta de interés: </label>
                                         <textarea name="descripcion_carta" value={formPostulacion.descripcion_carta} onChange={(e) => setFormPostulacion({ ...formPostulacion, [e.target.name]: e.target.value })} className="w-full px-3 py-2 border border-gray-300 rounded h-28" />
                                     </div>
 
                                     <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                                         <div>
-                                            <label className="block text-sm font-medium text-gray-700">Correo del profesor para recomendación: </label>
+                                            <label className="block text-sm font-medium text-black">Correo del profesor para recomendación: </label>
                                             <input name="correo_profe" value={formPostulacion.correo_profe} onChange={(e) => setFormPostulacion({ ...formPostulacion, [e.target.name]: e.target.value })} className="w-full px-3 py-2 border border-gray-300 rounded" />
                                         </div>
                                         <div>
-                                            <label className="block text-sm font-medium text-gray-700">Actividad Propuesta: </label>
+                                            <label className="block text-sm font-medium text-black">Actividad Propuesta: </label>
                                             <input name="actividad" value={formPostulacion.actividad} onChange={(e) => setFormPostulacion({ ...formPostulacion, [e.target.name]: e.target.value })} className="w-full px-3 py-2 border border-gray-300 rounded" />
                                         </div>
                                         <div>
-                                            <label className="block text-sm font-medium text-gray-700">Metodología: </label>
+                                            <label className="block text-sm font-medium text-black">Metodología: </label>
                                             <input name="metodologia" value={formPostulacion.metodologia} onChange={(e) => setFormPostulacion({ ...formPostulacion, [e.target.name]: e.target.value })} className="w-full px-3 py-2 border border-gray-300 rounded" />
                                         </div>
                                     </div>
 
                                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                         <div>
-                                            <label className="block text-sm font-medium text-gray-700">Día</label>
+                                            <label className="block text-sm font-medium text-black">Día</label>
                                             <select name="dia" value={formPostulacion.dia} onChange={(e) => setFormPostulacion({ ...formPostulacion, [e.target.name]: e.target.value })} className="w-full px-3 py-2 border border-gray-300 rounded bg-white">
                                                 <option value="">Seleccione un día</option>
                                                 <option value="Lunes">Lunes</option>
@@ -394,7 +394,7 @@ export const PostulanteVista = ({user, alumno, curriculum, actividadesExtracurri
                                             </select>
                                         </div>
                                         <div>
-                                            <label className="block text-sm font-medium text-gray-700">Bloque</label>
+                                            <label className="block text-sm font-medium text-black">Bloque</label>
                                             <select name="bloque" value={formPostulacion.bloque} onChange={(e) => setFormPostulacion({ ...formPostulacion, [e.target.name]: e.target.value })} className="w-full px-3 py-2 border border-gray-300 rounded bg-white">
                                                 <option value="">Seleccione un bloque</option>
                                                 <option value="A">A</option>
@@ -443,13 +443,13 @@ export const PostulanteVista = ({user, alumno, curriculum, actividadesExtracurri
                 </div>
                 
                 {vista === 'perfil' ? (
-                    <>
+                    <div className="text-black">
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
                             <p><b>RUT:</b> {user.rut}</p>
                             <p><b>Nombre:</b> {user.nombres} {user.apellido}</p>
                             <p><b>Correo:</b> {curriculum?.correo}</p>
-                            <p><b>Año de ingreso: </b>vacío</p>
-                            <p><b>Semestre actual: </b>vacío</p>
+                            <p><b>Año de ingreso: </b>No aplica</p>
+                            <p><b>Semestre actual: </b>No aplica</p>
                         </div>
                         <div className="mt-4">
                             <button onClick={() => setMostrarPopup(true)} className="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
@@ -480,9 +480,9 @@ export const PostulanteVista = ({user, alumno, curriculum, actividadesExtracurri
 
 
                         </div>
-                    </>
+                    </div>
                     ) : (
-                        <div>
+                        <div className="text-black">
                             <h2 className="text-xl font-bold mb-4">Postular</h2>
                             <div className="flex items-center space-x-2 mb-4">
                                
@@ -537,7 +537,7 @@ export const PostulanteVista = ({user, alumno, curriculum, actividadesExtracurri
                                         </div>
                                         <div>
                                             <label className="block text-sm font-medium text-gray-700">Metodología: </label>
-                                            <input name="metodologia" value={formPostulacion.metodologia} onChange={(e) => setFormPostulacion({ ...formPostulacion, [e.target.name]: e.target.value })} className="w-full px-3 py-2 border border-gray-300 rounded" />
+                                            <textarea name="metodologia" value={formPostulacion.metodologia} onChange={(e) => setFormPostulacion({ ...formPostulacion, [e.target.name]: e.target.value })} className="w-full px-3 py-2 border border-gray-300 rounded h-28" />
                                         </div>
                                     </div>
 
@@ -699,16 +699,16 @@ export const PostulanteVista = ({user, alumno, curriculum, actividadesExtracurri
                         <div>
                             <h4 className="text-lg font-medium text-gray-700 mb-3">Ayudantías Previas</h4>
                             {form.ayudantias.map((a, i) => (
-                                <div key={`ayudantia-${i}`} className="grid grid-cols-1 md:grid-cols-4 gap-3 mb-3 p-3 border rounded bg-gray-50">
+                                <div key={`ayudantia-${i}` } className="grid grid-cols-1 md:grid-cols-4 gap-3 mb-3 p-3 border rounded bg-gray-50">
                                     <input placeholder="Nombre asignatura" name="nombre_asig" value={a.nombre_asig} onChange={(e) => handleArrayChange(e, "ayudantias", i)} className="px-3 py-2 border border-gray-300 rounded focus:ring-blue-500 focus:border-blue-500 text-gray-800"/>
                                     <input placeholder="Coordinador" name="nombre_coordinador" value={a.nombre_coordinador} onChange={(e) => handleArrayChange(e, "ayudantias", i)} className="px-3 py-2 border border-gray-300 rounded focus:ring-blue-500 focus:border-blue-500 text-gray-800"/>
-                                    <input placeholder="Evaluación" name="evaluacion_obtenida" value={a.evaluacion_obtenida} onChange={(e) => handleArrayChange(e, "ayudantias", i)} className="px-3 py-2 border border-gray-300 rounded focus:ring-blue-500 focus:border-blue-500 text-gray-800"/>
+                                    <input placeholder="Evaluación" name="evaluacion" value={a.evaluacion} onChange={(e) => handleArrayChange(e, "ayudantias", i)} className="px-3 py-2 border border-gray-300 rounded focus:ring-blue-500 focus:border-blue-500 text-gray-800"/>
                                     <button type="button" onClick={() => removeItem("ayudantias", i)} className="bg-red-500 hover:bg-red-600 text-white py-2 px-3 rounded text-sm">
                                         Eliminar
                                     </button>
                                 </div>
                             ))}
-                            <button type="button" onClick={() => addItem("ayudantias", { nombreAsig: "", coordinador: "", evaluacion: "" })} className="bg-green-500 hover:bg-green-600 text-white py-2 px-4 rounded text-sm font-medium">
+                            <button type="button" onClick={() => addItem("ayudantias", { nombre_asig: "", nombre_coordinador: "", evaluacion: "" })} className="bg-green-500 hover:bg-green-600 text-white py-2 px-4 rounded text-sm font-medium">
                                 + Agregar Ayudantía
                             </button>
                         </div>
@@ -733,7 +733,7 @@ export const PostulanteVista = ({user, alumno, curriculum, actividadesExtracurri
                         <div>
                             <h4 className="text-lg font-medium text-gray-700 mb-3">Actividades Científicas</h4>
                             {form.actividades_cientificas.map((a, i) => (
-                                <div key={`actividad-${i}`} className="grid grid-cols-1 md:grid-cols-4 gap-3 mb-3 p-3 border rounded bg-gray-50">
+                                <div key={`actividad-${i} || ${i}`} className="grid grid-cols-1 md:grid-cols-4 gap-3 mb-3 p-3 border rounded bg-gray-50">
                                     <input placeholder="Nombre" name="nombre" value={a.nombre} onChange={(e) => handleArrayChange(e, "actividades_cientificas", i)} className="px-3 py-2 border border-gray-300 rounded focus:ring-blue-500 focus:border-blue-500 text-gray-800"/>
                                     <input placeholder="Descripción" name="descripcion" value={a.descripcion} onChange={(e) => handleArrayChange(e, "actividades_cientificas", i)} className="px-3 py-2 border border-gray-300 rounded focus:ring-blue-500 focus:border-blue-500 text-gray-800"/>
                                     <input placeholder="Periodo de participación" name="periodo_participacion" value={a.periodo_participacion} onChange={(e) => handleArrayChange(e, "actividades_cientificas", i)} className="px-3 py-2 border border-gray-300 rounded focus:ring-blue-500 focus:border-blue-500 text-gray-800"/>
@@ -750,7 +750,7 @@ export const PostulanteVista = ({user, alumno, curriculum, actividadesExtracurri
                         <div>
                             <h4 className="text-lg font-medium text-gray-700 mb-3">Actividades Extracurriculares</h4>
                             {form.actividades_extracurriculares.map((a, i) => (
-                                <div key={`actividad-${i}`} className="grid grid-cols-1 md:grid-cols-5 gap-3 mb-3 p-3 border rounded bg-gray-50">
+                                <div key={`actividad-${i} || ${i}`} className="grid grid-cols-1 md:grid-cols-5 gap-3 mb-3 p-3 border rounded bg-gray-50">
                                     <input placeholder="Nombre" name="nombre" value={a.nombre} onChange={(e) => handleArrayChange(e, "actividades_extracurriculares", i)} className="px-3 py-2 border border-gray-300 rounded focus:ring-blue-500 focus:border-blue-500 text-gray-800"/>
                                     <input placeholder="Docente o institución" name="docente" value={a.docente} onChange={(e) => handleArrayChange(e, "actividades_extracurriculares", i)} className="px-3 py-2 border border-gray-300 rounded focus:ring-blue-500 focus:border-blue-500 text-gray-800"/>
                                     <input placeholder="Descripción" name="descripcion" value={a.descripcion} onChange={(e) => handleArrayChange(e, "actividades_extracurriculares", i)} className="px-3 py-2 border border-gray-300 rounded focus:ring-blue-500 focus:border-blue-500 text-gray-800"/>
