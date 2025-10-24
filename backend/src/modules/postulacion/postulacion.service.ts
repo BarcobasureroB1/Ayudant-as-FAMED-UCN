@@ -62,10 +62,10 @@ export class PostulacionService {
       'postulacion.dia AS dia',
       'postulacion.bloque AS bloque',
     ])
-    //.where('usuario.rut = :rut', { rut: rut_alumno })
-    //.andWhere('postulacion.cancelada_por_usuario = false')
-    //.andWhere('postulacion.rechazada_por_jefatura = false')
-    //.andWhere('postulacion.es_actual = true')
+    .where('usuario.rut = :rut', { rut: rut_alumno })
+    .andWhere('postulacion.cancelada_por_usuario = false')
+    .andWhere('postulacion.rechazada_por_jefatura = false')
+    .andWhere('postulacion.es_actual = true')
     .getRawMany();
 }
 }
