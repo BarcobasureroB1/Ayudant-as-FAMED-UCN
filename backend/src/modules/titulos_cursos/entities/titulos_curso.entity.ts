@@ -8,9 +8,9 @@ export class TitulosCurso {
     @ManyToOne(() => Usuario, (usuario) => usuario.titulos, { onDelete: 'CASCADE' })
     usuario: Usuario;
     @Column()
-    nombre : string;
+    nombre_asig: string;
     @Column()
-    institucion : string;
+    n_coordinador: string;
     @Column()
-    ano : string;
+    evaluacion : string;
 }

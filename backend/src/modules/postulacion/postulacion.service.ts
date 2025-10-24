@@ -52,10 +52,10 @@ export class PostulacionService {
     }
     return this.postulacionRepository
     .createQueryBuilder('postulacion')
-    .leftJoin('postulacion.asignatura', 'asignatura')
+    .leftJoin('postulacion.ayudantia', 'ayudantia')
     .select([
       'postulacion.id',
-      'asignatura.nombre AS nombre_asignatura',
+      'ayudantia.asignatura AS nombre_asignatura',
       'postulacion.descripcion_carta',
       'postulacion.correo_profe',
       'postulacion.actividad',
@@ -63,7 +63,7 @@ export class PostulacionService {
       'postulacion.dia',
       'postulacion.bloque',
     ])
-    .where('postulacion.rut_alumno = :rut', { rut: rut_alumno })
+    .where('postulacion.usuario.rut = :rut', { rut: rut_alumno })
     .andWhere('postulacion.cancelada_por_usuario = false')
     .andWhere('postulacion.rechazada_por_jefatura = false')
     .andWhere('postulacion.es_actual = true')
