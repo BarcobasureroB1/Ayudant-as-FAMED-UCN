@@ -312,7 +312,7 @@ export const PostulanteVista = ({user, alumno, curriculum, actividadesExtracurri
                                                 <p><b>Descripción carta: </b>
                                                     <button onClick={() => { setPostulacionSeleccionada(p); setMostrarPopupPostulaciones(true); }} className="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">Ver documento</button>
                                                 </p>
-                                                <p><b>Acción: </b> <button onClick={() => cancelarPostulacion.mutate({id: p.id})}>Cancelar postulación</button></p>
+                                                <p><b>Acción: </b> <button onClick={() => cancelarPostulacion.mutate({id: p.id})} className="bg-blue-600 hover:bg-red-700 text-white font-bold py-2 px-4 rounded">Cancelar postulación</button></p>
                                             </li>
                                         ))
                                     ) : (
@@ -471,7 +471,7 @@ export const PostulanteVista = ({user, alumno, curriculum, actividadesExtracurri
                                                 <p><b>Descripción carta: </b>
                                                     <button onClick={() => { setPostulacionSeleccionada(p); setMostrarPopupPostulaciones(true); }} className="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">Ver documento</button>
                                                 </p>
-                                                <p><b>Acción: </b> <button onClick={() => cancelarPostulacion.mutate({id: p.id})}>Cancelar postulación</button></p>
+                                                <p><b>Acción: </b> <button onClick={() => cancelarPostulacion.mutate({id: p.id})} className="bg-red-600 hover:bg-red-700 text-white font-bold py-2 px-4 rounded">Cancelar postulación</button></p>
                                             </li>
                                         ))
                                     ) : (
