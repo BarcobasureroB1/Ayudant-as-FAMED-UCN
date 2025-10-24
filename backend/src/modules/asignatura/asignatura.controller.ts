@@ -12,8 +12,8 @@ export class AsignaturaController {
     return this.asignaturaService.create(createAsignaturaDto);
   }
   @Get()
-  findall(){
-    return this.asignaturaService.findAll()
+  async findall(){
+    return await this.asignaturaService.findAll()
   }
 
   

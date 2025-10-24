@@ -21,7 +21,6 @@ export class Ayudantia {
     periodo: string;
     @Column()
     remunerada: string;
-    @ManyToOne(() => Postulacion, (postulacion) => postulacion.id)
-    postulacion: Postulacion;
+    
 
 }
