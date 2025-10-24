@@ -1207,7 +1207,7 @@ export const PostulanteVista = ({user, alumno, curriculum, actividadesExtracurri
                         <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
                             <div>
                                 <h1 className="text-2xl md:text-3xl font-bold text-gray-900">
-                                    Portal del Administrador
+                                    Portal del Postulante
                                 </h1>
                                 <p className="text-gray-600 mt-1">
                                     Gestiona tu perfil y postulaciones
@@ -1270,10 +1270,10 @@ export const PostulanteVista = ({user, alumno, curriculum, actividadesExtracurri
                                         <p className="text-sm text-gray-600">Semestre actual</p>
                                         <Badge variant="default">No aplica</Badge>
                                     </div>
-                                    <div>
+                                    {/*<div>
                                         <p className="text-sm text-gray-600">Rol</p>
                                         <Badge variant="success">Administrador</Badge>
-                                    </div>
+                                    </div>*/}
                                 </div>
                             </InfoCard>
 
