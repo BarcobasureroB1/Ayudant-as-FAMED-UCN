@@ -61,6 +61,8 @@ export class PostulacionService {
       'postulacion.metodologia AS metodologia',
       'postulacion.dia AS dia',
       'postulacion.bloque AS bloque',
+      'postulacion.cancelada_por_usuario AS estado',
+
     ])
     .where('usuario.rut = :rut', { rut: rut_alumno })
     .andWhere('postulacion.cancelada_por_usuario = false')
