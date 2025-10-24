@@ -46,27 +46,31 @@ export class PostulacionService {
   }
 
   async findcurrent(rut_alumno: string) {
-    const usuario = await this.usuarioRepository.findBy({ rut: rut_alumno });
-    if (!usuario) {
-      return null;
-    }
-    return this.postulacionRepository
+  // Verificamos si el usuario existe
+  const usuario = await this.usuarioRepository.findOneBy({ rut: rut_alumno });
+  if (!usuario) {
+    return null;
+  }
+
+  // Buscamos las postulaciones activas del usuario
+  return await this.postulacionRepository
     .createQueryBuilder('postulacion')
     .leftJoin('postulacion.ayudantia', 'ayudantia')
+    .leftJoin('ayudantia.asignatura', 'asignatura')
     .select([
-      'postulacion.id',
-      'ayudantia.asignatura AS nombre_asignatura',
-      'postulacion.descripcion_carta',
-      'postulacion.correo_profe',
-      'postulacion.actividad',
-      'postulacion.metodologia',
-      'postulacion.dia',
-      'postulacion.bloque',
+      'postulacion.id AS id',
+      'asignatura.nombre AS nombre_asignatura',
+      'postulacion.descripcion_carta AS descripcion_carta',
+      'postulacion.correo_profe AS correo_profe',
+      'postulacion.actividad AS actividad',
+      'postulacion.metodologia AS metodologia',
+      'postulacion.dia AS dia',
+      'postulacion.bloque AS bloque',
     ])
-    .where('postulacion.usuario.rut = :rut', { rut: rut_alumno })
+    .where('postulacion.usuario = :rut', { rut: usuario.rut })
     .andWhere('postulacion.cancelada_por_usuario = false')
     .andWhere('postulacion.rechazada_por_jefatura = false')
     .andWhere('postulacion.es_actual = true')
     .getRawMany();
-  }
+}
 }

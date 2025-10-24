@@ -16,9 +16,7 @@ export class ActividadesCientificasService {
     return `This action returns all actividadesCientificas`;
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} actividadesCientifica`;
-  }
+ 
 
   async findByUsuario(rut: string) {
     const actividades = await this.actividadesCientificaRepository.find({
