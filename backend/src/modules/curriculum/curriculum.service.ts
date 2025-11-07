@@ -31,71 +31,86 @@ export class CurriculumService {
     if (!usuario) {
       throw new Error('Usuario no encontrado');
     }
-    const curriculum = this.curriculumRepository.create({
-      usuario,
-      nombres: data.nombres,
-      apellidos: data.apellidos,
-      fecha_nacimiento: data.fecha_nacimiento,
-      comuna: data.comuna,
-      ciudad: data.ciudad,
-      Num_Celular: data.num_celular,
-      correo: data.correo,
-      carrera: data.carrera,
-      otros: data.otros,
-    });
-    await this.curriculumRepository.save(curriculum);
 
-    const rut = data.rut_alumno;
+    // Ejecutar todo en una transacción para asegurar rollback si alguna operación falla
+    return await this.curriculumRepository.manager.transaction(
+      async (transactionalEntityManager) => {
+        const curriculumRepo = transactionalEntityManager.getRepository(Curriculum);
+        const ayudantiasRepo = transactionalEntityManager.getRepository(AyudantiasCurriculum);
+        const titulosRepo = transactionalEntityManager.getRepository(TitulosCurso);
+        const cientificasRepo = transactionalEntityManager.getRepository(ActividadesCientifica);
+        const extracurricularesRepo = transactionalEntityManager.getRepository(ActividadesExtracurriculare);
 
-    if (data.ayudantias?.length) {
-      console.log('Ayudantias data:', data.ayudantias);
-      const ayudantias = data.ayudantias.map((a) =>
-        this.ayudantiasCurriculumRepository.create({
+        // Crear y guardar curriculum
+        const curriculum = curriculumRepo.create({
           usuario,
-          nombre_asig: a.nombre_asig,
-          nombre_coordinador: a.nombre_coordinador,
-          evaluacion: a.evaluacion_obtenida
-        }),
-      );
-      await this.ayudantiasCurriculumRepository.save(ayudantias);
-    }
+          nombres: data.nombres,
+          apellidos: data.apellidos,
+          fecha_nacimiento: data.fecha_nacimiento,
+          comuna: data.comuna,
+          ciudad: data.ciudad,
+          Num_Celular: data.num_celular,
+          correo: data.correo,
+          carrera: data.carrera,
+          otros: data.otros,
+        });
+        await curriculumRepo.save(curriculum);
 
-   if (data.cursos_titulos_grados?.length) {
-      const titulos = data.cursos_titulos_grados.map((c) =>
-        this.titulosCursoRepository.create({
-          usuario,
-          nombre_asig: c.nombre_asig,
-          n_coordinador: c.n_coordinador,
-          evaluacion: c.evaluacion,
-        }),
-      );
-      await this.titulosCursoRepository.save(titulos);
-    }
-     if (data.actividades_cientificas?.length) {
-      const cientificas = data.actividades_cientificas.map((a) =>
-        this.actividadesCientificaRepository.create({
-          usuario,
-          nombre: a.nombre,
-          descripcion: a.descripcion,
-          periodo_participacion: a.periodo_participacion,
-        }),
-      );
-      await this.actividadesCientificaRepository.save(cientificas);
-    }
-    if (data.actividades_extracurriculares?.length) {
-      const extra = data.actividades_extracurriculares.map((a) =>
-        this.actividadesExtracurriculareRepository.create({
-          usuario,
-          nombre: a.nombre,
-          docente: a.docente,
-          descripcion: a.descripcion,
-          periodo_participacion: a.periodo_participacion,
-        }),
-      );
-      await this.actividadesExtracurriculareRepository.save(extra);
-    }
-   
+        // Si alguna de las siguientes operaciones lanza, la transacción hace rollback automáticamente
 
+        if (data.ayudantias?.length) {
+          const ayudantias = data.ayudantias.map((a) =>
+            ayudantiasRepo.create({
+              usuario,
+              nombre_asig: a.nombre_asig,
+              nombre_coordinador: a.nombre_coordinador,
+              evaluacion: a.evaluacion_obtenida,
+            }),
+          );
+          await ayudantiasRepo.save(ayudantias);
+        }
+
+        if (data.cursos_titulos_grados?.length) {
+          const titulos = data.cursos_titulos_grados.map((c) =>
+            titulosRepo.create({
+              usuario,
+              nombre_asig: c.nombre_asig,
+              n_coordinador: c.n_coordinador,
+              evaluacion: c.evaluacion,
+            }),
+          );
+          await titulosRepo.save(titulos);
+        }
+
+        if (data.actividades_cientificas?.length) {
+          const cientificas = data.actividades_cientificas.map((a) =>
+            cientificasRepo.create({
+              usuario,
+              nombre: a.nombre,
+              descripcion: a.descripcion,
+              periodo_participacion: a.periodo_participacion,
+            }),
+          );
+          await cientificasRepo.save(cientificas);
+        }
+
+        if (data.actividades_extracurriculares?.length) {
+          const extra = data.actividades_extracurriculares.map((a) =>
+            extracurricularesRepo.create({
+              usuario,
+              nombre: a.nombre,
+              docente: a.docente,
+              descripcion: a.descripcion,
+              periodo_participacion: a.periodo_participacion,
+            }),
+          );
+          await extracurricularesRepo.save(extra);
+        }
+
+        // Retornar el curriculum creado (puedes ajustar para devolver relaciones si lo deseas)
+        return curriculum;
+      },
+    );
   }
 
   findAll() {
