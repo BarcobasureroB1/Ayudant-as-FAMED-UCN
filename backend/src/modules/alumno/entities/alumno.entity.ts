@@ -21,7 +21,7 @@ export class Alumno {
     @Column()
     promedio: number;
     @Column()
-    nivel: string;
+    nivel: number;
     @Column()
     periodo: string;
   @OneToMany(() => AsignaturaAlumno, (aa) => aa.alumno)

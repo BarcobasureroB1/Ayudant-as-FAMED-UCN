@@ -12,23 +12,5 @@ export class AlumnoController {
     return this.alumnoService.create(createAlumnoDto);
   }
 
-  @Get()
-  findAll() {
-    return this.alumnoService.findAll();
-  }
-
-  @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.alumnoService.findOne(+id);
-  }
-
-  @Patch(':id')
-  update(@Param('id') id: string, @Body() updateAlumnoDto: UpdateAlumnoDto) {
-    return this.alumnoService.update(+id, updateAlumnoDto);
-  }
-
-  @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.alumnoService.remove(+id);
-  }
+ 
 }
