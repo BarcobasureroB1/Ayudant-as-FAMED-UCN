@@ -18,7 +18,7 @@ export class Alumno {
     codigo_carrera : string;
     @Column()
     nombre_carrera : string;
-    @Column()
+    @Column({ type: 'float' })
     promedio: number;
     @Column()
     nivel: number;
