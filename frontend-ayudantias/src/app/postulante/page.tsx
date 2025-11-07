@@ -1632,6 +1632,7 @@ export const PostulanteVista = ({user, alumno, curriculum, actividadesExtracurri
                                     <input 
                                         id="num_celular" 
                                         name="num_celular" 
+                                        type="number"
                                         value={form.num_celular} 
                                         onChange={handleChange} 
                                         required 
@@ -1729,6 +1730,7 @@ export const PostulanteVista = ({user, alumno, curriculum, actividadesExtracurri
                                             <input 
                                                 placeholder="Evaluación obtenida" 
                                                 name="evaluacion_obtenida" 
+                                                type="number"
                                                 value={a.evaluacion_obtenida} 
                                                 onChange={(e) => handleArrayChange(e, "ayudantias", i)} 
                                                 className="w-full px-3 py-2 border border-gray-300 rounded focus:ring-1 focus:ring-blue-500 focus:border-blue-500 text-gray-800 bg-white"
