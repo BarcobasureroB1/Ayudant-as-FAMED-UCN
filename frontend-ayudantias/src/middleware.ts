@@ -1,6 +1,6 @@
 import { NextResponse, NextRequest } from "next/server";
 
-const rutasProtegidas = ["/postulante", "/adminDashboard"];
+const rutasProtegidas = ["/postulante", "/adminDashboard", "/secretaria-depto"];
 
 
 export function middleware(request: NextRequest)
@@ -56,5 +56,5 @@ export function middleware(request: NextRequest)
 
 //rutas a las que afecta el middleware
 export const config = {
-    matcher: ["/adminDashboard", "/login", "/postulante"],
+    matcher: ["/adminDashboard", "/login", "/postulante", "/secretaria-depto"],
 };
