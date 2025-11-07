@@ -4,12 +4,15 @@ import { UsuarioService } from '../usuario/usuario.service';
 import * as bcryptjs from 'bcryptjs';
 import { RegisterDto } from './dto/RegisterDto';
 import { Usuario } from '../usuario/entities/usuario.entity';
+import { AlumnoService } from '../alumno/alumno.service';
 
 @Injectable()
 export class AuthService {
   constructor(
     private readonly usuarioService: UsuarioService,
-    private readonly jwtService: JwtService) {}
+    private readonly jwtService: JwtService,
+    private readonly alumnoService: AlumnoService,
+  ) {}
 
  async login(loginDto: any) {
   const usuario = await this.usuarioService.findforLogin(loginDto.rut);
@@ -34,17 +37,28 @@ export class AuthService {
   }
 
   async Register(registerDto: RegisterDto) {
+    if (!this.comprobarrut(registerDto.rut)) {
+      throw new Error('RUT inválido');
+    }
     const usuarioExists = await this.usuarioService.findforLogin(registerDto.rut);
     if (usuarioExists) {
       throw new Error('El usuario ya existe');
     }
-
+    
     const hashedPassword = await bcryptjs.hash(registerDto.password, 10);
     const newUser = new Usuario()
     newUser.rut = registerDto.rut;
     newUser.nombres = registerDto.nombres;
     newUser.apellidos = registerDto.apellidos;
-    newUser.tipo = registerDto.tipo;
+    const alumnoExists = await this.alumnoService.findByRut(registerDto.rut);
+    if (!alumnoExists) {
+      newUser.tipo = registerDto.tipo;
+      console.log('alumno no encontrado asignado tipo auxiliar:', newUser.tipo);
+    }
+    else {
+      newUser.tipo = 'alumno';
+      console.log('alumno encontrado asignado tipo alumno:', newUser.tipo);
+    }
     newUser.password = hashedPassword;
     newUser.c_ayudantias = 0;
     newUser.deshabilitado = false;
@@ -52,7 +66,14 @@ export class AuthService {
 
     return { message: 'Usuario registrado exitosamente' };
 
-
   }
 
+  comprobarrut(rut: string): boolean {
+    if (!rut) return false;
+    // remove non-digit characters (dots, dashes, spaces, etc.)
+    const cleaned = rut.replace(/[^\d]/g, '');
+    if (cleaned.length === 0) return false;
+    const parsed = parseInt(cleaned, 10);
+    return !Number.isNaN(parsed);
+  }
 }
