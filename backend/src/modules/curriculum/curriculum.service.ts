@@ -8,6 +8,7 @@ import { AyudantiasCurriculum } from '../ayudantias_curriculum/entities/ayudanti
 import { TitulosCurso } from '../titulos_cursos/entities/titulos_curso.entity';
 import { ActividadesCientifica } from '../actividades_cientificas/entities/actividades_cientifica.entity';
 import { ActividadesExtracurriculare } from '../actividades_extracurriculares/entities/actividades_extracurriculare.entity';
+import { Alumno } from '../alumno/entities/alumno.entity';
 
 
 @Injectable()
@@ -24,12 +25,15 @@ export class CurriculumService {
     @InjectRepository(ActividadesExtracurriculare)
     private readonly actividadesExtracurriculareRepository: Repository<ActividadesExtracurriculare>,
     private readonly usuarioService: UsuarioService,
+    @InjectRepository(Alumno)
+    private readonly alumnoRepository: Repository<Alumno>,
+    
   ) {}
 
   async create(data: CreateCurriculumDto) {
-    const usuario = await this.usuarioService.findOne(data.rut_alumno);
-    if (!usuario) {
-      throw new Error('Usuario no encontrado');
+    const alumno = await this.alumnoRepository.findOneBy({ rut_alumno: data.rut_alumno });
+    if (!alumno) {
+      throw new Error('Alumno no encontrado');
     }
 
     // Ejecutar todo en una transacción para asegurar rollback si alguna operación falla
@@ -43,7 +47,7 @@ export class CurriculumService {
 
         // Crear y guardar curriculum
         const curriculum = curriculumRepo.create({
-          usuario,
+          alumno,
           nombres: data.nombres,
           apellidos: data.apellidos,
           fecha_nacimiento: data.fecha_nacimiento,
@@ -61,7 +65,7 @@ export class CurriculumService {
         if (data.ayudantias?.length) {
           const ayudantias = data.ayudantias.map((a) =>
             ayudantiasRepo.create({
-              usuario,
+              alumno,
               nombre_asig: a.nombre_asig,
               nombre_coordinador: a.nombre_coordinador,
               evaluacion: a.evaluacion_obtenida,
@@ -73,7 +77,7 @@ export class CurriculumService {
         if (data.cursos_titulos_grados?.length) {
           const titulos = data.cursos_titulos_grados.map((c) =>
             titulosRepo.create({
-              usuario,
+              alumno,
               nombre_asig: c.nombre_asig,
               n_coordinador: c.n_coordinador,
               evaluacion: c.evaluacion,
@@ -85,7 +89,7 @@ export class CurriculumService {
         if (data.actividades_cientificas?.length) {
           const cientificas = data.actividades_cientificas.map((a) =>
             cientificasRepo.create({
-              usuario,
+              alumno,
               nombre: a.nombre,
               descripcion: a.descripcion,
               periodo_participacion: a.periodo_participacion,
@@ -97,7 +101,7 @@ export class CurriculumService {
         if (data.actividades_extracurriculares?.length) {
           const extra = data.actividades_extracurriculares.map((a) =>
             extracurricularesRepo.create({
-              usuario,
+              alumno,
               nombre: a.nombre,
               docente: a.docente,
               descripcion: a.descripcion,
@@ -126,15 +130,15 @@ export class CurriculumService {
     return `This action updates a #${id} curriculum`;
   }
 
-  async findByRut(rut: string) {
+  async findByRut(rut_alumno: string) {
   const curriculum = await this.curriculumRepository.findOne({
-    where: { usuario: { rut } },
+    where: { alumno: { rut_alumno } },
     relations: [
-      'usuario',
-      'usuario.actividades_cientificas',
-      'usuario.actividades_extracurriculares',
-      'usuario.ayudantias',
-      'usuario.titulos',
+      'alumno',
+      'alumno.actividades_cientificas',
+      'alumno.actividades_extracurriculares',
+      'alumno.ayudantias',
+      'alumno.titulos',
     ],
   });
 

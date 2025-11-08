@@ -9,11 +9,13 @@ import { ActividadesCientifica } from '../actividades_cientificas/entities/activ
 
 import { ActividadesExtracurriculare } from '../actividades_extracurriculares/entities/actividades_extracurriculare.entity';
 import { UsuarioModule } from '../usuario/usuario.module';
+import { Alumno } from '../alumno/entities/alumno.entity';
+import { AlumnoModule } from '../alumno/alumno.module';
 
 
 @Module({
-  imports: [TypeOrmModule.forFeature([Curriculum,AyudantiasCurriculum,TitulosCurso,ActividadesCientifica,ActividadesExtracurriculare]),
-UsuarioModule],
+  imports: [TypeOrmModule.forFeature([Curriculum,Alumno,AyudantiasCurriculum,TitulosCurso,ActividadesCientifica,ActividadesExtracurriculare]),
+UsuarioModule,AlumnoModule],
   controllers: [CurriculumController],
   providers: [CurriculumService],
 })

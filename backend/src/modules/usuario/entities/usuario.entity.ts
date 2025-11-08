@@ -24,14 +24,7 @@ export class Usuario {
     deshabilitado: boolean;
     @ManyToMany((nullable: true) => Departamento, (departamento) => departamento.secretarias)
     departamentos: Departamento[];
-    @OneToMany(() => ActividadesCientifica, (actividadesCientifica) => actividadesCientifica.usuario)
-    actividades_cientificas: ActividadesCientifica[];
-    @OneToMany(() => AyudantiasCurriculum, (ayudantiasCurriculum) => ayudantiasCurriculum.usuario)
-    ayudantias: AyudantiasCurriculum[];
-    @OneToMany(() => TitulosCurso, (titulosCurso) => titulosCurso.usuario)
-    titulos: TitulosCurso[];
-    @OneToMany(() => ActividadesExtracurriculare, (actividadesExtracurriculare) => actividadesExtracurriculare.usuario)
-    actividades_extracurriculares: ActividadesExtracurriculare[];
+  
     @OneToMany(() => Ayudantia, (ayudantia) => ayudantia.alumno)
     ayudantias_como_alumno: Ayudantia[];
 
