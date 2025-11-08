@@ -1,3 +1,4 @@
+import { Alumno } from 'src/modules/alumno/entities/alumno.entity';
 import { Curriculum } from 'src/modules/curriculum/entities/curriculum.entity';
 import { Postulacion } from 'src/modules/postulacion/entities/postulacion.entity';
 import { Usuario } from 'src/modules/usuario/entities/usuario.entity';
@@ -6,8 +7,8 @@ import { Column, Entity, ManyToOne, OneToMany, OneToOne, PrimaryGeneratedColumn 
 export class AyudantiasCurriculum {
     @PrimaryGeneratedColumn()
     id: number;
-     @ManyToOne(() => Usuario, (usuario) => usuario.ayudantias, { onDelete: 'CASCADE' })
-    usuario: Usuario;
+     @ManyToOne(() => Alumno, (alumno) => alumno.ayudantias, { onDelete: 'CASCADE' })
+    alumno: Alumno;
     @Column()
     nombre_asig: string;
     @Column()

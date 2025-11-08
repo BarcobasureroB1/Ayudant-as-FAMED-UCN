@@ -7,8 +7,8 @@ import { CreateAyudantiasCurriculumDto } from './dto/create-ayudantias_curriculu
 export class AyudantiasCurriculumController {
   constructor(private readonly ayudantiasCurriculumService: AyudantiasCurriculumService) {}
   @Get(':rut')
-  findByUsuario(@Param('rut') rut: string) {
-    return this.ayudantiasCurriculumService.findByUsuario(rut);
+  findByAlumno(@Param('rut') rut: string) {
+    return this.ayudantiasCurriculumService.findByAlumno(rut);
   }
  
 }
