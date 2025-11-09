@@ -8,6 +8,7 @@ import { AyudantiasCurriculum } from '../ayudantias_curriculum/entities/ayudanti
 import { TitulosCurso } from '../titulos_cursos/entities/titulos_curso.entity';
 import { ActividadesCientifica } from '../actividades_cientificas/entities/actividades_cientifica.entity';
 import { ActividadesExtracurriculare } from '../actividades_extracurriculares/entities/actividades_extracurriculare.entity';
+import { Alumno } from '../alumno/entities/alumno.entity';
 
 
 @Injectable()
@@ -24,78 +25,106 @@ export class CurriculumService {
     @InjectRepository(ActividadesExtracurriculare)
     private readonly actividadesExtracurriculareRepository: Repository<ActividadesExtracurriculare>,
     private readonly usuarioService: UsuarioService,
+    @InjectRepository(Alumno)
+    private readonly alumnoRepository: Repository<Alumno>,
+    
   ) {}
 
   async create(data: CreateCurriculumDto) {
-    const usuario = await this.usuarioService.findOne(data.rut_alumno);
+    const rut = data.rut_alumno;
+    const usuario = await this.usuarioService.findOne(rut);
+
     if (!usuario) {
       throw new Error('Usuario no encontrado');
     }
-    const curriculum = this.curriculumRepository.create({
-      usuario,
-      nombres: data.nombres,
-      apellidos: data.apellidos,
-      fecha_nacimiento: data.fecha_nacimiento,
-      comuna: data.comuna,
-      ciudad: data.ciudad,
-      Num_Celular: data.num_celular,
-      correo: data.correo,
-      carrera: data.carrera,
-      otros: data.otros,
-    });
-    await this.curriculumRepository.save(curriculum);
 
-    const rut = data.rut_alumno;
-
-    if (data.ayudantias?.length) {
-      console.log('Ayudantias data:', data.ayudantias);
-      const ayudantias = data.ayudantias.map((a) =>
-        this.ayudantiasCurriculumRepository.create({
-          usuario,
-          nombre_asig: a.nombre_asig,
-          nombre_coordinador: a.nombre_coordinador,
-          evaluacion: a.evaluacion_obtenida
-        }),
-      );
-      await this.ayudantiasCurriculumRepository.save(ayudantias);
+    // Si no es admin, validar que exista el alumno
+    if (usuario.tipo !== 'admin') {
+      const alumno = await this.alumnoRepository.findOneBy({ rut_alumno: rut });
+      if (!alumno) {
+        throw new Error('Alumno no encontrado');
+      }
     }
 
-   if (data.cursos_titulos_grados?.length) {
-      const titulos = data.cursos_titulos_grados.map((c) =>
-        this.titulosCursoRepository.create({
-          usuario,
-          nombre_asig: c.nombre_asig,
-          n_coordinador: c.n_coordinador,
-          evaluacion: c.evaluacion,
-        }),
-      );
-      await this.titulosCursoRepository.save(titulos);
-    }
-     if (data.actividades_cientificas?.length) {
-      const cientificas = data.actividades_cientificas.map((a) =>
-        this.actividadesCientificaRepository.create({
-          usuario,
-          nombre: a.nombre,
-          descripcion: a.descripcion,
-          periodo_participacion: a.periodo_participacion,
-        }),
-      );
-      await this.actividadesCientificaRepository.save(cientificas);
-    }
-    if (data.actividades_extracurriculares?.length) {
-      const extra = data.actividades_extracurriculares.map((a) =>
-        this.actividadesExtracurriculareRepository.create({
-          usuario,
-          nombre: a.nombre,
-          docente: a.docente,
-          descripcion: a.descripcion,
-          periodo_participacion: a.periodo_participacion,
-        }),
-      );
-      await this.actividadesExtracurriculareRepository.save(extra);
-    }
-   
+    // Ejecutar todo en una transacción para asegurar rollback si alguna operación falla
+    return await this.curriculumRepository.manager.transaction(
+      async (transactionalEntityManager) => {
+        const curriculumRepo = transactionalEntityManager.getRepository(Curriculum);
+        const ayudantiasRepo = transactionalEntityManager.getRepository(AyudantiasCurriculum);
+        const titulosRepo = transactionalEntityManager.getRepository(TitulosCurso);
+        const cientificasRepo = transactionalEntityManager.getRepository(ActividadesCientifica);
+        const extracurricularesRepo = transactionalEntityManager.getRepository(ActividadesExtracurriculare);
 
+        // Crear y guardar curriculum
+        const curriculum = curriculumRepo.create({
+          usuario: usuario,
+          nombres: data.nombres,
+          apellidos: data.apellidos,
+          fecha_nacimiento: data.fecha_nacimiento,
+          comuna: data.comuna,
+          ciudad: data.ciudad,
+          Num_Celular: data.num_celular,
+          correo: data.correo,
+          carrera: data.carrera,
+          otros: data.otros,
+        });
+        await curriculumRepo.save(curriculum);
+
+        // Si alguna de las siguientes operaciones lanza, la transacción hace rollback automáticamente
+
+        if (data.ayudantias?.length) {
+          const ayudantias = data.ayudantias.map((a) =>
+            ayudantiasRepo.create({
+              usuario,
+              nombre_asig: a.nombre_asig,
+              nombre_coordinador: a.nombre_coordinador,
+              evaluacion: a.evaluacion_obtenida,
+            }),
+          );
+          await ayudantiasRepo.save(ayudantias);
+        }
+
+        if (data.cursos_titulos_grados?.length) {
+          const titulos = data.cursos_titulos_grados.map((c) =>
+            titulosRepo.create({
+              usuario,
+              nombre_asig: c.nombre_asig,
+              n_coordinador: c.n_coordinador,
+              evaluacion: c.evaluacion,
+            }),
+          );
+          await titulosRepo.save(titulos);
+        }
+
+        if (data.actividades_cientificas?.length) {
+          const cientificas = data.actividades_cientificas.map((a) =>
+            cientificasRepo.create({
+              usuario,
+              nombre: a.nombre,
+              descripcion: a.descripcion,
+              periodo_participacion: a.periodo_participacion,
+            }),
+          );
+          await cientificasRepo.save(cientificas);
+        }
+
+        if (data.actividades_extracurriculares?.length) {
+          const extra = data.actividades_extracurriculares.map((a) =>
+            extracurricularesRepo.create({
+              usuario,
+              nombre: a.nombre,
+              docente: a.docente,
+              descripcion: a.descripcion,
+              periodo_participacion: a.periodo_participacion,
+            }),
+          );
+          await extracurricularesRepo.save(extra);
+        }
+
+        // Retornar el curriculum creado (puedes ajustar para devolver relaciones si lo deseas)
+        return curriculum;
+      },
+    );
   }
 
   findAll() {

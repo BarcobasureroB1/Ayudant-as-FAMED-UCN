@@ -7,10 +7,11 @@ import { jwtConstants } from './constants/jwt.constant';
 import { UsuarioModule } from '../usuario/usuario.module';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { Usuario } from '../usuario/entities/usuario.entity';
+import { AlumnoModule } from '../alumno/alumno.module';
 
 @Module({
   imports: [TypeOrmModule.forFeature([Usuario])
-    ,UsuarioModule,
+    ,UsuarioModule,AlumnoModule,
     JwtModule.register({
       global: true,
       secret: jwtConstants.secret,

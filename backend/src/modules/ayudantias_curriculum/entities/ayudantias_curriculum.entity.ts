@@ -1,3 +1,4 @@
+import { Alumno } from 'src/modules/alumno/entities/alumno.entity';
 import { Curriculum } from 'src/modules/curriculum/entities/curriculum.entity';
 import { Postulacion } from 'src/modules/postulacion/entities/postulacion.entity';
 import { Usuario } from 'src/modules/usuario/entities/usuario.entity';

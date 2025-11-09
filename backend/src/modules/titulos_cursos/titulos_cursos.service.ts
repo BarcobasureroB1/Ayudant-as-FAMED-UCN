@@ -11,9 +11,9 @@ export class TitulosCursosService {
   @InjectRepository(TitulosCurso)
   private readonly titulosCursosRepository: Repository<TitulosCurso>,
  ) {}
-  async findByUsuario(rut: string) {
+  async findByAlumno(rut_alumno: string) {
     const titulos = await this.titulosCursosRepository.find({
-      where: { usuario: { rut } },
+      where: { usuario: { rut: rut_alumno } },
     });
     if (!titulos) {
       return null;

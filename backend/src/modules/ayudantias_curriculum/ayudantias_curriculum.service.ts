@@ -12,9 +12,9 @@ export class AyudantiasCurriculumService {
     private readonly ayudantiasCurriculumRepository: Repository<AyudantiasCurriculum>,
   ) {}
 
-  async findByUsuario(rut: string) {
+  async findByAlumno(rut_alumno: string) {
     const ayudantias = await this.ayudantiasCurriculumRepository.find({
-      where: { usuario: { rut } },
+      where: { usuario: { rut: rut_alumno } },
     });
     if (!ayudantias) {
       return null;

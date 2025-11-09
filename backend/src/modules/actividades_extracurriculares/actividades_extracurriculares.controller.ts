@@ -8,8 +8,8 @@ export class ActividadesExtracurricularesController {
   constructor(private readonly actividadesExtracurricularesService: ActividadesExtracurricularesService) {}
 
   @Get(':rut')
-  findByUsuario(@Param('rut') rut: string) {
-    return this.actividadesExtracurricularesService.findByUsuario(rut);
+  findByAlumno(@Param('rut') rut: string) {
+    return this.actividadesExtracurricularesService.findByAlumno(rut);
   }
 
 }

@@ -18,7 +18,7 @@ export class ActividadesCientificasService {
 
  
 
-  async findByUsuario(rut: string) {
+  async findByAlumno(rut: string) {
     const actividades = await this.actividadesCientificaRepository.find({
       where: { usuario: { rut } },
     });

@@ -8,7 +8,7 @@ export class TitulosCursosController {
   constructor(private readonly titulosCursosService: TitulosCursosService) {}
 
   @Get(':rut')
-  findByUsuario(@Param('rut') rut: string) {
-    return this.titulosCursosService.findByUsuario(rut);
+  findByAlumno(@Param('rut') rut: string) {
+    return this.titulosCursosService.findByAlumno(rut);
   }
 }

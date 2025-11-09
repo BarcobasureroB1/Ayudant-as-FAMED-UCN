@@ -1,4 +1,5 @@
 
+import { Alumno } from 'src/modules/alumno/entities/alumno.entity';
 import { Usuario } from 'src/modules/usuario/entities/usuario.entity';
 import { Column, Entity, JoinColumn, OneToMany, OneToOne, PrimaryGeneratedColumn } from 'typeorm';
 @Entity()
@@ -8,7 +9,7 @@ export class Curriculum {
     @OneToOne(() => Usuario, (usuario) => usuario.rut)
     @JoinColumn({ name: 'rut_alumno' }) // FK en la tabla curriculum
     usuario: Usuario;
-    
+
     @Column()
     nombres: string;
     @Column()
