@@ -15,6 +15,14 @@ export class AsignaturaController {
   async findall(){
     return await this.asignaturaService.findAll()
   }
+  @Get('available/:rut_alumno')
+  async findAvaibleAsignaturas(@Param('rut_alumno') rut_alumno: string){
+    return await this.asignaturaService.findAvaibleAsignaturas(rut_alumno)
+  }
+  @Get(':rut_alumno')
+  findOne(@Param('rut_alumno') rut_alumno: string) {
+    return this.asignaturaService.findpostulablesByRut(rut_alumno);
+  }
 
   
 }
