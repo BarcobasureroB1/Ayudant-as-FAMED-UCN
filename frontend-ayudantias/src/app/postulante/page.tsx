@@ -602,6 +602,7 @@ import { AyudantiasAnteriores, useAyudantiasPorAlumno } from '@/hooks/useAyudant
 import { PostulacionData, usePostulacionesPorAlumno, useCancelarPostulacion, useCrearPostulacion } from '@/hooks/usePostulacion';
 import { useAsignaturasDisponiblesPostulacion, useTodasAsignaturas } from '@/hooks/useAsignaturas';
 import Cookies from 'js-cookie';
+import Select from 'react-select';
 
 // componente de tarjeta de info
 const InfoCard = ({ title, children, className = "" }: { title: string; children: React.ReactNode; className?: string }) => (
@@ -639,6 +640,11 @@ interface UserProps {
     cancelarPostulacion?: any;
     asignaturasDisponibles?: any;
     asignaturasTodas?: any;
+}
+
+interface OptionType {
+  value: string;
+  label: string;
 }
 
 export const PostulanteVista = ({user, alumno, curriculum, actividadesExtracurriculares, actividadesCientificas, cursosTitulosGrados, ayudantias, ayudantiasAnteriores, postulaciones, cancelarPostulacion, asignaturasDisponibles, asignaturasTodas}: UserProps) => {
@@ -925,6 +931,19 @@ export const PostulanteVista = ({user, alumno, curriculum, actividadesExtracurri
         </div>
     ) : null;
 
+    const opcionesAsignaturas: OptionType[] =
+        asignaturasTodas?.map((a: any) => ({
+            value: String(a.id),
+            label: a.nombre,
+        })) || [];
+
+    const opcionesAsignaturasDisponibles =
+         asignaturasDisponibles?.map((a: any) => ({
+            value: String(a.id),
+            label: a.nombre,
+        })) || [];
+
+
     //Vista Postulante
     if (curriculum && user.tipo === 'alumno') {
         return (
@@ -1053,31 +1072,39 @@ export const PostulanteVista = ({user, alumno, curriculum, actividadesExtracurri
 
                                     <form onSubmit={handleSubmitPostulacion} className="space-y-6">
                                         <div>
-                                            <label className="block text-sm font-medium text-gray-700 mb-2">Asignatura</label>
-                                            <select
-                                                name="id_asignatura"
-                                                value={formPostulacion.id_asignatura}
-                                                onChange={(e) => {
-                                                    const selectedId = e.target.value;
-                                                    const found = asignaturasDisponibles?.find((a: any) => String(a.id) === String(selectedId));
-                                                    setFormPostulacion({
+                                            <label className="block text-sm font-medium text-gray-700 mb-2">
+                                                Asignatura
+                                            </label>
+
+                                            {opcionesAsignaturasDisponibles.length > 0 ? (
+                                                <Select
+                                                    options={opcionesAsignaturasDisponibles}
+                                                    value={
+                                                        opcionesAsignaturas.find(
+                                                        (opt) => opt.value === String(formPostulacion.id_asignatura)
+                                                        ) || null
+                                                    }
+                                                    onChange={(selectedOption) => {
+                                                        if (!selectedOption) return;
+                                                        setFormPostulacion({
                                                         ...formPostulacion,
-                                                        id_asignatura: selectedId,
-                                                        nombre_asignatura: found?.nombre
-                                                    });
-                                                }}
-                                                className="w-full px-4 py-3 border border-gray-300 rounded-lg bg-white focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
-                                                required
-                                            >
-                                                <option value="">Seleccione una asignatura</option>
-                                                {asignaturasDisponibles && asignaturasDisponibles.length > 0 ? (
-                                                    asignaturasDisponibles.map((a: any) => (
-                                                        <option key={a.id} value={String(a.id)}>{a.nombre}</option>
-                                                    ))
-                                                ) : (
-                                                    <option value="">No hay asignaturas disponibles</option>
-                                                )}
-                                            </select>
+                                                        id_asignatura: selectedOption.value,
+                                                        nombre_asignatura: selectedOption.label,
+                                                        });
+                                                    }}
+                                                    placeholder="Seleccione una asignatura"
+                                                    isSearchable
+                                                    styles={{
+                                                        menu: (provided) => ({
+                                                        ...provided,
+                                                        maxHeight: 200,
+                                                        overflowY: "auto",
+                                                        }),
+                                                    }}
+                                                />
+                                            ) : (
+                                                <p className="text-gray-500 italic">No hay asignaturas disponibles</p>
+                                            )}
                                         </div>
 
                                         <div>
@@ -1328,31 +1355,39 @@ export const PostulanteVista = ({user, alumno, curriculum, actividadesExtracurri
                                 <InfoCard title="Nueva Postulación">
                                     <form onSubmit={handleSubmitPostulacion} className="space-y-6">
                                         <div>
-                                            <label className="block text-sm font-medium text-gray-700 mb-2">Asignatura</label>
-                                            <select
-                                                name="id_asignatura"
-                                                value={formPostulacion.id_asignatura}
-                                                onChange={(e) => {
-                                                    const selectedId = e.target.value;
-                                                    const found = asignaturasTodas?.find((a: any) => String(a.id) === String(selectedId));
-                                                    setFormPostulacion({
+                                            <label className="block text-sm font-medium text-gray-700 mb-2">
+                                                Asignatura
+                                            </label>
+
+                                            {opcionesAsignaturas.length > 0 ? (
+                                                <Select
+                                                    options={opcionesAsignaturas}
+                                                    value={
+                                                        opcionesAsignaturas.find(
+                                                        (opt) => opt.value === String(formPostulacion.id_asignatura)
+                                                        ) || null
+                                                    }
+                                                    onChange={(selectedOption) => {
+                                                        if (!selectedOption) return;
+                                                        setFormPostulacion({
                                                         ...formPostulacion,
-                                                        id_asignatura: selectedId,
-                                                        nombre_asignatura: found?.nombre
-                                                    });
-                                                }}
-                                                className="w-full px-4 py-3 border border-gray-300 rounded-lg bg-white focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
-                                                required
-                                            >
-                                                <option value="">Seleccione una asignatura</option>
-                                                {asignaturasTodas && asignaturasTodas.length > 0 ? (
-                                                    asignaturasTodas.map((a: any) => (
-                                                        <option key={a.id} value={String(a.id)}>{a.nombre}</option>
-                                                    ))
-                                                ) : (
-                                                    <option value="">No hay asignaturas disponibles</option>
-                                                )}
-                                            </select>
+                                                        id_asignatura: selectedOption.value,
+                                                        nombre_asignatura: selectedOption.label,
+                                                        });
+                                                    }}
+                                                    placeholder="Seleccione una asignatura"
+                                                    isSearchable
+                                                    styles={{
+                                                        menu: (provided) => ({
+                                                        ...provided,
+                                                        maxHeight: 200,
+                                                        overflowY: "auto",
+                                                        }),
+                                                    }}
+                                                />
+                                            ) : (
+                                                <p className="text-gray-500 italic">No hay asignaturas disponibles</p>
+                                            )}
                                         </div>
 
                                         <div>
