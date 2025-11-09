@@ -1297,10 +1297,10 @@ export const PostulanteVista = ({user, alumno, curriculum, actividadesExtracurri
                                         <p className="text-sm text-gray-600">Semestre actual</p>
                                         <Badge variant="default">No aplica</Badge>
                                     </div>
-                                    {/*<div>
+                                    {<div>
                                         <p className="text-sm text-gray-600">Rol</p>
                                         <Badge variant="success">Administrador</Badge>
-                                    </div>*/}
+                                    </div>}
                                 </div>
                             </InfoCard>
 
@@ -1699,7 +1699,7 @@ export const PostulanteVista = ({user, alumno, curriculum, actividadesExtracurri
                                         onChange={handleChange} 
                                         required 
                                         className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors text-gray-800 placeholder-gray-400"
-                                        placeholder="Ingeniería Civil Informática"
+                                        placeholder="Medicina, Kinesiologia, etc..."
                                     />
                                 </div>
                             </div>
