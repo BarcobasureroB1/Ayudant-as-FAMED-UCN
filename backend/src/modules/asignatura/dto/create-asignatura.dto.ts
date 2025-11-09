@@ -13,5 +13,7 @@ export class CreateAsignaturaDto {
     nrc: string;
     @IsString()
     Departamento:string
+    
+    
 
 }
