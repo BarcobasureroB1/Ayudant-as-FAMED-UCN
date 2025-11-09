@@ -21,5 +21,9 @@ export class CurriculumController {
   findByRut(@Param('rut_alumno') rut_alumno: string) {
     return this.curriculumService.findByRut(rut_alumno);
   }
+  @Patch(':id')
+  update(@Param('id') id: string, @Body() updateCurriculumDto: any) {
+    return this.curriculumService.update(updateCurriculumDto);
+  }
 
 }

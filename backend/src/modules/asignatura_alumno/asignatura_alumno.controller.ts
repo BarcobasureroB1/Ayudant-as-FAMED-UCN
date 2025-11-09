@@ -16,4 +16,9 @@ export class AsignaturaAlumnoController {
   findPostulablesByRut(@Param('rut_alumno') rut_alumno: string) {
     return this.asignaturaAlumnoService.findPostulablesByRut(rut_alumno);
   }
+
+  @Get()
+  async findAll() {
+    return await this.asignaturaAlumnoService.findAll();
+  }
 }

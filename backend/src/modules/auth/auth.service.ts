@@ -53,7 +53,7 @@ export class AuthService {
     const alumnoExists = await this.alumnoService.findByRut(registerDto.rut);
     if (!alumnoExists) {
       newUser.tipo = registerDto.tipo;
-      console.log('alumno no encontrado asignado tipo auxiliar:', newUser.tipo);
+      console.log('alumno no encontrado asignando tipo dto:', newUser.tipo);
     }
     else {
       newUser.tipo = 'alumno';
