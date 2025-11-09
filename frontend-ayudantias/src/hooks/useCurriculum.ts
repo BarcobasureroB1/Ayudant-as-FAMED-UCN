@@ -44,6 +44,25 @@ export interface CurriculumData {
   actividades_extracurriculares?: ActividadExtracurricular[];
 }
 
+export interface CurriculumDataEditar {
+  id: number;
+  rut_alumno?: string;
+  nombres?: string;
+  apellidos?: string;
+  fecha_nacimiento?: string;
+  comuna?: string;
+  ciudad?: string;
+  Num_Celular?: string;
+  correo?: string;
+  carrera?: string;
+  otros?: string;
+
+  ayudantias?: Ayudantia[];
+  cursos_titulos_grados?: CursoTituloGrado[];
+  actividades_cientificas?: ActividadCientifica[];
+  actividades_extracurriculares?: ActividadExtracurricular[];
+}
+
 export interface CurriculumResponse {
     
     "id": number;
@@ -185,8 +204,8 @@ export function useAyudantias(rut_alumno?: string) {
 export function useEditarCurriculum(){
     const clienteQuery = useQueryClient();
     return useMutation({
-        mutationFn: async ({id}:{id: number}) => {
-            await api.patch(`curriculum/${id}`)
+        mutationFn: async (curriculum: CurriculumDataEditar) => {
+            await api.patch(`curriculum/${curriculum.id}`, curriculum);
         },
         onSuccess: (_data) => {
             clienteQuery.invalidateQueries({queryKey:['curriculum']});
@@ -194,3 +213,4 @@ export function useEditarCurriculum(){
     });
 
 }
+

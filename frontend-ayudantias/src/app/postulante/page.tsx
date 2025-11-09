@@ -596,13 +596,15 @@ import React, { SyntheticEvent, useEffect, useState } from 'react';
 import { useRouter } from "next/navigation";
 import { useUserProfile, User } from '@/hooks/useUserProfile';
 import { useAlumnoProfile, AlumnoData } from '@/hooks/useAlumnoProfile';
-import { useComprobarCurriculum, useCrearCurriculum, useActividadesExtracurriculares, useActividadescientificas, useCursos_titulos_grados, useAyudantias, CurriculumResponse} from '@/hooks/useCurriculum';
+import { useComprobarCurriculum, useCrearCurriculum, useActividadesExtracurriculares, useActividadescientificas, useCursos_titulos_grados, useAyudantias, CurriculumResponse, useEditarCurriculum} from '@/hooks/useCurriculum';
 import { useAuth } from '@/context/AuthContext';
 import { AyudantiasAnteriores, useAyudantiasPorAlumno } from '@/hooks/useAyudantia';
 import { PostulacionData, usePostulacionesPorAlumno, useCancelarPostulacion, useCrearPostulacion } from '@/hooks/usePostulacion';
 import { useAsignaturasDisponiblesPostulacion, useTodasAsignaturas } from '@/hooks/useAsignaturas';
 import Cookies from 'js-cookie';
 import Select from 'react-select';
+import FormularioEditarCurriculum from "@/components/formularioEditarCurriculum";
+
 
 // componente de tarjeta de info
 const InfoCard = ({ title, children, className = "" }: { title: string; children: React.ReactNode; className?: string }) => (
@@ -661,6 +663,8 @@ export const PostulanteVista = ({user, alumno, curriculum, actividadesExtracurri
     const [vista, setVista] = useState<Vista>('perfil');
     const isPerfil = vista === 'perfil';
     const isPostular = vista === 'postular';
+
+    const [modoEdicion, setModoEdicion] = useState<boolean>(false);
   
     const [form, setForm] = useState({
         rut_alumno: user.rut || "",
@@ -910,6 +914,30 @@ export const PostulanteVista = ({user, alumno, curriculum, actividadesExtracurri
             </div>
         </div>
     ) : null;
+
+    const popupEditarCurriculum = modoEdicion && curriculum ? (
+    <div
+        className="fixed inset-0 flex items-center justify-center bg-black/60 backdrop-blur-sm z-50"
+        onClick={() => setModoEdicion(false)}
+    >
+        <div
+            className="bg-white p-6 rounded-2xl shadow-2xl w-[90%] max-w-[800px] relative animate-fadeIn max-h-[85vh] overflow-y-auto"
+            onClick={(e) => e.stopPropagation()}
+        >
+            <button
+                onClick={() => setModoEdicion(false)}
+                className="absolute top-4 right-4 text-gray-400 hover:text-gray-600 text-xl transition-colors"
+            >
+                ✕
+            </button>
+
+            <FormularioEditarCurriculum
+                datosIniciales={curriculum}
+                onCancel={() => setModoEdicion(false)}
+            />
+        </div>
+    </div>
+) : null;
 
     const popupPostulacion = (mostrarPopupPostulaciones && postulacionSeleccionada) ? (
         <div
@@ -1311,7 +1339,16 @@ export const PostulanteVista = ({user, alumno, curriculum, actividadesExtracurri
                                 <span>📄</span>
                                 Ver Curriculum Completo
                             </button>
+
+                            <button
+                                onClick={() => setModoEdicion(true)}
+                                className="bg-yellow-500 hover:bg-yellow-600 text-white font-semibold py-2 px-4 rounded-lg transition"
+                            >
+                                ✏️ Editar
+                            </button>
                         </div>
+                        
+
 
                         <div className="lg:col-span-2">
                             {vista === 'perfil' ? (
@@ -1504,6 +1541,7 @@ export const PostulanteVista = ({user, alumno, curriculum, actividadesExtracurri
                 </div>
 
                 {popupCurriculum}
+                {popupEditarCurriculum}
                 {popupPostulacion}
             </div>
         );
