@@ -6,9 +6,9 @@ import { Column, Entity, JoinColumn, OneToMany, OneToOne, PrimaryGeneratedColumn
 export class Curriculum {
     @PrimaryGeneratedColumn()
     id: number;
-    @OneToOne(() => Alumno, (alumno) => alumno.rut_alumno)
+    @OneToOne(() => Usuario, (usuario) => usuario.rut)
     @JoinColumn({ name: 'rut_alumno' }) // FK en la tabla curriculum
-    alumno: Alumno;
+    usuario: Usuario;
 
     @Column()
     nombres: string;

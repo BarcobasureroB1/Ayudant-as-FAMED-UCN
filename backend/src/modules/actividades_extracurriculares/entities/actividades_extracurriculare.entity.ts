@@ -8,8 +8,8 @@ import { Column, Entity, JoinTable, ManyToOne, OneToMany, PrimaryGeneratedColumn
 export class ActividadesExtracurriculare {
     @PrimaryGeneratedColumn()
     id: number;
-    @ManyToOne(() => Alumno, (alumno) => alumno.actividades_extracurriculares, { onDelete: 'CASCADE' })
-    alumno: Alumno;
+    @ManyToOne(() => Usuario, (usuario) => usuario.actividades_extracurriculares, { onDelete: 'CASCADE' })
+    usuario: Usuario;
     @Column()
     nombre : string;
     @Column()

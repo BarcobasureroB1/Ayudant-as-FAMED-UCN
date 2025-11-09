@@ -13,7 +13,7 @@ export class TitulosCursosService {
  ) {}
   async findByAlumno(rut_alumno: string) {
     const titulos = await this.titulosCursosRepository.find({
-      where: { alumno: { rut_alumno } },
+      where: { usuario: { rut: rut_alumno } },
     });
     if (!titulos) {
       return null;

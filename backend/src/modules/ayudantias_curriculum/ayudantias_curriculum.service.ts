@@ -14,7 +14,7 @@ export class AyudantiasCurriculumService {
 
   async findByAlumno(rut_alumno: string) {
     const ayudantias = await this.ayudantiasCurriculumRepository.find({
-      where: { alumno: { rut_alumno } },
+      where: { usuario: { rut: rut_alumno } },
     });
     if (!ayudantias) {
       return null;

@@ -7,8 +7,8 @@ import { Column, Entity, ManyToOne, OneToMany, OneToOne, PrimaryGeneratedColumn 
 export class AyudantiasCurriculum {
     @PrimaryGeneratedColumn()
     id: number;
-     @ManyToOne(() => Alumno, (alumno) => alumno.ayudantias, { onDelete: 'CASCADE' })
-    alumno: Alumno;
+     @ManyToOne(() => Usuario, (usuario) => usuario.ayudantias, { onDelete: 'CASCADE' })
+    usuario: Usuario;
     @Column()
     nombre_asig: string;
     @Column()

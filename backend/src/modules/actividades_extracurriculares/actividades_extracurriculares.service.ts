@@ -14,10 +14,10 @@ export class ActividadesExtracurricularesService {
   
   async findByAlumno(rut_alumno: string) {
     const actividades = await this.actividadesExtracurriculareRepository.find({
-      where: { alumno: { rut_alumno  } },
+      where: { usuario: { rut: rut_alumno } },
     });
     if (!actividades) {
-     return null
+      return null;
     }
     return actividades;
   }

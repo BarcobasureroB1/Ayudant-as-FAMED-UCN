@@ -30,12 +30,8 @@ export class Alumno {
     periodo: string;
   @OneToMany(() => AsignaturaAlumno, (aa) => aa.alumno)
   asignaturasAlumno: AsignaturaAlumno[];
-  @OneToMany(() => AyudantiasCurriculum, (ayudantia) => ayudantia.alumno)
-  ayudantias: AyudantiasCurriculum[];
-  @OneToMany(() => TitulosCurso, (titulos) => titulos.alumno)
-  titulos: TitulosCurso[];
-  @OneToMany(() => ActividadesCientifica, (actividades) => actividades.alumno)
-  actividades_cientificas: ActividadesCientifica[];
-  @OneToMany(() => ActividadesExtracurriculare, (actividades) => actividades.alumno)
-  actividades_extracurriculares: ActividadesExtracurriculare[];
+  
+  
+  
+  
 }
