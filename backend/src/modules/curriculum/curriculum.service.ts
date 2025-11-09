@@ -31,11 +31,20 @@ export class CurriculumService {
   ) {}
 
   async create(data: CreateCurriculumDto) {
+    const rut = data.rut_alumno;
+    const usuario = await this.usuarioService.findOne(rut);
+    if (usuario) {
+      if (usuario.tipo !== 'admin') {
+        const alumno = await this.alumnoRepository.findOneBy({ rut_alumno: rut });
+      if (!alumno) {
+      throw new Error('Alumno no encontrado');
+      }
+    }
+  }
     const alumno = await this.alumnoRepository.findOneBy({ rut_alumno: data.rut_alumno });
     if (!alumno) {
       throw new Error('Alumno no encontrado');
     }
-
     // Ejecutar todo en una transacción para asegurar rollback si alguna operación falla
     return await this.curriculumRepository.manager.transaction(
       async (transactionalEntityManager) => {
