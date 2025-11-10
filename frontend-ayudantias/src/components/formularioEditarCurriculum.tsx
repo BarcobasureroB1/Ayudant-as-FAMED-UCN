@@ -93,7 +93,7 @@ export default function FormularioEditarCurriculum({
             ayudantias: d.usuario?.ayudantias?.map(a => ({
                 nombre_asig: a.nombre_asig,
                 nombre_coordinador: a.nombre_coordinador,
-                evaluacion_obtenida: a.evaluacion, // 🔄 mapeo clave aquí
+                evaluacion_obtenida: a.evaluacion, 
             })) || [],
             cursos_titulos_grados: d.usuario?.titulos?.map(t => ({
                 nombre_asig: t.nombre_asig,
@@ -119,7 +119,7 @@ export default function FormularioEditarCurriculum({
 
   const { mutate: editarCurriculum, isPending } = useEditarCurriculum();
 
-  // Maneja los cambios de los campos normales
+  
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
     setFormData((prev) => ({
@@ -128,7 +128,7 @@ export default function FormularioEditarCurriculum({
     }));
   };
 
-  // Añadir elemento a un array (ayudantías, cursos, etc.)
+  
     const handleAddArrayItem = (key: keyof CurriculumDataEditar, newItem: any) => {
     setFormData((prev) => ({
         ...prev,
@@ -136,7 +136,7 @@ export default function FormularioEditarCurriculum({
     }));
     };
 
-    // Modificar un campo dentro de un array
+    
     const handleArrayChange = (
     key: keyof CurriculumDataEditar,
     index: number,
@@ -155,7 +155,7 @@ export default function FormularioEditarCurriculum({
     });
     };
 
-    // Eliminar elemento del array
+    
     const handleRemoveArrayItem = (key: keyof CurriculumDataEditar, index: number) => {
     setFormData((prev) => {
         const current = prev[key];
@@ -173,7 +173,7 @@ export default function FormularioEditarCurriculum({
     if (!formData.id) return alert("Error: falta el ID del curriculum.");
 
     editarCurriculum(formData);
-    onCancel(); // cierra el popup
+    onCancel(); 
   };
 
   return (
@@ -181,7 +181,7 @@ export default function FormularioEditarCurriculum({
       onSubmit={handleSubmit}
       className="p-4 space-y-6 bg-white rounded-2xl text-black"
     >
-      {/* ---------- INFORMACIÓN PERSONAL ---------- */}
+      
       <section>
         <h3 className="text-lg font-medium text-gray-700 mb-2">
           Información Personal
@@ -247,7 +247,7 @@ export default function FormularioEditarCurriculum({
         </div>
       </section>
 
-      {/* ---------- AYUDANTÍAS ---------- */}
+      
       <section>
         <h3 className="text-lg font-medium text-gray-700 mb-2">Ayudantías</h3>
         {formData.ayudantias?.map((a, index) => (
@@ -301,7 +301,7 @@ export default function FormularioEditarCurriculum({
         </button>
       </section>
 
-      {/* ---------- CURSOS / TÍTULOS / GRADOS ---------- */}
+      
       <section className="mt-6">
         <h3 className="text-lg font-medium text-gray-700 mb-2">Cursos, Títulos o Grados</h3>
         {formData.cursos_titulos_grados?.map((c, index) => (
@@ -355,7 +355,7 @@ export default function FormularioEditarCurriculum({
       </section>
 
 
-      {/* ---------- ACTIVIDADES CIENTÍFICAS ---------- */}
+      
       <section className="mt-6">
         <h3 className="text-lg font-medium text-gray-700 mb-2">Actividades Científicas</h3>
         {formData.actividades_cientificas?.map((a, index) => (
@@ -414,7 +414,7 @@ export default function FormularioEditarCurriculum({
       </section>
 
 
-      {/* ---------- ACTIVIDADES EXTRACURRICULARES ---------- */}
+      
       <section className="mt-6">
         <h3 className="text-lg font-medium text-gray-700 mb-2">Actividades Extracurriculares</h3>
         {formData.actividades_extracurriculares?.map((a, index) => (
