@@ -606,6 +606,7 @@ import Select from 'react-select';
 import FormularioEditarCurriculum from "@/components/formularioEditarCurriculum";
 
 
+
 // componente de tarjeta de info
 const InfoCard = ({ title, children, className = "" }: { title: string; children: React.ReactNode; className?: string }) => (
     <div className={`bg-white rounded-xl shadow-sm border border-gray-200 p-6 ${className}`}>
@@ -965,7 +966,7 @@ export const PostulanteVista = ({user, alumno, curriculum, actividadesExtracurri
             label: a.nombre,
         })) || [];
 
-    const opcionesAsignaturasDisponibles =
+    const opcionesAsignaturasDisponibles: OptionType[] =
          asignaturasDisponibles?.map((a: any) => ({
             value: String(a.id),
             label: a.nombre,
@@ -1115,7 +1116,7 @@ export const PostulanteVista = ({user, alumno, curriculum, actividadesExtracurri
                                                 <Select
                                                     options={opcionesAsignaturasDisponibles}
                                                     value={
-                                                        opcionesAsignaturas.find(
+                                                        opcionesAsignaturasDisponibles.find(
                                                         (opt) => opt.value === String(formPostulacion.id_asignatura)
                                                         ) || null
                                                     }
@@ -1132,13 +1133,14 @@ export const PostulanteVista = ({user, alumno, curriculum, actividadesExtracurri
                                                     styles={{
                                                         menu: (provided) => ({
                                                         ...provided,
+                                                        color: "black",
                                                         maxHeight: 200,
                                                         overflowY: "auto",
                                                         }),
                                                     }}
                                                 />
                                             ) : (
-                                                <p className="text-gray-500 italic">No hay asignaturas disponibles</p>
+                                                <p className="text-black italic">No hay asignaturas disponibles</p>
                                             )}
                                         </div>
 
