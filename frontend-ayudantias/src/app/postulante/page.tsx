@@ -606,7 +606,7 @@ import Select from 'react-select';
 import FormularioEditarCurriculum from "@/components/formularioEditarCurriculum";
 
 
-
+// componente de tarjeta de info
 const InfoCard = ({ title, children, className = "" }: { title: string; children: React.ReactNode; className?: string }) => (
     <div className={`bg-white rounded-xl shadow-sm border border-gray-200 p-6 ${className}`}>
         <h3 className="text-lg font-semibold text-gray-800 mb-4 pb-2 border-b border-gray-100">{title}</h3>
@@ -614,7 +614,7 @@ const InfoCard = ({ title, children, className = "" }: { title: string; children
     </div>
 );
 
-
+// componente de badge para estados
 const Badge = ({ children, variant = "default" }: { children: React.ReactNode; variant?: "default" | "success" | "warning" | "error" }) => {
     const variants = {
         default: "bg-blue-100 text-blue-800",
@@ -821,9 +821,9 @@ export const PostulanteVista = ({user, alumno, curriculum, actividadesExtracurri
                     <div className="space-y-4">
                         {actividadesExtracurriculares.map((a: any) => (
                             <div key={a.id} className="border-l-4 border-teal-500 pl-4 py-2">
-                                <p className="font-medium text-gray-900">Nombre: {a.nombre}</p>
+                                <p className="font-medium text-gray-900">{a.nombre}</p>
                                 <p className="text-sm text-gray-600">Docente: {a.docente}</p>
-                                <p className="text-sm text-gray-600">Descripción: {a.descripcion}</p>
+                                <p className="text-sm text-gray-600">Descripción:{a.descripcion}</p>
                                 <p className="text-sm text-gray-600">Periodo: {a.periodo_participacion}</p>
                             </div>
                         ))}
@@ -972,7 +972,7 @@ export const PostulanteVista = ({user, alumno, curriculum, actividadesExtracurri
         })) || [];
 
 
-
+    
     if (curriculum && user.tipo === 'alumno') {
         return (
             <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 p-4 md:p-6">
@@ -1260,7 +1260,7 @@ export const PostulanteVista = ({user, alumno, curriculum, actividadesExtracurri
         );
     }
 
-
+   
     if (curriculum && user.tipo === 'admin') {
         return (
             <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 p-4 md:p-6">
@@ -1554,7 +1554,7 @@ export const PostulanteVista = ({user, alumno, curriculum, actividadesExtracurri
         );
     };
 
-
+    
     const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
         setForm({ ...form, [e.target.name]: e.target.value });
     };
@@ -1570,7 +1570,7 @@ export const PostulanteVista = ({user, alumno, curriculum, actividadesExtracurri
         setForm({ ...form, [key]: newArray });
     };
 
-
+    
     const removeItem = (key: string, index: number) => {
         const newArray = (form as any)[key].filter((_: any, i: number) => i !== index);
         setForm({ ...form, [key]: newArray });

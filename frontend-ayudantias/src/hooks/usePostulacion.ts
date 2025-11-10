@@ -27,6 +27,20 @@ export interface CrearPostulacion
     bloque: string;
 }
 
+export interface EditarPostulacion
+{
+    id: number;
+    rut_alumno: string;
+    id_asignatura: string;
+    nombre_asignatura: string;
+    descripcion_carta: string;
+    correo_profe: string;
+    actividad: string;
+    metodologia: string;
+    dia: string;
+    bloque: string;
+}
+
 export function usePostulacionesPorAlumno(rut_alumno?: string){
     return useQuery<PostulacionData, Error>({
         queryKey:['postulaciones', rut_alumno],
@@ -67,8 +81,8 @@ export function useCrearPostulacion() {
 export function useEditarPostulacion() {
     const clienteQuery = useQueryClient();
     return useMutation({
-        mutationFn: async ({id}:{id: number}) => {
-            await api.patch(`postulacion/editar/${id}`)
+        mutationFn: async (postulacion: EditarPostulacion) => {
+            await api.patch('postulacion', postulacion);
         },
         onSuccess: (_data) => {
             clienteQuery.invalidateQueries({queryKey:['postulaciones']});
