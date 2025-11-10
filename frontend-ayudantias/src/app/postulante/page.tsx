@@ -764,7 +764,7 @@ export const PostulanteVista = ({user, alumno, curriculum, actividadesExtracurri
                     <div className="space-y-4">
                         {ayudantias.map((a: any) => (
                             <div key={a.id} className="border-l-4 border-blue-500 pl-4 py-2">
-                                <p className="font-medium text-gray-900">{a.nombre_asig}</p>
+                                <p className="font-medium text-gray-900">Nombre: {a.nombre_asig}</p>
                                 <p className="text-sm text-gray-600">Coordinador: {a.nombre_coordinador}</p>
                                 <p className="text-sm text-gray-600">Evaluación: {a.evaluacion}</p>
                             </div>
@@ -778,7 +778,7 @@ export const PostulanteVista = ({user, alumno, curriculum, actividadesExtracurri
                     <div className="space-y-4">
                         {ayudantiasAnteriores.map((a: AyudantiasAnteriores) => (
                             <div key={a.id} className="border-l-4 border-green-500 pl-4 py-2">
-                                <p className="font-medium text-gray-900">{a.nombre_asig}</p>
+                                <p className="font-medium text-gray-900">Nombre: {a.nombre_asig}</p>
                                 <p className="text-sm text-gray-600">Coordinador: {a.n_coordinador}</p>
                                 <p className="text-sm text-gray-600">RUT coordinador: {a.rut_coordinador_otro}</p>
                                 <p className="text-sm text-gray-600">Evaluación: {a.evaluacion}</p>
@@ -793,7 +793,7 @@ export const PostulanteVista = ({user, alumno, curriculum, actividadesExtracurri
                     <div className="space-y-4">
                         {cursosTitulosGrados.map((c: any) => (
                             <div key={c.id} className="border-l-4 border-purple-500 pl-4 py-2">
-                                <p className="font-medium text-gray-900">{c.nombre_asig}</p>
+                                <p className="font-medium text-gray-900">Nombre: {c.nombre_asig}</p>
                                 <p className="text-sm text-gray-600">Coordinador: {c.n_coordinador}</p>
                                 <p className="text-sm text-gray-600">Evaluación: {c.evaluacion}</p>
                             </div>
@@ -807,8 +807,8 @@ export const PostulanteVista = ({user, alumno, curriculum, actividadesExtracurri
                     <div className="space-y-4">
                         {actividadesCientificas.map((a: any) => (
                             <div key={a.id} className="border-l-4 border-orange-500 pl-4 py-2">
-                                <p className="font-medium text-gray-900">{a.nombre}</p>
-                                <p className="text-sm text-gray-600">{a.descripcion}</p>
+                                <p className="font-medium text-gray-900">Nombre: {a.nombre}</p>
+                                <p className="text-sm text-gray-600">Descripción: {a.descripcion}</p>
                                 <p className="text-sm text-gray-600">Periodo: {a.periodo_participacion}</p>
                             </div>
                         ))}
@@ -821,9 +821,9 @@ export const PostulanteVista = ({user, alumno, curriculum, actividadesExtracurri
                     <div className="space-y-4">
                         {actividadesExtracurriculares.map((a: any) => (
                             <div key={a.id} className="border-l-4 border-teal-500 pl-4 py-2">
-                                <p className="font-medium text-gray-900">{a.nombre}</p>
+                                <p className="font-medium text-gray-900">Nombre: {a.nombre}</p>
                                 <p className="text-sm text-gray-600">Docente: {a.docente}</p>
-                                <p className="text-sm text-gray-600">{a.descripcion}</p>
+                                <p className="text-sm text-gray-600">Descripción: {a.descripcion}</p>
                                 <p className="text-sm text-gray-600">Periodo: {a.periodo_participacion}</p>
                             </div>
                         ))}
@@ -1053,6 +1053,13 @@ export const PostulanteVista = ({user, alumno, curriculum, actividadesExtracurri
                             >
                                 <span>📄</span>
                                 Ver Curriculum Completo
+                            </button>
+
+                            <button
+                                onClick={() => setModoEdicion(true)}
+                                className="bg-yellow-500 hover:bg-yellow-600 text-white font-semibold py-2 px-4 rounded-lg transition"
+                            >
+                                ✏️ Editar
                             </button>
                         </div>
 
