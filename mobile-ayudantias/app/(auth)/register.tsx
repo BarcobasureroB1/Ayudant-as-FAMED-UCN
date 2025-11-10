@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { View, Text, TextInput, StyleSheet, Alert, TouchableOpacity, ActivityIndicator, TouchableWithoutFeedback, Keyboard } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { useRegister } from '../hooks/useRegister';
+import { useRegister } from '../../hooks/useRegister';
 import { Link, useRouter } from 'expo-router';
 
 export default function RegisterPage() {

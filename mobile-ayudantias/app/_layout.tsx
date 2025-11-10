@@ -1,13 +1,14 @@
-import React, { useEffect } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { ProveedorAuth, useAuth } from '../context/AuthContext';
-import { Stack, useRouter, useSegments } from 'expo-router';
+import { SplashScreen, Stack, useRouter, useSegments } from 'expo-router';
 import { ActivityIndicator, View } from 'react-native';
 import { DarkTheme, DefaultTheme, ThemeProvider } from '@react-navigation/native';
 import { StatusBar } from 'expo-status-bar';
 import 'react-native-reanimated';
 import { useColorScheme } from '@/hooks/use-color-scheme';
 
+SplashScreen.preventAutoHideAsync(); //
 
 const queryCliente = new QueryClient();
 
@@ -15,8 +16,9 @@ function RootLayoutNav() {
   const { token, loading, tipoUser } = useAuth();
   const router = useRouter();
   const segmentos = useSegments();
-
   const colorScheme = useColorScheme() ?? 'light';
+
+  const [estadoNav, setEstadoNav] = useState(false);
 
   //redireccion
   useEffect(() => {
@@ -25,7 +27,9 @@ function RootLayoutNav() {
       return;
     }
 
+    const authGrupo = segmentos[0] === '(auth)';
     const appGrupo = segmentos[0] === '(tabs)';
+    let rutaRedir = null;
 
     if (token && tipoUser === 'alumno')
     {
@@ -34,23 +38,35 @@ function RootLayoutNav() {
       {
         router.replace('/(tabs)');
       }
-    } else if (!token)
+    } else if (!token || tipoUser !== 'alumno')
     {
-      //si no esta logueado se manda al login 
-      if (appGrupo)
+      //si no esta logueado y si no es postulante se manda al login 
+      if (!authGrupo)
       {
-        router.replace('/login');
+        router.replace('/(auth)/login');
       }
-    } else if (tipoUser !== 'alumno')
-      // y si no es postulante tambien se manda al login
-      if(appGrupo)
-      {
-        router.replace('/login')
-      }
+    }
+
+    // redirige a la ruta correcta
+    if (rutaRedir)
+    {
+      router.replace(rutaRedir);
+    }
+
+    //oculta el splash ()
+    setEstadoNav(true);
   }, [token, loading, tipoUser, segmentos, router]);
 
+  const vistaRaiz = useCallback(async () => {
+    //se oculta el splash para cargar la vista correcta
+    if (estadoNav)
+    {
+      await SplashScreen.hideAsync();
+    }
+  }, [estadoNav]);
 
-  if(loading)
+  //si la navegacion aun no carga, se muestra cargando
+  if(!estadoNav)
   {
     return (
       <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center'}}>
@@ -58,17 +74,22 @@ function RootLayoutNav() {
       </View>
     );
   }
+ /*if (!estadoNav) {
+  return null;
+  
+ }*/
 
 
   return (
     <ThemeProvider value={colorScheme === 'dark' ? DarkTheme: DefaultTheme}>
-      <Stack screenOptions={{headerShown: false }}>
-        <Stack.Screen name = "login"/>
-        <Stack.Screen name = "register"/>
-        <Stack.Screen name="(app)"/>
-        <Stack.Screen name="modal" options={{presentation: 'modal', title: 'Modal'}}/>
-      </Stack>
-      <StatusBar style = {colorScheme === 'dark' ? 'light' : 'dark'}/>
+      <View style={ {flex: 1}} onLayout={vistaRaiz}>
+        <Stack screenOptions={{headerShown: false }}>
+          <Stack.Screen name = "(auth)"/>
+          <Stack.Screen name="(tabs)"/>
+          <Stack.Screen name="modal" options={{presentation: 'modal', title: 'Modal'}}/>
+        </Stack>
+        <StatusBar style = {colorScheme === 'dark' ? 'light' : 'dark'}/>
+      </View>
     </ThemeProvider>
   );
 }
