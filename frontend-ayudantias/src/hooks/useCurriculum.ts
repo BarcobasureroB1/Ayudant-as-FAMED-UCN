@@ -209,6 +209,10 @@ export function useEditarCurriculum(){
         },
         onSuccess: (_data) => {
             clienteQuery.invalidateQueries({queryKey:['curriculum']});
+            clienteQuery.invalidateQueries({queryKey:['curriculum_ayudantias']});
+            clienteQuery.invalidateQueries({queryKey:['curriculum_cursos_titulos_grados']});
+            clienteQuery.invalidateQueries({queryKey:['curriculum_actividades_cientificas']});
+            clienteQuery.invalidateQueries({queryKey:['curriculum_extracurricular']});
         }                        
     });
 

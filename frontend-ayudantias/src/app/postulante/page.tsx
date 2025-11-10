@@ -604,6 +604,7 @@ import { useAsignaturasDisponiblesPostulacion, useTodasAsignaturas } from '@/hoo
 import Cookies from 'js-cookie';
 import Select from 'react-select';
 import FormularioEditarCurriculum from "@/components/formularioEditarCurriculum";
+import FormularioEditarPostulacion from '@/components/Postulacion/FormularioEditarPostulacion';
 
 
 
@@ -661,11 +662,15 @@ export const PostulanteVista = ({user, alumno, curriculum, actividadesExtracurri
     const [mostrarPopup, setMostrarPopup] = useState<boolean>(false);
     const [mostrarPopupPostulaciones, setMostrarPopupPostulaciones] = useState<boolean>(false);
     const [postulacionSeleccionada, setPostulacionSeleccionada] = useState<any>(null);
+
+    const [mostrarPopupEditarPostulacion, setMostrarPopupEditarPostulacion] = useState(false);
+
     const [vista, setVista] = useState<Vista>('perfil');
     const isPerfil = vista === 'perfil';
     const isPostular = vista === 'postular';
 
     const [modoEdicion, setModoEdicion] = useState<boolean>(false);
+    
   
     const [form, setForm] = useState({
         rut_alumno: user.rut || "",
@@ -1083,6 +1088,15 @@ export const PostulanteVista = ({user, alumno, curriculum, actividadesExtracurri
                                                             >
                                                                 Ver Detalles
                                                             </button>
+                                                            <button
+                                                                onClick={() => {
+                                                                    setPostulacionSeleccionada(p);
+                                                                    setMostrarPopupEditarPostulacion(true);
+                                                                }}
+                                                                className="bg-yellow-100 hover:bg-yellow-200 text-yellow-700 font-medium py-2 px-3 rounded-lg text-sm transition-colors"
+                                                                >
+                                                                ✏️ Editar Postulación
+                                                            </button>
                                                             <button 
                                                                 onClick={() => cancelarPostulacion.mutate({id: p.id})} 
                                                                 className="bg-red-100 hover:bg-red-200 text-red-700 font-medium py-2 px-3 rounded-lg text-sm transition-colors"
@@ -1259,6 +1273,30 @@ export const PostulanteVista = ({user, alumno, curriculum, actividadesExtracurri
                 {popupCurriculum}
                 {popupEditarCurriculum}
                 {popupPostulacion}
+                {mostrarPopupEditarPostulacion && postulacionSeleccionada && (
+                    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+                        <div
+                        className="bg-white rounded-2xl shadow-2xl p-6 w-full max-w-4xl max-h-[calc(100vh-4rem)] overflow-auto relative"
+                        onClick={(e) => e.stopPropagation()}
+                        >
+                        
+                        <button
+                            onClick={() => setMostrarPopupEditarPostulacion(false)}
+                            className="absolute top-3 right-3 text-gray-500 hover:text-gray-800 text-xl font-bold"
+                            aria-label="Cerrar"
+                        >
+                            ✖
+                        </button>
+
+                        
+                        <FormularioEditarPostulacion
+                            postulacion={postulacionSeleccionada}
+                            opcionesAsignaturas={opcionesAsignaturas}
+                            onClose={() => setMostrarPopupEditarPostulacion(false)}
+                        />
+                        </div>
+                    </div>
+                )}
             </div>
         );
     }
@@ -1378,6 +1416,15 @@ export const PostulanteVista = ({user, alumno, curriculum, actividadesExtracurri
                                                                 className="bg-blue-100 hover:bg-blue-200 text-blue-700 font-medium py-2 px-3 rounded-lg text-sm transition-colors"
                                                             >
                                                                 Ver Detalles
+                                                            </button>
+                                                            <button
+                                                                onClick={() => {
+                                                                    setPostulacionSeleccionada(p);
+                                                                    setMostrarPopupEditarPostulacion(true);
+                                                                }}
+                                                                className="bg-yellow-100 hover:bg-yellow-200 text-yellow-700 font-medium py-2 px-3 rounded-lg text-sm transition-colors"
+                                                                >
+                                                                ✏️ Editar Postulación
                                                             </button>
                                                             <button 
                                                                 onClick={() => cancelarPostulacion.mutate({id: p.id})} 
@@ -1553,6 +1600,31 @@ export const PostulanteVista = ({user, alumno, curriculum, actividadesExtracurri
                 {popupCurriculum}
                 {popupEditarCurriculum}
                 {popupPostulacion}
+                {mostrarPopupEditarPostulacion && postulacionSeleccionada && (
+                    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+                        <div
+                        className="bg-white rounded-2xl shadow-2xl p-6 w-full max-w-4xl max-h-[calc(100vh-4rem)] overflow-auto relative"
+                        onClick={(e) => e.stopPropagation()}
+                        >
+                        
+                        <button
+                            onClick={() => setMostrarPopupEditarPostulacion(false)}
+                            className="absolute top-3 right-3 text-gray-500 hover:text-gray-800 text-xl font-bold"
+                            aria-label="Cerrar"
+                        >
+                            ✖
+                        </button>
+
+                        
+                        <FormularioEditarPostulacion
+                            postulacion={postulacionSeleccionada}
+                            opcionesAsignaturas={opcionesAsignaturas}
+                            onClose={() => setMostrarPopupEditarPostulacion(false)}
+                        />
+                        </div>
+                    </div>
+                )}
+                
             </div>
         );
     };
@@ -1639,7 +1711,8 @@ export const PostulanteVista = ({user, alumno, curriculum, actividadesExtracurri
                                         name="rut_alumno" 
                                         value={form.rut_alumno} 
                                         onChange={handleChange} 
-                                        required 
+                                        required
+                                        maxLength={9}
                                         className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors text-gray-800 placeholder-gray-400"
                                         placeholder="12.345.678-9"
                                     />
