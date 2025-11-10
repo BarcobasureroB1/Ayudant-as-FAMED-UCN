@@ -937,7 +937,7 @@ export const PostulanteVista = ({user, alumno, curriculum, actividadesExtracurri
             />
         </div>
     </div>
-) : null;
+    ) : null;
 
     const popupPostulacion = (mostrarPopupPostulaciones && postulacionSeleccionada) ? (
         <div
@@ -1026,19 +1026,19 @@ export const PostulanteVista = ({user, alumno, curriculum, actividadesExtracurri
                                 <div className="space-y-3">
                                     <div>
                                         <p className="text-sm text-black">RUT</p>
-                                        <p className="font-medium">{user.rut}</p>
+                                        <p className="font-medium text-black">{user.rut}</p>
                                     </div>
                                     <div>
                                         <p className="text-sm text-black">Nombre</p>
-                                        <p className="font-medium">{user.nombres} {user.apellido}</p>
+                                        <p className="font-medium text-black">{user.nombres} {user.apellido}</p>
                                     </div>
                                     <div>
                                         <p className="text-sm text-black">Correo</p>
-                                        <p className="font-medium">{curriculum?.correo}</p>
+                                        <p className="font-medium text-black">{curriculum?.correo}</p>
                                     </div>
                                     <div>
                                         <p className="text-sm text-black">Año de ingreso</p>
-                                        <p className="font-medium">{alumno?.fecha_admision}</p>
+                                        <p className="font-medium text-black">{alumno?.fecha_admision}</p>
                                     </div>
                                     <div>
                                         <p className="text-sm text-black">Semestre actual</p>
@@ -1148,7 +1148,7 @@ export const PostulanteVista = ({user, alumno, curriculum, actividadesExtracurri
                                                 name="descripcion_carta" 
                                                 value={formPostulacion.descripcion_carta} 
                                                 onChange={(e) => setFormPostulacion({ ...formPostulacion, [e.target.name]: e.target.value })} 
-                                                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors h-32"
+                                                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors h-32 text-black"
                                                 placeholder="Describe por qué estás interesado en esta ayudantía..."
                                                 required
                                             />
@@ -1162,7 +1162,7 @@ export const PostulanteVista = ({user, alumno, curriculum, actividadesExtracurri
                                                     type="email"
                                                     value={formPostulacion.correo_profe} 
                                                     onChange={(e) => setFormPostulacion({ ...formPostulacion, [e.target.name]: e.target.value })} 
-                                                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
+                                                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors text-black"
                                                     placeholder="profesor@universidad.cl"
                                                     required
                                                 />
@@ -1173,7 +1173,7 @@ export const PostulanteVista = ({user, alumno, curriculum, actividadesExtracurri
                                                     name="actividad" 
                                                     value={formPostulacion.actividad} 
                                                     onChange={(e) => setFormPostulacion({ ...formPostulacion, [e.target.name]: e.target.value })} 
-                                                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
+                                                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors text-black"
                                                     placeholder="Ej: Resolución de ejercicios"
                                                     required
                                                 />
@@ -1184,7 +1184,7 @@ export const PostulanteVista = ({user, alumno, curriculum, actividadesExtracurri
                                                     name="metodologia" 
                                                     value={formPostulacion.metodologia} 
                                                     onChange={(e) => setFormPostulacion({ ...formPostulacion, [e.target.name]: e.target.value })} 
-                                                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
+                                                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors text-black"
                                                     placeholder="Ej: Aprendizaje activo"
                                                     required
                                                 />
@@ -1198,7 +1198,7 @@ export const PostulanteVista = ({user, alumno, curriculum, actividadesExtracurri
                                                     name="dia" 
                                                     value={formPostulacion.dia} 
                                                     onChange={(e) => setFormPostulacion({ ...formPostulacion, [e.target.name]: e.target.value })} 
-                                                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
+                                                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors text-black"
                                                     required
                                                 >
                                                     <option value="">Seleccione un día</option>
@@ -1216,7 +1216,7 @@ export const PostulanteVista = ({user, alumno, curriculum, actividadesExtracurri
                                                     name="bloque" 
                                                     value={formPostulacion.bloque} 
                                                     onChange={(e) => setFormPostulacion({ ...formPostulacion, [e.target.name]: e.target.value })} 
-                                                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
+                                                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors text-black"
                                                     required
                                                 >
                                                     <option value="">Seleccione un bloque</option>
@@ -1255,6 +1255,7 @@ export const PostulanteVista = ({user, alumno, curriculum, actividadesExtracurri
                 </div>
 
                 {popupCurriculum}
+                {popupEditarCurriculum}
                 {popupPostulacion}
             </div>
         );

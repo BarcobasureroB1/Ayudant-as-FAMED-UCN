@@ -56,7 +56,7 @@ export function useCancelarPostulacion(){
     const clienteQuery = useQueryClient();
     return useMutation({
         mutationFn: async ({id}:{id: number}) => {
-            await api.patch(`postulacion/${id}`)
+            await api.patch(`/postulacion/cancel/${id}`)
         },
         onSuccess: (_data) => {
             clienteQuery.invalidateQueries({queryKey:['postulaciones']});
@@ -82,7 +82,7 @@ export function useEditarPostulacion() {
     const clienteQuery = useQueryClient();
     return useMutation({
         mutationFn: async (postulacion: EditarPostulacion) => {
-            await api.patch('postulacion', postulacion);
+            await api.patch('/postulacion', postulacion);
         },
         onSuccess: (_data) => {
             clienteQuery.invalidateQueries({queryKey:['postulaciones']});
