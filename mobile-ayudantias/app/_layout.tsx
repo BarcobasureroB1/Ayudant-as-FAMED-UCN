@@ -29,7 +29,6 @@ function RootLayoutNav() {
 
     const authGrupo = segmentos[0] === '(auth)';
     const appGrupo = segmentos[0] === '(tabs)';
-    let rutaRedir = null;
 
     if (token && tipoUser === 'alumno')
     {
@@ -40,20 +39,14 @@ function RootLayoutNav() {
       }
     } else if (!token || tipoUser !== 'alumno')
     {
-      //si no esta logueado y si no es postulante se manda al login 
+      //si no esta logueado o si no es postulante se manda al login 
       if (!authGrupo)
       {
         router.replace('/(auth)/login');
       }
     }
 
-    // redirige a la ruta correcta
-    if (rutaRedir)
-    {
-      router.replace(rutaRedir);
-    }
-
-    //oculta el splash ()
+    //muestra la app y oculta la vista de carga al inicio (login y register)
     setEstadoNav(true);
   }, [token, loading, tipoUser, segmentos, router]);
 
@@ -65,19 +58,11 @@ function RootLayoutNav() {
     }
   }, [estadoNav]);
 
-  //si la navegacion aun no carga, se muestra cargando
-  if(!estadoNav)
-  {
-    return (
-      <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center'}}>
-        <ActivityIndicator size="large" color={colorScheme === 'dark' ? 'white' : 'black'}/>
-      </View>
-    );
-  }
- /*if (!estadoNav) {
+  //si la navegacion aun no carga, no muestra nada
+ if (!estadoNav) {
   return null;
   
- }*/
+ }
 
 
   return (
