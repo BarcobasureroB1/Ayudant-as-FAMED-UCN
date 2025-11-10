@@ -31,7 +31,7 @@ export default function DashboardPage() {
                 case 'admin':
                     router.push("/adminDashboard");
                     break;
-                case 'postulante':
+                case 'alumno':
                     router.push("/postulante");
                     break;
                 case 'secretariaDepto':

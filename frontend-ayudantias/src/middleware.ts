@@ -44,7 +44,7 @@ export function middleware(request: NextRequest)
         return NextResponse.redirect(new URL("/dashboard", request.url));
     }
 
-    if (pathname.startsWith("/postulante") && userTipo !== "postulante")
+    if (pathname.startsWith("/postulante") && userTipo !== "alumno")
     {
         //se redirige al dashboard para ir a la vista segun el rol del usuario
         return NextResponse.redirect(new URL("/dashboard", request.url));

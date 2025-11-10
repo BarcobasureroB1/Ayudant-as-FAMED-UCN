@@ -31,7 +31,7 @@ export default function RegisterPage() {
             rut,
             nombres: nombre,
             apellidos: apellidos,
-            tipo: "postulante",
+            tipo: "alumno",
             password: password,
         });
     };
