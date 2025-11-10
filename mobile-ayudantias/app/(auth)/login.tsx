@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
 import { View, Text, TextInput, StyleSheet, Alert, TouchableOpacity, ActivityIndicator, TouchableWithoutFeedback, Keyboard } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { useLogin } from '../hooks/useLogin';
-import { useAuth } from '../context/AuthContext';
+import { useLogin } from '../../hooks/useLogin';
+import { useAuth } from '../../context/AuthContext';
 import { Link } from 'expo-router';
 
 export default function LoginPage() {
