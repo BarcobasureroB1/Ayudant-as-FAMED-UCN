@@ -27,7 +27,7 @@ function RootLayoutNav() {
 
     const appGrupo = segmentos[0] === '(tabs)';
 
-    if (token && tipoUser === 'postulante')
+    if (token && tipoUser === 'alumno')
     {
       // si se logueo y es postulante se manda a la app
       if(!appGrupo)
@@ -41,7 +41,7 @@ function RootLayoutNav() {
       {
         router.replace('/login');
       }
-    } else if (tipoUser !== 'postulante')
+    } else if (tipoUser !== 'alumno')
       // y si no es postulante tambien se manda al login
       if(appGrupo)
       {
