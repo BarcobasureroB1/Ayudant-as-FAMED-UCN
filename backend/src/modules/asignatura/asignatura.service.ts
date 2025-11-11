@@ -37,6 +37,9 @@ export class AsignaturaService {
     if (createAsignaturaDto.estado) {
       asignatura.estado = createAsignaturaDto.estado;
     }
+    if (createAsignaturaDto.abierta_postulacion !== undefined) {
+      asignatura.abierta_postulacion = createAsignaturaDto.abierta_postulacion;
+    }
     // ManyToMany relation expects an array of departamentos
     asignatura.departamentos = [departamento];
 
@@ -102,6 +105,34 @@ export class AsignaturaService {
 
   async findAll() {
     return await this.asignaturaRepository.find();
+  }
+
+  /**
+   * Devuelve las asignaturas que pertenecen a un departamento dado (por id)
+   * en el formato solicitado por el cliente.
+   */
+  async findByDepartamentoId(departamentoId: number) {
+    const asignaturas = await this.asignaturaRepository
+      .createQueryBuilder('asignatura')
+      .innerJoin('asignatura.departamentos', 'departamento', 'departamento.id = :depId', { depId: departamentoId })
+      .getMany();
+
+    return asignaturas.map((a) => ({
+      id: a.id,
+      nombre: a.nombre,
+      estado: a.estado,
+      semestre: String(a.semestre),
+      nrc: a.nrc,
+      abierta_postulacion: a.abierta_postulacion,
+    }));
+  }
+  async estadoAsignatura(id: number) {
+    const asignatura = await this.asignaturaRepository.findOneBy({ id });
+    if (!asignatura) {
+      return null;
+    } 
+    asignatura.estado = 'pendiente';
+    return await this.asignaturaRepository.save(asignatura);
   }
 
 }

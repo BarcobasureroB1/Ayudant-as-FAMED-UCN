@@ -17,14 +17,15 @@ export class DepartamentoController {
     return this.departamentoService.findAll();
   }
 
-  @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.departamentoService.findOne(+id);
+  
+
+  @Patch('asignar-secretario/:id/:rut_secretario')
+  asignarSecretario(@Param('id') id: string, @Param('rut_secretario') rut_secretario: string) {
+    return this.departamentoService.asignarsecretariario(+id, rut_secretario);
   }
-
-
-  @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.departamentoService.remove(+id);
+  
+  @Get(':rut_secretaria')
+  findBySecretarioRut(@Param('rut_secretaria') rut_secretaria: string) {
+    return this.departamentoService.findBysecretarioRut(rut_secretaria);
   }
 }

@@ -14,7 +14,7 @@ export class Postulacion {
     asignatura: Asignatura;
     @Column()
     descripcion_carta: string;
-    @Column()
+    @Column({nullable: true})
     correo_profe : string;
     @Column()
     actividad: string;

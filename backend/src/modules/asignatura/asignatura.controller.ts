@@ -24,5 +24,13 @@ export class AsignaturaController {
     return this.asignaturaService.findpostulablesByRut(rut_alumno);
   }
 
-  
+  @Get('por-departamento/:id_departamento')
+  findByDepartamento(@Param('id_departamento') id_departamento: string) {
+    return this.asignaturaService.findByDepartamentoId(+id_departamento);
+  }
+
+  @Patch('estado/:id')
+  estadoAsignatura(@Param('id') id: string) {
+    return this.asignaturaService.estadoAsignatura(+id);
+  }
 }

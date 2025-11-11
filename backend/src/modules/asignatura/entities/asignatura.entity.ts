@@ -14,6 +14,8 @@ export class Asignatura {
     semestre: number;
     @Column()
     nrc: string;
+    @Column({ default: false })
+    abierta_postulacion: boolean;
     @ManyToMany(() => Departamento, (departamento) => departamento.asignaturas)
     departamentos: Departamento[];
     
