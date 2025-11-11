@@ -6,31 +6,67 @@ import { useUserProfile, User} from '@/hooks/useUserProfile';
 import { useAuth } from '@/context/AuthContext';
 import Cookies from 'js-cookie';
 
-import AperturaConcursoAdmin from '@/components/Secretariadepartamento/AperturaConcursoAdmin';
-import AperturaConcursoSecreDepto from '@/components/Secretariadepartamento/AperturaConcursoSecreDepto';
-
-
-const InfoCard = ({ title, children, className = "" }: { title: string; children: React.ReactNode; className?: string }) => (
-    <div className={`bg-white rounded-xl shadow-sm border border-gray-200 p-6 ${className}`}>
-        <h3 className="text-lg font-semibold text-gray-800 mb-4 pb-2 border-b border-gray-100">{title}</h3>
-        {children}
-    </div>
-);
 
 interface UserProps {
     user: User;
 }
+
+const FeatureCard = ({ 
+    title, 
+    description, 
+    icon, 
+    status = "soon",
+    color = "blue" 
+}: { 
+    title: string; 
+    description: string; 
+    icon: string; 
+    status?: "soon" | "active";
+    color?: "blue" | "green" | "purple" | "red" | "yellow";
+}) => {
+    const colorClasses = {
+        blue: "bg-blue-50 border-blue-200 text-blue-700",
+        green: "bg-green-50 border-green-200 text-green-700",
+        purple: "bg-purple-50 border-purple-200 text-purple-700",
+        red: "bg-red-50 border-red-200 text-red-700",
+        yellow: "bg-yellow-50 border-yellow-200 text-yellow-700"
+    };
+
+    const statusClasses = status === "soon" 
+        ? "opacity-60 cursor-not-allowed" 
+        : "cursor-pointer hover:scale-105 hover:shadow-md";
+
+    return (
+        <div 
+            className={`p-6 rounded-lg border-2 transition-all duration-300 ${colorClasses[color]} ${statusClasses}`}
+        >
+            <div className="flex items-center justify-between mb-3">
+                <div className="flex items-center">
+                    <div className="text-2xl mr-3">
+                        <span>{icon}</span>
+                    </div>
+                    <h3 className="text-lg font-semibold">{title}</h3>
+                </div>
+                {status === "soon" && (
+                    <span className="bg-gray-200 text-gray-700 text-xs px-2 py-1 rounded-full">
+                        Próximamente
+                    </span>
+                )}
+            </div>
+            <p className="text-sm opacity-80">{description}</p>
+        </div>
+    );
+};
 
 export const SecretariaDeptoDashboard = ({ user }: UserProps) => {
     const router = useRouter();
 
     const { setToken, setUsertipo } = useAuth();
 
-    type Vista = 'Concurso' | 'Constancia' | 'Coordinador';
+    type Vista = 'Concurso' | 'Constancia';
     const [vista, setVista] = useState<Vista>('Concurso');
     const isConcurso = vista === 'Concurso';
     const isConstancia = vista === 'Constancia';
-    const isCoordinador = vista === 'Coordinador';
 
     const handleBackToAdmin = () => {
         router.push('/adminDashboard');
@@ -90,16 +126,6 @@ export const SecretariaDeptoDashboard = ({ user }: UserProps) => {
                             >
                                 Generar constancia
                             </button>
-                            <button 
-                                onClick={() => setVista('Coordinador')} 
-                                className={`py-2 px-4 rounded-lg transition-all duration-200 ${
-                                isCoordinador 
-                                ? 'bg-white text-blue-600 shadow-sm' 
-                                : 'text-gray-600 hover:text-gray-900'
-                                }`}
-                            >
-                                Gestionar coordinadores
-                            </button>
                             </div>
                             <button 
                             onClick={logout} 
@@ -108,39 +134,9 @@ export const SecretariaDeptoDashboard = ({ user }: UserProps) => {
                             <span>Cerrar Sesión</span>
                             </button>
                         </div>
-                    </div>
                 </div>
-                <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                    <div className="lg:col-span-2">
-                            {vista === 'Concurso' ? (
-                                <div className="space-y-6">
-                                    <InfoCard title="Concurso de Postulación">
-                                        <p>Detalles del concurso...</p>
-                                    </InfoCard>
-                                    {user.tipo === 'admin' && (
-                                        <AperturaConcursoAdmin />
-                                    )}
-                                    {user.tipo ==='secretaria_depto' && (
-                                        <AperturaConcursoSecreDepto datosUsuario={user} />
-                                    )}
-                                </div>
-                                
-                            ): vista === 'Constancia' ? (
-                                <div className="space-y-6">
-                                    <InfoCard title="Generar Constancia">
-                                        <p>Detalles de la constancia...</p>
-                                    </InfoCard>
-                                </div>
-                            ): vista ==='Coordinador' ? (
-                                <div className="space-y-6">
-                                    <InfoCard title="Gestionar Coordinadores">
-                                        <p>Detalles de la gestión de coordinadores...</p>
-                                    </InfoCard>
-                                </div>
-                            ) : null}
+            </div>
 
-                    </div>
-                </div>
         </div>
     );
 };

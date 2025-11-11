@@ -69,8 +69,8 @@ export const AdminDashboard = ({user}:UserProps) => {
             color: "blue" as const
         },
         {
-            title: "Secretaria de Depto",
-            description: "Acceder a funciones de secretar@ de depto (proximamente)",
+            title: "Secretaría de Depto",
+            description: "Acceder a funciones de secretaría de depto (proximamente)",
             icon: "📊",
             path:"/secretaria-depto",
             color: "green" as const
@@ -89,7 +89,7 @@ export const AdminDashboard = ({user}:UserProps) => {
 
     return (
         <div className="min-h-screen bg-gray-50 p-6">
-            {/* Header */}
+            
             <div className="bg-white rounded-lg shadow-sm p-6 mb-6 border border-gray-200">
                 <div className="flex justify-between items-center">
                     <div>
