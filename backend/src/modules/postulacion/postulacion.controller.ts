@@ -12,8 +12,7 @@ export class PostulacionController {
   create(@Body() createPostulacionDto: CreatePostulacionDto) {
     return this.postulacionService.create(createPostulacionDto);
   }
-  // Mover la ruta de cancelación a un path explícito para evitar colisiones
-  // con la ruta de actualización que antes estaba en 'postulacion'.
+
   @Patch('cancel/:id')
   cancel(@Param('id') id: string) {
     return this.postulacionService.cancel(+id);
@@ -22,7 +21,7 @@ export class PostulacionController {
   findOne(@Param('rut_alumno') rut_alumno: string) {
     return this.postulacionService.findcurrent(rut_alumno);
   }
-  // Actualización parcial: aceptamos el DTO directamente en el body.
+  
   @Patch()
   update(@Body() updatePostulacionDto: UpdatePostulacionDto) {
     return this.postulacionService.update(updatePostulacionDto);

@@ -1,4 +1,4 @@
-import { IsString } from "class-validator";
+import { IsOptional, IsString } from "class-validator";
 
 
 export class CreatePostulacionDto {
@@ -11,6 +11,7 @@ export class CreatePostulacionDto {
     @IsString()
     descripcion_carta: string;
     @IsString()
+    @IsOptional()
     correo_profe: string;
     @IsString()
     actividad: string;
