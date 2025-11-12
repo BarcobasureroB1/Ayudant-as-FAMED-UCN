@@ -9,6 +9,8 @@ import Cookies from 'js-cookie';
 import AperturaConcursoAdmin from '@/components/Secretariadepartamento/AperturaConcursoAdmin';
 import AperturaConcursoSecreDepto from '@/components/Secretariadepartamento/AperturaConcursoSecreDepto';
 
+import { useTodasAsignaturas } from '@/hooks/useAsignaturas';
+
 
 const InfoCard = ({ title, children, className = "" }: { title: string; children: React.ReactNode; className?: string }) => (
     <div className={`bg-white rounded-xl shadow-sm border border-gray-200 p-6 ${className}`}>
@@ -19,9 +21,10 @@ const InfoCard = ({ title, children, className = "" }: { title: string; children
 
 interface UserProps {
     user: User;
+    asignaturas: any[];
 }
 
-export const SecretariaDeptoDashboard = ({ user }: UserProps) => {
+export const SecretariaDeptoDashboard = ({ user, asignaturas }: UserProps) => {
     const router = useRouter();
 
     const { setToken, setUsertipo } = useAuth();
@@ -110,15 +113,14 @@ export const SecretariaDeptoDashboard = ({ user }: UserProps) => {
                         </div>
                     </div>
                 </div>
-                <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                    <div className="lg:col-span-2">
+                <div className="flex justify-center">
+                    <div className="w-full max-w-7xl px-4 sm:px-6 lg:px-12">
                             {vista === 'Concurso' ? (
                                 <div className="space-y-6">
-                                    <InfoCard title="Concurso de Postulación">
-                                        <p>Detalles del concurso...</p>
-                                    </InfoCard>
                                     {user.tipo === 'admin' && (
-                                        <AperturaConcursoAdmin />
+                                        <AperturaConcursoAdmin 
+                                        asignaturas={asignaturas}
+                                    />
                                     )}
                                     {user.tipo ==='secretaria_depto' && (
                                         <AperturaConcursoSecreDepto datosUsuario={user} />
@@ -127,9 +129,6 @@ export const SecretariaDeptoDashboard = ({ user }: UserProps) => {
                                 
                             ): vista === 'Constancia' ? (
                                 <div className="space-y-6">
-                                    <InfoCard title="Generar Constancia">
-                                        <p>Detalles de la constancia...</p>
-                                    </InfoCard>
                                 </div>
                             ): vista ==='Coordinador' ? (
                                 <div className="space-y-6">
@@ -147,6 +146,7 @@ export const SecretariaDeptoDashboard = ({ user }: UserProps) => {
 
 export default function SecretariaDeptoPage() {
     const { data: user, isLoading: cargauser, isError } = useUserProfile();
+    const { data: asignaturas, isLoading: cargaAsignaturas, isError: errorAsignaturas } = useTodasAsignaturas();
     const router = useRouter();
 
     useEffect(() => {
@@ -155,7 +155,7 @@ export default function SecretariaDeptoPage() {
         }
     }, [isError, user, router]);
 
-    if (cargauser) {
+    if (cargauser || cargaAsignaturas) {
         return (
             <div className="min-h-screen flex items-center justify-center">
                 <div className="text-center">
@@ -166,7 +166,7 @@ export default function SecretariaDeptoPage() {
         );
     }
 
-    if (isError || !user) {
+    if (isError || !user || errorAsignaturas) {
         return (
             <div className="min-h-screen flex items-center justify-center">
                 <div className="text-center">
@@ -177,5 +177,5 @@ export default function SecretariaDeptoPage() {
         );
     }
 
-    return <SecretariaDeptoDashboard user={user} />;
+    return <SecretariaDeptoDashboard user={user} asignaturas={asignaturas} />;
 }

@@ -37,10 +37,10 @@ export function useAbrirConcurso() {
     const clienteQuery = useQueryClient();
     return useMutation({
         mutationFn: async (id: string) => {
-            await api.patch(`/postulacion/${id}`);
+            await api.patch(`/asignatura/estado/${id}`);
         },
         onSuccess: (_data) => {
-            clienteQuery.invalidateQueries({queryKey:['postulaciones']});
+            clienteQuery.invalidateQueries({queryKey:['asignaturas']});
         }                        
     });
 
@@ -50,10 +50,10 @@ export function useCerrarConcurso() {
     const clienteQuery = useQueryClient();
     return useMutation({
         mutationFn: async (id: string) => {
-            await api.patch(`/postulacion/cerrar/${id}`);
+            await api.patch(`/asignatura/cerrar/${id}`);
         },
         onSuccess: (_data) => {
-            clienteQuery.invalidateQueries({queryKey:['postulaciones']});
+            clienteQuery.invalidateQueries({queryKey:['asignaturas']});
         }                        
     });
 
@@ -68,5 +68,3 @@ export function useAsignaturasPorDepartamento(id_departamento: string){
         },
     });
 }
-
-//
