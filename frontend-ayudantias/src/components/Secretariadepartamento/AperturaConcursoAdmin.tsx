@@ -34,23 +34,21 @@ const InfoCard = ({
 );
 
 export default function AperturaConcursoAdmin({ asignaturas = [] }: Props) {
-  
   const [itemsPorPagina, setItemsPorPagina] = useState(5);
-  
   const [paginaActual, setPaginaActual] = useState(1);
   const [busqueda, setBusqueda] = useState("");
-
   const [mostrarPopup, setMostrarPopup] = useState(false);
   const [mensajePopup, setMensajePopup] = useState("");
+  const [mostrarConfirmacion, setMostrarConfirmacion] = useState(false);
+  const [idAConfirmar, setIdAConfirmar] = useState<string | null>(null);
 
   const { mutate: abrirConcurso } = useAbrirConcurso();
   const { mutate: cerrarConcurso } = useCerrarConcurso();
 
-
   const handleAbrirConcurso = (id: string) => {
     abrirConcurso(id, {
       onSuccess: () => {
-        setMensajePopup("Solicitud de apertura de concurso enviada, espere a que se apruebe su solicitud.");
+        setMensajePopup("Solicitud de apertura de concurso enviada, espere a que se apruebe su solicitud. Una vez aprobada, aparecerá la opción para abrir la postulación.");
         setMostrarPopup(true);
       },
       onError: () => {
@@ -59,6 +57,7 @@ export default function AperturaConcursoAdmin({ asignaturas = [] }: Props) {
       },
     });
   };
+
   const handleCerrarConcurso = (id: string) => {
     cerrarConcurso(id, {
       onSuccess: () => {
@@ -72,48 +71,51 @@ export default function AperturaConcursoAdmin({ asignaturas = [] }: Props) {
     });
   };
 
+  const confirmarCierre = (id: string) => {
+    setIdAConfirmar(id);
+    setMostrarConfirmacion(true);
+  };
 
-  
-  const totalPaginas = Math.ceil(asignaturas.length / itemsPorPagina);
+  const ejecutarCierreConfirmado = () => {
+    if (idAConfirmar) {
+      handleCerrarConcurso(idAConfirmar);
+    }
+    setMostrarConfirmacion(false);
+    setIdAConfirmar(null);
+  };
 
   const asignaturasFiltradas = asignaturas.filter((a) =>
     a.nombre.toLowerCase().includes(busqueda.toLowerCase())
   );
-  
+
   const totalPaginasFiltradas = Math.ceil(asignaturasFiltradas.length / (itemsPorPagina || 1));
   const indiceInicio = (paginaActual - 1) * (itemsPorPagina || 1);
   const indiceFin = indiceInicio + (itemsPorPagina || 1);
   const asignaturasPaginadas = asignaturasFiltradas.slice(indiceInicio, indiceFin);
 
-  
   const handleChangeItemsPorPagina = (e: React.ChangeEvent<HTMLInputElement>) => {
-  const valor = e.target.value;
+    const valor = e.target.value;
+    if (valor === "") {
+      setItemsPorPagina(NaN);
+      return;
+    }
+    const numero = Number(valor);
+    if (numero > 0) {
+      setItemsPorPagina(numero);
+      setPaginaActual(1);
+    }
+  };
 
-  if (valor === "") {
-    setItemsPorPagina(NaN); 
-    return;
-  }
-
-  const numero = Number(valor);
-  if (numero > 0) {
-    setItemsPorPagina(numero);
-    setPaginaActual(1);
-  }
-};
-
-  
   const handlePaginaChange = (nuevaPagina: number) => {
-    if (nuevaPagina >= 1 && nuevaPagina <= totalPaginas) {
+    if (nuevaPagina >= 1 && nuevaPagina <= totalPaginasFiltradas) {
       setPaginaActual(nuevaPagina);
     }
   };
 
-  
-
   return (
     <div className="flex justify-center items-center w-full">
       <div className="w-full max-w-7xl px-4 sm:px-6 lg:px-12">
-        <InfoCard title="Todas las Asignaturas de todos los departamentos" className="shadow-lg">
+        <InfoCard title="Todas las Asignaturas" className="shadow-lg">
           {asignaturas.length > 0 ? (
             <>
               <div className="flex flex-col sm:flex-row justify-between items-center mb-4">
@@ -123,7 +125,7 @@ export default function AperturaConcursoAdmin({ asignaturas = [] }: Props) {
                   value={busqueda}
                   onChange={(e) => {
                     setBusqueda(e.target.value);
-                    setPaginaActual(1); 
+                    setPaginaActual(1);
                   }}
                   className="w-full sm:w-1/3 border border-gray-300 text-black rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
                 />
@@ -141,8 +143,6 @@ export default function AperturaConcursoAdmin({ asignaturas = [] }: Props) {
                   />
                   <span className="text-sm text-gray-700">asignaturas</span>
                 </div>
-
-                
                 {totalPaginasFiltradas > 1 && (
                   <div className="flex items-center gap-2 mt-2 sm:mt-0">
                     <button
@@ -174,7 +174,6 @@ export default function AperturaConcursoAdmin({ asignaturas = [] }: Props) {
                 )}
               </div>
 
-              
               <div className="overflow-x-auto rounded-lg border border-gray-200">
                 <table className="min-w-full text-sm text-gray-700 bg-white">
                   <thead className="bg-gray-100">
@@ -190,7 +189,7 @@ export default function AperturaConcursoAdmin({ asignaturas = [] }: Props) {
                         <td className="p-3 text-center">{a.nombre}</td>
                         <td className="p-3 text-center">{a.estado}</td>
                         <td className="p-3 text-center">
-                          {(a.estado.toLowerCase() === "cerrado" && !a.abierta_postulacion) && (
+                          {(a.estado.trim().toLowerCase() === "cerrado" && !a.abierta_postulacion) && (
                             <button
                               onClick={() => handleAbrirConcurso(a.id.toString())}
                               className="bg-green-600 hover:bg-green-700 text-white px-4 py-1.5 rounded-lg text-sm font-medium transition"
@@ -198,9 +197,19 @@ export default function AperturaConcursoAdmin({ asignaturas = [] }: Props) {
                               Abrir concurso
                             </button>
                           )}
-                          {(["pendiente", "abierto"].includes(a.estado.trim().toLowerCase())) && (
+                          {(a.estado.trim().toLowerCase() === "pendiente" && a.abierta_postulacion) && (
                             <button
-                              onClick={() => handleCerrarConcurso(a.id.toString())}
+                              onClick={() => {
+                                alert(`Placeholder: abrir postulación para asignatura ID ${a.id}`);
+                              }}
+                              className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-1.5 rounded-lg text-sm font-medium transition"
+                            >
+                              Abrir concurso de postulación
+                            </button>
+                          )}
+                          {["pendiente", "abierto"].includes(a.estado.trim().toLowerCase()) && (
+                            <button
+                              onClick={() => confirmarCierre(a.id.toString())}
                               className="bg-red-600 hover:bg-red-700 text-white px-4 py-1.5 rounded-lg text-sm font-medium transition"
                             >
                               Cerrar/Cancelar concurso
@@ -212,6 +221,32 @@ export default function AperturaConcursoAdmin({ asignaturas = [] }: Props) {
                   </tbody>
                 </table>
               </div>
+
+              {mostrarConfirmacion && (
+                <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-40 z-50">
+                  <div className="bg-white rounded-lg shadow-lg p-6 w-11/12 sm:w-96 text-center">
+                    <p className="text-gray-800 mb-4">
+                      Para volver a abrir el concurso de postulación deberá aceptarse su solicitud, esto puede llevar un poco de tiempo.<br/><br/>
+                      ¿Está seguro/a de cancelar/cerrar este concurso?
+                    </p>
+                    <div className="flex justify-center gap-4">
+                      <button
+                        onClick={ejecutarCierreConfirmado}
+                        className="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-md"
+                      >
+                        Sí, cancelar concurso
+                      </button>
+                      <button
+                        onClick={() => setMostrarConfirmacion(false)}
+                        className="bg-gray-300 hover:bg-gray-400 text-gray-800 px-4 py-2 rounded-md"
+                      >
+                        No, volver
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              )}
+
               {mostrarPopup && (
                 <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-40 z-50">
                   <div className="bg-white rounded-lg shadow-lg p-6 w-11/12 sm:w-96 text-center">
