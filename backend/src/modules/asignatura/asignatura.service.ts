@@ -70,7 +70,7 @@ export class AsignaturaService {
       this.logger.debug(`asignatura_alumno rows found: ${aas.length}`);
 
       // Filtrar por semestre y estado, mapear a objetos planos
-      const estados = ['abierta', 'habilitada'];
+      const estados = ['abierto', 'habilitada'];
       const result = aas
         .filter((aa) => aa.asignatura && aa.asignatura.semestre <= nivel && estados.includes(aa.asignatura.estado))
         .map((aa) => ({
@@ -90,7 +90,7 @@ export class AsignaturaService {
   async findpostulablesByRut(rut_alumno: string) {
     const postulables = await this.asignaturaRepository.find({
       where: {
-        estado: 'abierta',
+        estado: 'abierto',
         asignaturasAlumnos: {
           alumno: {
             rut_alumno: rut_alumno,
@@ -132,6 +132,16 @@ export class AsignaturaService {
       return null;
     } 
     asignatura.estado = 'pendiente';
+    return await this.asignaturaRepository.save(asignatura);
+  }
+
+  async cerrarAsignatura(id: number) {
+    const asignatura = await this.asignaturaRepository.findOneBy({ id });
+    if (!asignatura) {
+      return null;
+    }
+    asignatura.estado = 'cerrado';
+    asignatura.abierta_postulacion = false;
     return await this.asignaturaRepository.save(asignatura);
   }
 

@@ -33,4 +33,9 @@ export class AsignaturaController {
   estadoAsignatura(@Param('id') id: string) {
     return this.asignaturaService.estadoAsignatura(+id);
   }
+
+  @Patch('cerrar/:id')
+  cerrarAsignatura(@Param('id') id: string) {
+    return this.asignaturaService.cerrarAsignatura(+id);
+  }
 }
