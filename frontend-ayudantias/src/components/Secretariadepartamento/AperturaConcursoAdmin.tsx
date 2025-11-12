@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
-import { useAbrirConcurso } from "@/hooks/useAsignaturas";
+import { useAbrirConcurso, useCerrarConcurso } from "@/hooks/useAsignaturas";
 
 interface AsignaturaData {
   id: number;
@@ -44,19 +44,34 @@ export default function AperturaConcursoAdmin({ asignaturas = [] }: Props) {
   const [mensajePopup, setMensajePopup] = useState("");
 
   const { mutate: abrirConcurso } = useAbrirConcurso();
+  const { mutate: cerrarConcurso } = useCerrarConcurso();
+
 
   const handleAbrirConcurso = (id: string) => {
-  abrirConcurso(id, {
-    onSuccess: () => {
-      setMensajePopup("Solicitud de apertura de concurso enviada, espere a que se apruebe su solicitud.");
-      setMostrarPopup(true);
-    },
-    onError: () => {
-      setMensajePopup("Error al enviar la solicitud. Intente nuevamente.");
-      setMostrarPopup(true);
-    },
-  });
-};
+    abrirConcurso(id, {
+      onSuccess: () => {
+        setMensajePopup("Solicitud de apertura de concurso enviada, espere a que se apruebe su solicitud.");
+        setMostrarPopup(true);
+      },
+      onError: () => {
+        setMensajePopup("Error al enviar la solicitud. Intente nuevamente.");
+        setMostrarPopup(true);
+      },
+    });
+  };
+  const handleCerrarConcurso = (id: string) => {
+    cerrarConcurso(id, {
+      onSuccess: () => {
+        setMensajePopup("Concurso cerrado exitosamente.");
+        setMostrarPopup(true);
+      },
+      onError: () => {
+        setMensajePopup("Error al cerrar el concurso. Intente nuevamente.");
+        setMostrarPopup(true);
+      },
+    });
+  };
+
 
   
   const totalPaginas = Math.ceil(asignaturas.length / itemsPorPagina);
@@ -181,6 +196,14 @@ export default function AperturaConcursoAdmin({ asignaturas = [] }: Props) {
                               className="bg-green-600 hover:bg-green-700 text-white px-4 py-1.5 rounded-lg text-sm font-medium transition"
                             >
                               Abrir concurso
+                            </button>
+                          )}
+                          {(["pendiente", "abierto"].includes(a.estado.trim().toLowerCase())) && (
+                            <button
+                              onClick={() => handleCerrarConcurso(a.id.toString())}
+                              className="bg-red-600 hover:bg-red-700 text-white px-4 py-1.5 rounded-lg text-sm font-medium transition"
+                            >
+                              Cerrar/Cancelar concurso
                             </button>
                           )}
                         </td>
