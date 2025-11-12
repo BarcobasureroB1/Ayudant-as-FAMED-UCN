@@ -70,7 +70,7 @@ export class AsignaturaService {
       this.logger.debug(`asignatura_alumno rows found: ${aas.length}`);
 
       // Filtrar por semestre y estado, mapear a objetos planos
-      const estados = ['abierta', 'habilitada'];
+      const estados = ['abierto', 'habilitada'];
       const result = aas
         .filter((aa) => aa.asignatura && aa.asignatura.semestre <= nivel && estados.includes(aa.asignatura.estado))
         .map((aa) => ({
