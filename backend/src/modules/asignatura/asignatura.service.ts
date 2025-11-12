@@ -90,7 +90,7 @@ export class AsignaturaService {
   async findpostulablesByRut(rut_alumno: string) {
     const postulables = await this.asignaturaRepository.find({
       where: {
-        estado: 'abierta',
+        estado: 'abierto',
         asignaturasAlumnos: {
           alumno: {
             rut_alumno: rut_alumno,
