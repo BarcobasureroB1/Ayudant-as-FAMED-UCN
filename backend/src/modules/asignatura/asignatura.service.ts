@@ -135,4 +135,14 @@ export class AsignaturaService {
     return await this.asignaturaRepository.save(asignatura);
   }
 
+  async cerrarAsignatura(id: number) {
+    const asignatura = await this.asignaturaRepository.findOneBy({ id });
+    if (!asignatura) {
+      return null;
+    }
+    asignatura.estado = 'cerrado';
+    asignatura.abierta_postulacion = false;
+    return await this.asignaturaRepository.save(asignatura);
+  }
+
 }
