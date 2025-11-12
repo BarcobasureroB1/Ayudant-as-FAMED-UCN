@@ -132,9 +132,7 @@ export const SecretariaDeptoDashboard = ({ user, asignaturas }: UserProps) => {
                                 </div>
                             ): vista ==='Coordinador' ? (
                                 <div className="space-y-6">
-                                    <InfoCard title="Gestionar Coordinadores">
-                                        <p>Detalles de la gestión de coordinadores...</p>
-                                    </InfoCard>
+                                    
                                 </div>
                             ) : null}
 
