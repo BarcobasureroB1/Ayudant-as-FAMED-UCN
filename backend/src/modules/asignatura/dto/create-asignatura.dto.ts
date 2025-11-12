@@ -12,8 +12,9 @@ export class CreateAsignaturaDto {
     @IsString()
     nrc: string;
     @IsString()
-    Departamento:string
-    
+    Departamento:string;
+    @IsOptional()
+    abierta_postulacion?: boolean;
     
 
 }

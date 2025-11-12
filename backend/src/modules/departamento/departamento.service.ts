@@ -27,17 +27,28 @@ export class DepartamentoService {
     return await this.departamentoRepository.findOne({ where: { id } });
   }
   async asignarsecretariario(id: number, rut_secretario: string) {
-    const departamento = await this.departamentoRepository.findOneBy({ id });
+    const departamento = await this.departamentoRepository.findOne({
+      where: { id },
+      relations: ['secretarias'], // cargar la relación
+    });
     if (!departamento) {
       return null;
     }
-    const secretaria = await this.usuarioRepository.findOneBy({ rut: rut_secretario });
+
+    const secretaria = await this.usuarioRepository.findOne({
+      where: { rut: rut_secretario },
+    });
     if (!secretaria) {
       return null;
     }
+
+    // inicializar array si es necesario
+    if (!departamento.secretarias) {
+      departamento.secretarias = [];
+    }
+
     departamento.secretarias.push(secretaria);
     return await this.departamentoRepository.save(departamento);
-    
   }
   async findBysecretarioRut(rut_secretario: string): Promise<{ id: number; nombre: string }[]> {
     const results = await this.departamentoRepository
