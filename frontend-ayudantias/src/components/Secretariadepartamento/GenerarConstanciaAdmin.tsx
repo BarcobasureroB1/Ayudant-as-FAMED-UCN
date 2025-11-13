@@ -209,10 +209,10 @@ export default function GenerarConstanciaAdmin({ alumnos = [] }: Props) {
                             {ayudantias.map((ay: AyudantiasAnteriores) => (
                               <tr key={ay.id} className="border-b hover:bg-gray-50">
                                 <td className="p-2 text-center">{ay.tipo_ayudantia}</td>
-                                <td className="p-2 text-center">{ay.nombre_alumno}</td>
-                                <td className="p-2 text-center">{ay.nombre_carrera}</td>
+                                <td className="p-2 text-center">{ay.alumno.nombres} {ay.alumno.apellidos}</td>
+                                <td className="p-2 text-center">{ay.alumno.nombre_carrera}</td>
                                 <td className="p-2 text-center">{ay.periodo}</td>
-                                <td className="p-2 text-center">{ay.nombre_asig}</td>
+                                <td className="p-2 text-center">{ay.asignatura.nombre}</td>
                                 <td className="p-2 text-center">{ay.remunerada}</td>
                                 <td className="p-2 text-center">
                                   <button
