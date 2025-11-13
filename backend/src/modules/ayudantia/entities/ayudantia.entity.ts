@@ -21,7 +21,7 @@ export class Ayudantia {
     periodo: string;
     @Column()
     remunerada: string;
-    @Column({default: 'AD Honorem'})
+    @Column({default: 'Ayudantia Docente'})
     tipo_ayudantia: string;
 
     
