@@ -149,6 +149,7 @@ export class AsignaturaService {
   }
 
   async findwithcoordinador(DepartamentoId: number) {
+    console.log("ENTRE AQUI CON DEPARTAMENTO ID: ", DepartamentoId);
     // Seleccionamos columnas planas para evitar ciclos y devolver
     // explícitamente el rut, nombres y apellidos del usuario
     // que actúa como coordinador (sólo si existe un registro
@@ -185,12 +186,34 @@ export class AsignaturaService {
 
   
   async findallwithcoordinador() {
-    const asignaturas = await this.asignaturaRepository
+    console.log("ENTRE AQUI");
+    const rows = await this.asignaturaRepository
       .createQueryBuilder('asignatura')
-      .leftJoinAndSelect('asignatura.coordinador', 'coordinador', 'coordinador.actual = :actual', { actual: true })
-      .leftJoinAndSelect('coordinador.usuario', 'usuario')
-      .getMany();
-    return asignaturas;
+      .innerJoin('asignatura.departamentos', 'departamento')
+      .innerJoin('asignatura.coordinador', 'coord', 'coord.actual = :actual', { actual: true })
+      .innerJoin('coord.usuario', 'usuario')
+      .select([
+        'asignatura.id',
+        'asignatura.nombre',
+        'asignatura.estado',
+        'asignatura.semestre',
+        'asignatura.nrc',
+        'asignatura.abierta_postulacion',
+        'usuario.rut',
+        'usuario.nombres',
+        'usuario.apellidos',
+        'coord.rut_coordinador',
+      ])
+      .getRawMany();
+    return rows.map((r) => ({
+      id: r.asignatura_id,
+      nombre: r.asignatura_nombre,
+      estado: r.asignatura_estado,
+      semestre: String(r.asignatura_semestre),
+      nrc: r.asignatura_nrc,
+      abierta_postulacion: r.asignatura_abierta_postulacion,
+      coordinador : { rut: r.usuario_rut, nombres: r.usuario_nombres, apellidos: r.usuario_apellidos }
+    }));
     
   }
 

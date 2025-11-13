@@ -42,7 +42,7 @@ export class AsignaturaController {
   findwithcoordinador(@Param('id_departamento') id_departamento: string) {
     return this.asignaturaService.findwithcoordinador(+id_departamento);
   }
-  @Get('coordinadores')
+  @Get('coordinadores/sinfiltro/dif')
   findallwithcoordinador() {
     return this.asignaturaService.findallwithcoordinador();
   }
