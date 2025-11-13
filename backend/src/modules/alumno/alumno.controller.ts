@@ -11,6 +11,10 @@ export class AlumnoController {
   create(@Body() createAlumnoDto: CreateAlumnoDto) {
     return this.alumnoService.create(createAlumnoDto);
   }
+  @Get()
+  async findall(){
+    return await this.alumnoService.findall()
+  }
 
  
 }
