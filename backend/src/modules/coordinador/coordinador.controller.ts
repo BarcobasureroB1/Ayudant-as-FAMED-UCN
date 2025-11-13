@@ -11,20 +11,16 @@ export class CoordinadorController {
     return this.coordinadorService.create(createCoordinadorDto);
   }
 
-  @Get()
-  findAll() {
-    return this.coordinadorService.findAll();
+
+  @Patch('estado/:id_asignatura/:rut_coordinador')
+  actualizarEstadoCoordinador(
+    @Param('id_asignatura') id_asignatura: number,
+    @Param('rut_coordinador') rut_coordinador: number,
+  ) {
+    return this.coordinadorService.actualizarEstadoCoordinador(
+      id_asignatura,
+      rut_coordinador,
+    );
   }
-
-  @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.coordinadorService.findOne(+id);
-  }
-
-
-
-  @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.coordinadorService.remove(+id);
-  }
+  
 }

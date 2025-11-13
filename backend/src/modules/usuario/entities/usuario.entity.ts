@@ -5,7 +5,8 @@ import { AyudantiasCurriculum } from 'src/modules/ayudantias_curriculum/entities
 import { Departamento } from 'src/modules/departamento/entities/departamento.entity';
 import { Postulacion } from 'src/modules/postulacion/entities/postulacion.entity';
 import { TitulosCurso } from 'src/modules/titulos_cursos/entities/titulos_curso.entity';
-import { Column, Entity, ManyToMany, OneToMany, PrimaryColumn } from 'typeorm';
+import { Coordinador } from 'src/modules/coordinador/entities/coordinador.entity';
+import { Column, Entity, ManyToMany, OneToMany, OneToOne, PrimaryColumn } from 'typeorm';
 @Entity()
 export class Usuario {
     @PrimaryColumn()
@@ -38,6 +39,8 @@ export class Usuario {
     ayudantias_como_coordinador: Ayudantia[];
     @OneToMany(() => Postulacion, (postulacion) => postulacion.usuario)
     postulaciones: Postulacion[];
+    @OneToMany(() => Coordinador, (coordinador) => coordinador.usuario)
+    coordinador: Coordinador []; 
 
 
 }

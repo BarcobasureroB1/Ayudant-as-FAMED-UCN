@@ -38,4 +38,12 @@ export class AsignaturaController {
   cerrarAsignatura(@Param('id') id: string) {
     return this.asignaturaService.cerrarAsignatura(+id);
   }
+  @Get('coordinadores/:id_departamento')
+  findwithcoordinador(@Param('id_departamento') id_departamento: string) {
+    return this.asignaturaService.findwithcoordinador(+id_departamento);
+  }
+  @Get('coordinadores')
+  findallwithcoordinador() {
+    return this.asignaturaService.findallwithcoordinador();
+  }
 }

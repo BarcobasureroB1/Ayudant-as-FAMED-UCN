@@ -6,6 +6,7 @@ import { Asignatura } from './entities/asignatura.entity';
 import { AsignaturaAlumno } from '../asignatura_alumno/entities/asignatura_alumno.entity';
 import { Not, IsNull } from 'typeorm';
 import { Departamento } from '../departamento/entities/departamento.entity';
+import { Coordinador } from '../coordinador/entities/coordinador.entity';
 import { UsuarioService } from '../usuario/usuario.service';
 import { AlumnoService } from '../alumno/alumno.service';
 import { Alumno } from '../alumno/entities/alumno.entity';
@@ -126,6 +127,8 @@ export class AsignaturaService {
       abierta_postulacion: a.abierta_postulacion,
     }));
   }
+
+  //cambia el estado de una asignatura a pendiente
   async estadoAsignatura(id: number) {
     const asignatura = await this.asignaturaRepository.findOneBy({ id });
     if (!asignatura) {
@@ -134,7 +137,7 @@ export class AsignaturaService {
     asignatura.estado = 'pendiente';
     return await this.asignaturaRepository.save(asignatura);
   }
-
+  //cambia el estado de una asignatura a cerrado y deshabilita postulaciones
   async cerrarAsignatura(id: number) {
     const asignatura = await this.asignaturaRepository.findOneBy({ id });
     if (!asignatura) {
@@ -144,5 +147,52 @@ export class AsignaturaService {
     asignatura.abierta_postulacion = false;
     return await this.asignaturaRepository.save(asignatura);
   }
+
+  async findwithcoordinador(DepartamentoId: number) {
+    // Seleccionamos columnas planas para evitar ciclos y devolver
+    // explícitamente el rut, nombres y apellidos del usuario
+    // que actúa como coordinador (sólo si existe un registro
+    // en la tabla Coordinador con actual = true).
+    const rows = await this.asignaturaRepository
+      .createQueryBuilder('asignatura')
+      .innerJoin('asignatura.departamentos', 'departamento', 'departamento.id = :depId', { depId: DepartamentoId })
+      .innerJoin('asignatura.coordinador', 'coord', 'coord.actual = :actual', { actual: true })
+      .innerJoin('coord.usuario', 'usuario')
+      .select([
+        'asignatura.id',
+        'asignatura.nombre',
+        'asignatura.estado',
+        'asignatura.semestre',
+        'asignatura.nrc',
+        'asignatura.abierta_postulacion',
+        'usuario.rut',
+        'usuario.nombres',
+        'usuario.apellidos',
+        'coord.rut_coordinador',
+      ])
+      .getRawMany();
+
+    return rows.map((r) => ({
+      id: r.asignatura_id,
+      nombre: r.asignatura_nombre,
+      estado: r.asignatura_estado,
+      semestre: String(r.asignatura_semestre),
+      nrc: r.asignatura_nrc,
+      abierta_postulacion: r.asignatura_abierta_postulacion,
+      coordinador : { rut: r.usuario_rut, nombres: r.usuario_nombres, apellidos: r.usuario_apellidos }
+    }));
+  }
+
+  
+  async findallwithcoordinador() {
+    const asignaturas = await this.asignaturaRepository
+      .createQueryBuilder('asignatura')
+      .leftJoinAndSelect('asignatura.coordinador', 'coordinador', 'coordinador.actual = :actual', { actual: true })
+      .leftJoinAndSelect('coordinador.usuario', 'usuario')
+      .getMany();
+    return asignaturas;
+    
+  }
+
 
 }
