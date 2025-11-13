@@ -14,6 +14,8 @@ export interface AyudantiasAnteriores
     rut_coordinador_otro: string;
     periodo: string;
     remunerada: string;
+    tipo_ayudantia: string;
+    nombre_carrera: string;
 }
 
 export function useAyudantiasPorAlumno(rut_alumno?: string){

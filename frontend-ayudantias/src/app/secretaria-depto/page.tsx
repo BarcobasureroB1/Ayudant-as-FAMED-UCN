@@ -6,10 +6,16 @@ import { useUserProfile, User} from '@/hooks/useUserProfile';
 import { useAuth } from '@/context/AuthContext';
 import Cookies from 'js-cookie';
 
+import { AlumnoData, useAlumnos } from '@/hooks/useAlumnoProfile';
+
 import AperturaConcursoAdmin from '@/components/Secretariadepartamento/AperturaConcursoAdmin';
 import AperturaConcursoSecreDepto from '@/components/Secretariadepartamento/AperturaConcursoSecreDepto';
 
-import { useTodasAsignaturas } from '@/hooks/useAsignaturas';
+import { useTodasAsignaturas, useAsignaturasPorDepartamento, useAsignaturasCoordinadores, useAsignaturasCoordinadoresPorDepartamento } from '@/hooks/useAsignaturas';
+import GestionCoordinadores from '@/components/Secretariadepartamento/GestionCoordinadores';
+import GestionCoordinadoresAdmin from '@/components/Secretariadepartamento/GestionCoordinadoresAdmin';
+
+import GenerarConstanciaAdmin from '@/components/Secretariadepartamento/GenerarConstanciaAdmin';
 
 
 const InfoCard = ({ title, children, className = "" }: { title: string; children: React.ReactNode; className?: string }) => (
@@ -22,9 +28,11 @@ const InfoCard = ({ title, children, className = "" }: { title: string; children
 interface UserProps {
     user: User;
     asignaturas: any[];
+    asignaturasCoordinadores: any[];
+    alumnos: AlumnoData[];
 }
 
-export const SecretariaDeptoDashboard = ({ user, asignaturas }: UserProps) => {
+export const SecretariaDeptoDashboard = ({ user, asignaturas, asignaturasCoordinadores, alumnos }: UserProps) => {
     const router = useRouter();
 
     const { setToken, setUsertipo } = useAuth();
@@ -129,9 +137,22 @@ export const SecretariaDeptoDashboard = ({ user, asignaturas }: UserProps) => {
                                 
                             ): vista === 'Constancia' ? (
                                 <div className="space-y-6">
+                                    {user.tipo === 'admin' && (
+                                        <GenerarConstanciaAdmin 
+                                        alumnos={alumnos}
+                                    />
+                                    )}
                                 </div>
                             ): vista ==='Coordinador' ? (
                                 <div className="space-y-6">
+                                    {user.tipo === 'admin' && (
+                                        <GestionCoordinadoresAdmin
+                                        asignaturas={asignaturasCoordinadores}
+                                    />
+                                    )}
+                                    {user.tipo ==='secretaria_depto' && (
+                                        <GestionCoordinadores datosUsuario={user} />
+                                    )}
                                     
                                 </div>
                             ) : null}
@@ -145,15 +166,23 @@ export const SecretariaDeptoDashboard = ({ user, asignaturas }: UserProps) => {
 export default function SecretariaDeptoPage() {
     const { data: user, isLoading: cargauser, isError } = useUserProfile();
     const { data: asignaturas, isLoading: cargaAsignaturas, isError: errorAsignaturas } = useTodasAsignaturas();
+    const { data: asignaturasCoordinadores, isLoading: cargaAsignaturasCoordinadores, isError: errorAsignaturasCoordinadores } = useAsignaturasCoordinadores();
+    const { data: alumnos, isLoading: cargaAlumnos, isError: errorAlumnos } = useAlumnos();
     const router = useRouter();
 
     useEffect(() => {
-        if (isError || !user) {
+        if (isError || !user ) {
             router.push("/login");
         }
     }, [isError, user, router]);
 
-    if (cargauser || cargaAsignaturas) {
+    useEffect(() => {
+        if (errorAsignaturasCoordinadores || errorAsignaturas || errorAlumnos) {
+            router.push("/login");
+        }
+    }, [errorAsignaturas, errorAsignaturasCoordinadores, errorAlumnos, router]);
+
+    if (cargauser || cargaAsignaturas || cargaAsignaturasCoordinadores || cargaAlumnos) {
         return (
             <div className="min-h-screen flex items-center justify-center">
                 <div className="text-center">
@@ -164,16 +193,16 @@ export default function SecretariaDeptoPage() {
         );
     }
 
-    if (isError || !user || errorAsignaturas) {
+    if (isError || !user || errorAsignaturas || errorAsignaturasCoordinadores || errorAlumnos) {
         return (
             <div className="min-h-screen flex items-center justify-center">
                 <div className="text-center">
                     <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-gray-900 mx-auto"></div>
-                    <p className="mt-4 text-gray-600">Redirigiendo al login...</p>
+                    <p className="mt-4 text-gray-600">Ocurrió un error al buscar los datos. Redirigiendo al login...</p>
                 </div>
             </div>
         );
     }
 
-    return <SecretariaDeptoDashboard user={user} asignaturas={asignaturas} />;
+    return <SecretariaDeptoDashboard user={user} asignaturas={asignaturas} asignaturasCoordinadores={asignaturasCoordinadores} alumnos={alumnos} />;
 }

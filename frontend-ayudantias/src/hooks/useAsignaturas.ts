@@ -68,3 +68,25 @@ export function useAsignaturasPorDepartamento(id_departamento: string){
         },
     });
 }
+
+export function useAsignaturasCoordinadoresPorDepartamento(id_departamento: string){
+    return useQuery<AsignaturaData[], Error>({
+        queryKey:['asignaturasCoordinadores', id_departamento],
+        queryFn: async () => {
+            const respuesta = await api.get(`asignatura/coordinadores/${id_departamento}`);
+            return respuesta.data;
+        },
+    });
+}
+
+export function useAsignaturasCoordinadores(){
+    return useQuery({
+        queryKey:['asignaturasCoordinadores'],
+        queryFn: async () => {
+            const respuesta = await api.get('asignatura/coordinadores');
+            return respuesta.data;
+        },
+    });
+}
+
+//
