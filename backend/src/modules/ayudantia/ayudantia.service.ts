@@ -51,16 +51,42 @@ export class AyudantiaService {
 
   async findByUsuario(rut: string) {
     console.log('Finding ayudantias for rut:', rut);
-    const ayudantias = await this.ayudantiaRepository
+    const raws = await this.ayudantiaRepository
       .createQueryBuilder('ayudantia')
-      .leftJoinAndSelect('ayudantia.alumno', 'alumno')
-      .leftJoinAndSelect('ayudantia.asignatura', 'asignatura')
-      .leftJoinAndSelect('ayudantia.coordinador', 'coordinador')
+      .leftJoin('ayudantia.alumno', 'alumno')
+      .leftJoin('ayudantia.asignatura', 'asignatura')
+      .leftJoin('ayudantia.coordinador', 'coordinador')
       // Filtrar por la columna física en la tabla `ayudantia` para cubrir
       // ambos roles: alumno o coordinador.
+      .select([
+        'ayudantia.id AS id',
+        'ayudantia.evaluacion AS evaluacion',
+        'ayudantia.periodo AS periodo',
+        'ayudantia.remunerada AS remunerada',
+        'ayudantia.tipo_ayudantia AS tipo_ayudantia',
+        'alumno.rut AS alumno_rut',
+        'alumno.nombres AS alumno_nombres',
+        'alumno.apellidos AS alumno_apellidos',
+        'coordinador.rut AS coord_rut',
+        'coordinador.nombres AS coord_nombres',
+        'coordinador.apellidos AS coord_apellidos',
+        'asignatura.id AS asignatura_id',
+        'asignatura.nombre AS asignatura_nombre',
+      ])
       .where('ayudantia.rut_alumno = :rut OR ayudantia.rut_coordinador_otro = :rut', { rut })
-      .getMany();
+      .getRawMany();
 
-    return ayudantias;
+    const mapped = raws.map(r => ({
+      id: r.id,
+      evaluacion: r.evaluacion,
+      periodo: r.periodo,
+      remunerada: r.remunerada,
+      tipo_ayudantia: r.tipo_ayudantia,
+      alumno: r.alumno_rut ? { rut: r.alumno_rut, nombres: r.alumno_nombres, apellidos: r.alumno_apellidos } : null,
+      coordinador: r.coord_rut ? { rut: r.coord_rut, nombres: r.coord_nombres, apellidos: r.coord_apellidos } : null,
+      asignatura: r.asignatura_id ? { id: r.asignatura_id, nombre: r.asignatura_nombre } : null,
+    }));
+
+    return mapped;
   }
 }
