@@ -36,20 +36,10 @@ export class CoordinadorService {
       asignaturas: asignatura,
       
     });
-    // ensure usuario.coordinador array exists before pushing
-    if (!user_coordinador.coordinador) {
-      user_coordinador.coordinador = [];
-    }
-    user_coordinador.coordinador.push(coordinador);
-    await this.usuarioRepository.save(user_coordinador);
-    // ensure asignatura.coordinador array exists before pushing
-    if (!asignatura.coordinador) {
-      asignatura.coordinador = [];
-    }
-    asignatura.coordinador.push(coordinador);
-    await this.asignaturaRepository.save(asignatura);
-
-    return this.coordinadorRepository.save(coordinador);
+    // Guardar directamente la entidad Coordinador. No hacemos push
+    // en `usuario.coordinador` ni en `asignatura.coordinador` para evitar
+    // efectos secundarios no deseados al guardar las entidades padre.
+    return await this.coordinadorRepository.save(coordinador);
   }
 
   async actualizarEstadoCoordinador(id_asignatura: number, rut_coordinador: number) {
