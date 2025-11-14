@@ -33,5 +33,6 @@ export function useAyudantiasPorAlumno(rut_alumno?: string){
             const respuesta = await api.get(`ayudantia/${rut_alumno}`);
             return respuesta.data;
         },
+        enabled : !!rut_alumno,
     });
 }

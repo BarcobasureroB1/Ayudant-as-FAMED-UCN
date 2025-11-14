@@ -83,7 +83,8 @@ export function useAsignaturasCoordinadores(){
     return useQuery({
         queryKey:['asignaturasCoordinadores'],
         queryFn: async () => {
-            const respuesta = await api.get('asignatura/coordinadores');
+            const respuesta = await api.get('asignatura/coordinadores/sinfiltro/dif');
+            console.log(respuesta.data);
             return respuesta.data;
         },
     });
