@@ -150,15 +150,14 @@ export class AsignaturaService {
 
   async findwithcoordinador(DepartamentoId: number) {
     console.log("ENTRE AQUI CON DEPARTAMENTO ID: ", DepartamentoId);
-    // Seleccionamos columnas planas para evitar ciclos y devolver
-    // explícitamente el rut, nombres y apellidos del usuario
-    // que actúa como coordinador (sólo si existe un registro
-    // en la tabla Coordinador con actual = true).
+    // Traemos todos los coordinadores (histórico + actual) para las asignaturas
+    // del departamento dado, y luego agrupamos por asignatura para devolver
+    // un listado de coordinadores por asignatura.
     const rows = await this.asignaturaRepository
       .createQueryBuilder('asignatura')
       .innerJoin('asignatura.departamentos', 'departamento', 'departamento.id = :depId', { depId: DepartamentoId })
-      .innerJoin('asignatura.coordinador', 'coord', 'coord.actual = :actual', { actual: true })
-      .innerJoin('coord.usuario', 'usuario')
+      .leftJoin('asignatura.coordinador', 'coord', 'coord.actual = :actual', { actual: true })
+      .leftJoin('coord.usuario', 'usuario')
       .select([
         'asignatura.id',
         'asignatura.nombre',
@@ -166,22 +165,41 @@ export class AsignaturaService {
         'asignatura.semestre',
         'asignatura.nrc',
         'asignatura.abierta_postulacion',
-        'usuario.rut',
-        'usuario.nombres',
-        'usuario.apellidos',
-        'coord.rut_coordinador',
+        'coord.id AS coord_id',
+        'coord.actual AS coord_actual',
+        'usuario.rut AS usuario_rut',
+        'usuario.nombres AS usuario_nombres',
+        'usuario.apellidos AS usuario_apellidos',
       ])
       .getRawMany();
 
-    return rows.map((r) => ({
-      id: r.asignatura_id,
-      nombre: r.asignatura_nombre,
-      estado: r.asignatura_estado,
-      semestre: String(r.asignatura_semestre),
-      nrc: r.asignatura_nrc,
-      abierta_postulacion: r.asignatura_abierta_postulacion,
-      coordinador : { rut: r.usuario_rut, nombres: r.usuario_nombres, apellidos: r.usuario_apellidos }
-    }));
+    const map = new Map<number, any>();
+    for (const r of rows) {
+      const aid = r.asignatura_id;
+      if (!map.has(aid)) {
+        map.set(aid, {
+          id: r.asignatura_id,
+          nombre: r.asignatura_nombre,
+          estado: r.asignatura_estado,
+          semestre: String(r.asignatura_semestre),
+          nrc: r.asignatura_nrc,
+          abierta_postulacion: r.asignatura_abierta_postulacion,
+          coordinadores: [],
+        });
+      }
+      const item = map.get(aid);
+      if (r.coord_id) {
+        item.coordinadores.push({
+          id: r.coord_id,
+          rut: r.usuario_rut,
+          nombres: r.usuario_nombres,
+          apellidos: r.usuario_apellidos,
+          actual: Boolean(r.coord_actual),
+        });
+      }
+    }
+
+    return Array.from(map.values());
   }
 
   
@@ -189,9 +207,9 @@ export class AsignaturaService {
     console.log("ENTRE AQUI");
     const rows = await this.asignaturaRepository
       .createQueryBuilder('asignatura')
-      .innerJoin('asignatura.departamentos', 'departamento')
-      .innerJoin('asignatura.coordinador', 'coord', 'coord.actual = :actual', { actual: true })
-      .innerJoin('coord.usuario', 'usuario')
+      .leftJoin('asignatura.departamentos', 'departamento')
+      .leftJoin('asignatura.coordinador', 'coord', 'coord.actual = :actual', { actual: true })
+      .leftJoin('coord.usuario', 'usuario')
       .select([
         'asignatura.id',
         'asignatura.nombre',
@@ -199,21 +217,42 @@ export class AsignaturaService {
         'asignatura.semestre',
         'asignatura.nrc',
         'asignatura.abierta_postulacion',
-        'usuario.rut',
-        'usuario.nombres',
-        'usuario.apellidos',
-        'coord.rut_coordinador',
+        'coord.id AS coord_id',
+        'coord.actual AS coord_actual',
+        'usuario.rut AS usuario_rut',
+        'usuario.nombres AS usuario_nombres',
+        'usuario.apellidos AS usuario_apellidos',
       ])
       .getRawMany();
-    return rows.map((r) => ({
-      id: r.asignatura_id,
-      nombre: r.asignatura_nombre,
-      estado: r.asignatura_estado,
-      semestre: String(r.asignatura_semestre),
-      nrc: r.asignatura_nrc,
-      abierta_postulacion: r.asignatura_abierta_postulacion,
-      coordinador : { rut: r.usuario_rut, nombres: r.usuario_nombres, apellidos: r.usuario_apellidos }
-    }));
+
+    const map = new Map<number, any>();
+    for (const r of rows) {
+      const aid = r.asignatura_id;
+      if (!map.has(aid)) {
+        map.set(aid, {
+          id: r.asignatura_id,
+          nombre: r.asignatura_nombre,
+          estado: r.asignatura_estado,
+          semestre: String(r.asignatura_semestre),
+          nrc: r.asignatura_nrc,
+          abierta_postulacion: r.asignatura_abierta_postulacion,
+          coordinadores: [],
+        });
+      }
+      const item = map.get(aid);
+      if (r.coord_id) {
+        item.coordinadores.push({
+          id: r.coord_id,
+          rut: r.usuario_rut,
+          nombres: r.usuario_nombres,
+          apellidos: r.usuario_apellidos,
+          actual: Boolean(r.coord_actual),
+        });
+      }
+    }
+
+    return Array.from(map.values());
+    
     
   }
 

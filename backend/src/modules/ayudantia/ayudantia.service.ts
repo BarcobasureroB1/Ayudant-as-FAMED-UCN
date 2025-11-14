@@ -5,6 +5,7 @@ import { Repository } from 'typeorm';
 import { Ayudantia } from './entities/ayudantia.entity';
 import { Asignatura } from '../asignatura/entities/asignatura.entity';
 import { Usuario } from '../usuario/entities/usuario.entity';
+import { Alumno } from '../alumno/entities/alumno.entity';
 import { Coordinador } from '../coordinador/entities/coordinador.entity';
 
 
@@ -56,6 +57,9 @@ export class AyudantiaService {
       .leftJoin('ayudantia.alumno', 'alumno')
       .leftJoin('ayudantia.asignatura', 'asignatura')
       .leftJoin('ayudantia.coordinador', 'coordinador')
+      // Además unimos la tabla `alumno` para obtener datos específicos
+      // que no están en `usuario`, como `nombre_carrera`.
+      .leftJoin(Alumno, 'alumno_data', 'alumno_data.rut_alumno = ayudantia.rut_alumno')
       // Filtrar por la columna física en la tabla `ayudantia` para cubrir
       // ambos roles: alumno o coordinador.
       .select([
@@ -72,6 +76,7 @@ export class AyudantiaService {
         'coordinador.apellidos AS coord_apellidos',
         'asignatura.id AS asignatura_id',
         'asignatura.nombre AS asignatura_nombre',
+        'alumno_data.nombre_carrera AS alumno_nombre_carrera',
       ])
       .where('ayudantia.rut_alumno = :rut OR ayudantia.rut_coordinador_otro = :rut', { rut })
       .getRawMany();
@@ -82,7 +87,7 @@ export class AyudantiaService {
       periodo: r.periodo,
       remunerada: r.remunerada,
       tipo_ayudantia: r.tipo_ayudantia,
-      alumno: r.alumno_rut ? { rut: r.alumno_rut, nombres: r.alumno_nombres, apellidos: r.alumno_apellidos } : null,
+      alumno: r.alumno_rut ? { rut: r.alumno_rut, nombres: r.alumno_nombres, apellidos: r.alumno_apellidos, nombre_carrera: r.alumno_nombre_carrera ?? null } : null,
       coordinador: r.coord_rut ? { rut: r.coord_rut, nombres: r.coord_nombres, apellidos: r.coord_apellidos } : null,
       asignatura: r.asignatura_id ? { id: r.asignatura_id, nombre: r.asignatura_nombre } : null,
     }));

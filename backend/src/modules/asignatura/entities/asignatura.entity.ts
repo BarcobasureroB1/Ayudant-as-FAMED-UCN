@@ -28,7 +28,6 @@ export class Asignatura {
     postulaciones: Postulacion[];
     
     @OneToMany(() => Coordinador, (coordinador) => coordinador.asignaturas)
-    @JoinColumn({ name: 'coordinador_rut', referencedColumnName: 'rut' })
     coordinador?: Coordinador[];
 }
     
