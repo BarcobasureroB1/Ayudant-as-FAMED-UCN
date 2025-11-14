@@ -3,8 +3,8 @@ import api from '../api/axios';
 
 interface AsignarCoordinador
 {
+    rut_coordinador: string
     id_asignatura: number;
-    rut_coordinador: string;
 }
 
 interface QuitarCoordinador
@@ -13,7 +13,7 @@ interface QuitarCoordinador
     rut_coordinador: string
 }
 
-export function useCrearCurriculum() {
+export function useAsignarCoordinador() {
     const clienteQuery = useQueryClient();
     return useMutation({
         mutationFn: async (Info: AsignarCoordinador) => {
@@ -22,6 +22,7 @@ export function useCrearCurriculum() {
         },
         onSuccess: (_data) => {
             clienteQuery.invalidateQueries({ queryKey: ['asignaturasCoordinadores'] });
+            clienteQuery.invalidateQueries({ queryKey: ['coordinadores'] });
         },
     });
 }
@@ -34,7 +35,18 @@ export function useQuitarCoordinador() {
         },
         onSuccess: (_data) => {
             clienteQuery.invalidateQueries({queryKey:['asignaturasCoordinadores']});
+            clienteQuery.invalidateQueries({queryKey:['coordinadores']});
         }                        
     });
 
+}
+
+export function useCoordinadoresTodos(){
+    return useQuery({
+        queryKey:['coordinadores'],
+        queryFn: async () => {
+            const respuesta = await api.get('coordinador');
+            return respuesta.data;
+        },
+    });
 }
