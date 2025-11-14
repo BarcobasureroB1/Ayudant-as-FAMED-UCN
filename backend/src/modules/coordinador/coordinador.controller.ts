@@ -11,6 +11,10 @@ export class CoordinadorController {
     return this.coordinadorService.create(createCoordinadorDto);
   }
 
+  @Get()
+  findAll() {
+    return this.coordinadorService.getAll();
+  }
 
   @Patch('estado/:id_asignatura/:rut_coordinador')
   actualizarEstadoCoordinador(

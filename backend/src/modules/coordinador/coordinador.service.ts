@@ -59,4 +59,50 @@ export class CoordinadorService {
     coordinador.actual = false;
     return this.coordinadorRepository.save(coordinador);
   }
+
+  /**
+   * Devuelve todos los coordinadores agrupados por usuario.
+   * Cada elemento contiene la información del usuario y un listado
+   * de asignaturas que coordina (con el id del registro en coordinador
+   * y el flag `actual`).
+   */
+  async getAll() {
+    const rows = await this.coordinadorRepository
+      .createQueryBuilder('coord')
+      .leftJoin('coord.usuario', 'usuario')
+      .leftJoin('coord.asignaturas', 'asignatura')
+      .select([
+        'coord.id AS coord_id',
+        'coord.actual AS coord_actual',
+        'usuario.rut AS usuario_rut',
+        'usuario.nombres AS usuario_nombres',
+        'usuario.apellidos AS usuario_apellidos',
+        'asignatura.id AS asignatura_id',
+        'asignatura.nombre AS asignatura_nombre',
+      ])
+      .getRawMany();
+
+    const map = new Map<string, any>();
+    for (const r of rows) {
+      const rut = r.usuario_rut;
+      if (!map.has(rut)) {
+        map.set(rut, {
+          rut: r.usuario_rut,
+          nombres: r.usuario_nombres,
+          apellidos: r.usuario_apellidos,
+          asignaturas: [],
+        });
+      }
+      const item = map.get(rut);
+      if (r.coord_id) {
+        item.asignaturas.push({
+          coordinadorId: r.coord_id,
+          asignatura: r.asignatura_id ? { id: r.asignatura_id, nombre: r.asignatura_nombre } : null,
+          actual: Boolean(r.coord_actual),
+        });
+      }
+    }
+
+    return Array.from(map.values());
+  }
 }
