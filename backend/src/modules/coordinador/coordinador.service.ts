@@ -71,6 +71,7 @@ export class CoordinadorService {
       .createQueryBuilder('coord')
       .leftJoin('coord.usuario', 'usuario')
       .leftJoin('coord.asignaturas', 'asignatura')
+      .where('coord.actual = :actual', { actual: true })
       .select([
         'coord.id AS coord_id',
         'coord.actual AS coord_actual',

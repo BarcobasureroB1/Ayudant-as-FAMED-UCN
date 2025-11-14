@@ -33,4 +33,9 @@ export class UsuarioController {
     return this.usuarioService.guardar(usuario);
   }
 
+  @Get('coordinadores/actuales')
+  findCoordinadores() {
+    return this.usuarioService.findcoordinadores();
+  }
+
 }
