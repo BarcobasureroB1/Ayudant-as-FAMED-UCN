@@ -2,14 +2,21 @@
 
 import React, { useState } from "react";
 import Select from "react-select";
-import { useAsignarCoordinador, useQuitarCoordinador, useCoordinadoresTodos } from "../../hooks/useCoordinadores";
+import { useAsignarCoordinador, useQuitarCoordinador } from "../../hooks/useCoordinadores";
+
 
 interface CoordinadorData {
-  id: number;
   rut: string;
   nombres: string;
   apellidos: string;
-  actual: boolean;
+  asignaturas: {
+    coordinadorId: number;
+    asignatura: {
+      id: number;
+      nombre: string;
+    };
+    actual: boolean;
+  }[];
 }
 
 interface AsignaturaCoordinadoresData {
@@ -19,11 +26,12 @@ interface AsignaturaCoordinadoresData {
   semestre: string;
   nrc: string;
   abierta_postulacion: boolean;
-  coordinadores: CoordinadorData[];
+  coordinadores: { rut: string; nombres: string; apellidos: string }[];
 }
 
 interface Props {
   asignaturas?: AsignaturaCoordinadoresData[];
+  coordinadoresTodos?: CoordinadorData[];
 }
 
 const InfoCard = ({
@@ -43,30 +51,27 @@ const InfoCard = ({
   </div>
 );
 
-export default function GestionCoordinadores({ asignaturas = [] }: Props) {
+export default function GestionCoordinadores({
+  asignaturas = [],
+  coordinadoresTodos = [],
+}: Props) {
   const [itemsPorPagina, setItemsPorPagina] = useState(5);
   const [paginaActual, setPaginaActual] = useState(1);
   const [busqueda, setBusqueda] = useState("");
 
-  
   const [asignaturaSeleccionada, setAsignaturaSeleccionada] =
     useState<AsignaturaCoordinadoresData | null>(null);
 
-  
   const [confirmarQuitar, setConfirmarQuitar] = useState<{
     asignaturaId: number;
     rut: string;
   } | null>(null);
 
-  
   const [nuevoCoordinador, setNuevoCoordinador] = useState<any>(null);
 
-  
-  const { data: coordinadoresTodos = [] } = useCoordinadoresTodos();
   const asignarCoordinador = useAsignarCoordinador();
   const quitarCoordinador = useQuitarCoordinador();
 
-  
   const asignaturasFiltradas = asignaturas.filter((a) =>
     a.nombre.toLowerCase().includes(busqueda.toLowerCase())
   );
@@ -81,13 +86,15 @@ export default function GestionCoordinadores({ asignaturas = [] }: Props) {
     indiceInicio + (itemsPorPagina || 1)
   );
 
-  
-  const obtenerCoordinadoresDisponibles = (asignatura: AsignaturaCoordinadoresData) => {
+
+  const obtenerCoordinadoresDisponibles = (
+    asignatura: AsignaturaCoordinadoresData
+  ) => {
     const asignadosRut = new Set(asignatura.coordinadores.map((c) => c.rut));
-    return coordinadoresTodos.filter((c: CoordinadorData) => !asignadosRut.has(c.rut));
+    return coordinadoresTodos.filter((c) => !asignadosRut.has(c.rut));
   };
 
-  
+
   const handleAgregar = () => {
     if (!nuevoCoordinador || !asignaturaSeleccionada) return;
 
@@ -98,18 +105,23 @@ export default function GestionCoordinadores({ asignaturas = [] }: Props) {
       },
       {
         onSuccess: () => {
-          
           const coordinador = coordinadoresTodos.find(
-            (c: CoordinadorData) => c.rut === nuevoCoordinador.value
+            (c) => c.rut === nuevoCoordinador.value
           );
 
-          
           if (coordinador) {
             setAsignaturaSeleccionada((prev) =>
               prev
                 ? {
                     ...prev,
-                    coordinadores: [...prev.coordinadores, coordinador],
+                    coordinadores: [
+                      ...prev.coordinadores,
+                      {
+                        rut: coordinador.rut,
+                        nombres: coordinador.nombres,
+                        apellidos: coordinador.apellidos,
+                      },
+                    ],
                   }
                 : prev
             );
@@ -122,7 +134,6 @@ export default function GestionCoordinadores({ asignaturas = [] }: Props) {
   };
 
 
-  
   const handleConfirmarQuitar = () => {
     if (!confirmarQuitar) return;
 
@@ -133,7 +144,6 @@ export default function GestionCoordinadores({ asignaturas = [] }: Props) {
       },
       {
         onSuccess: () => {
-          
           setAsignaturaSeleccionada((prev) =>
             prev
               ? {
@@ -151,14 +161,13 @@ export default function GestionCoordinadores({ asignaturas = [] }: Props) {
     );
   };
 
-
   return (
     <div className="flex justify-center items-center w-full">
       <div className="w-full max-w-7xl px-4 sm:px-6 lg:px-12">
         <InfoCard title="Gestión de Coordinadores por Asignatura" className="shadow-lg">
           {asignaturas.length > 0 ? (
             <>
-              
+
               <div className="flex flex-col sm:flex-row justify-between items-center mb-4">
                 <input
                   type="text"
@@ -171,7 +180,6 @@ export default function GestionCoordinadores({ asignaturas = [] }: Props) {
                   className="w-full sm:w-1/3 border border-gray-300 text-black rounded-md px-3 py-2 text-sm"
                 />
 
-                
                 <div className="flex items-center gap-2">
                   <label className="text-sm text-gray-700">Mostrar</label>
                   <input
@@ -190,7 +198,6 @@ export default function GestionCoordinadores({ asignaturas = [] }: Props) {
                   <span className="text-sm text-gray-700">asignaturas</span>
                 </div>
 
-                
                 {totalPaginasFiltradas > 1 && (
                   <div className="flex items-center gap-2 mt-2 sm:mt-0">
                     <button
@@ -224,7 +231,7 @@ export default function GestionCoordinadores({ asignaturas = [] }: Props) {
                 )}
               </div>
 
-              
+
               <div className="overflow-x-auto rounded-lg border border-gray-200">
                 <table className="min-w-full text-sm text-gray-700 bg-white">
                   <thead className="bg-gray-100">
@@ -253,7 +260,7 @@ export default function GestionCoordinadores({ asignaturas = [] }: Props) {
                 </table>
               </div>
 
-              
+
               {asignaturaSeleccionada && (
                 <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-40 z-50">
                   <div className="bg-white rounded-xl shadow-lg p-6 w-full max-w-lg">
@@ -261,12 +268,11 @@ export default function GestionCoordinadores({ asignaturas = [] }: Props) {
                       Coordinadores de {asignaturaSeleccionada.nombre}
                     </h3>
 
-                    
                     {asignaturaSeleccionada.coordinadores.length > 0 ? (
                       <ul className="space-y-2">
                         {asignaturaSeleccionada.coordinadores.map((c) => (
                           <li
-                            key={c.id}
+                            key={c.rut}
                             className="border rounded-md p-3 bg-gray-50 flex justify-between"
                           >
                             <span className="text-black">
@@ -288,10 +294,12 @@ export default function GestionCoordinadores({ asignaturas = [] }: Props) {
                         ))}
                       </ul>
                     ) : (
-                      <p className="text-black text-center">Sin coordinadores asignados.</p>
+                      <p className="text-black text-center">
+                        Sin coordinadores asignados.
+                      </p>
                     )}
 
-                   
+
                     <div className="mt-6">
                       <h4 className="font-semibold text-black mb-2 text-center">
                         Agregar coordinador
@@ -301,12 +309,13 @@ export default function GestionCoordinadores({ asignaturas = [] }: Props) {
                         value={nuevoCoordinador}
                         onChange={setNuevoCoordinador}
                         options={obtenerCoordinadoresDisponibles(asignaturaSeleccionada).map(
-                          (c: CoordinadorData) => ({
+                          (c) => ({
                             value: c.rut,
                             label: `${c.nombres} ${c.apellidos}`,
                           })
                         )}
                         placeholder="Seleccionar coordinador..."
+                        className="text-black"
                         isSearchable
                       />
 
@@ -317,6 +326,7 @@ export default function GestionCoordinadores({ asignaturas = [] }: Props) {
                         Asignar coordinador
                       </button>
                     </div>
+
 
                     <div className="flex justify-end mt-6">
                       <button
@@ -330,7 +340,7 @@ export default function GestionCoordinadores({ asignaturas = [] }: Props) {
                 </div>
               )}
 
-              
+
               {confirmarQuitar && (
                 <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-40 z-50">
                   <div className="bg-white p-6 rounded-lg w-full max-w-md text-center">

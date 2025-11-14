@@ -24,7 +24,7 @@ export interface AyudantiasAnteriores
             id: number;
             nombre: string;
         }
-    }
+}
 
 export function useAyudantiasPorAlumno(rut_alumno?: string){
     return useQuery<AyudantiasAnteriores, Error>({

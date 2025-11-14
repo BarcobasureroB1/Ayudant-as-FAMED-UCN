@@ -12,6 +12,7 @@ import AperturaConcursoAdmin from '@/components/Secretariadepartamento/AperturaC
 import AperturaConcursoSecreDepto from '@/components/Secretariadepartamento/AperturaConcursoSecreDepto';
 
 import { useTodasAsignaturas, useAsignaturasPorDepartamento, useAsignaturasCoordinadores, useAsignaturasCoordinadoresPorDepartamento } from '@/hooks/useAsignaturas';
+import { CoordinadorData, useCoordinadoresTodos } from '@/hooks/useCoordinadores';
 import GestionCoordinadores from '@/components/Secretariadepartamento/GestionCoordinadores';
 import GestionCoordinadoresAdmin from '@/components/Secretariadepartamento/GestionCoordinadoresAdmin';
 
@@ -30,9 +31,10 @@ interface UserProps {
     asignaturas: any[];
     asignaturasCoordinadores: any[];
     alumnos: AlumnoData[];
+    coordinadoresTodos: CoordinadorData[];
 }
 
-export const SecretariaDeptoDashboard = ({ user, asignaturas, asignaturasCoordinadores, alumnos }: UserProps) => {
+export const SecretariaDeptoDashboard = ({ user, asignaturas, asignaturasCoordinadores, alumnos, coordinadoresTodos }: UserProps) => {
     const router = useRouter();
 
     const { setToken, setUsertipo } = useAuth();
@@ -148,6 +150,7 @@ export const SecretariaDeptoDashboard = ({ user, asignaturas, asignaturasCoordin
                                     {user.tipo === 'admin' && (
                                         <GestionCoordinadoresAdmin
                                         asignaturas={asignaturasCoordinadores}
+                                        coordinadoresTodos={coordinadoresTodos}
                                     />
                                     )}
                                     {user.tipo ==='secretaria_depto' && (
@@ -168,6 +171,7 @@ export default function SecretariaDeptoPage() {
     const { data: asignaturas, isLoading: cargaAsignaturas, isError: errorAsignaturas } = useTodasAsignaturas();
     const { data: asignaturasCoordinadores, isLoading: cargaAsignaturasCoordinadores, isError: errorAsignaturasCoordinadores } = useAsignaturasCoordinadores();
     const { data: alumnos, isLoading: cargaAlumnos, isError: errorAlumnos } = useAlumnos();
+    const { data: coordinadoresTodos, isLoading: cargaCoordinadoresTodos, isError: errorCoordinadoresTodos } = useCoordinadoresTodos();
     const router = useRouter();
 
     useEffect(() => {
@@ -177,12 +181,12 @@ export default function SecretariaDeptoPage() {
     }, [isError, user, router]);
 
     useEffect(() => {
-        if (errorAsignaturasCoordinadores || errorAsignaturas || errorAlumnos) {
+        if (errorAsignaturasCoordinadores || errorAsignaturas || errorAlumnos || errorCoordinadoresTodos) {
             router.push("/login");
         }
-    }, [errorAsignaturas, errorAsignaturasCoordinadores, errorAlumnos, router]);
+    }, [errorAsignaturas, errorAsignaturasCoordinadores, errorAlumnos, errorCoordinadoresTodos, router]);
 
-    if (cargauser || cargaAsignaturas || cargaAsignaturasCoordinadores || cargaAlumnos) {
+    if (cargauser || cargaAsignaturas || cargaAsignaturasCoordinadores || cargaAlumnos || cargaCoordinadoresTodos) {
         return (
             <div className="min-h-screen flex items-center justify-center">
                 <div className="text-center">
@@ -193,7 +197,7 @@ export default function SecretariaDeptoPage() {
         );
     }
 
-    if (isError || !user || errorAsignaturas || errorAsignaturasCoordinadores || errorAlumnos) {
+    if (isError || !user || errorAsignaturas || errorAsignaturasCoordinadores || errorAlumnos || errorCoordinadoresTodos) {
         return (
             <div className="min-h-screen flex items-center justify-center">
                 <div className="text-center">
@@ -204,5 +208,5 @@ export default function SecretariaDeptoPage() {
         );
     }
 
-    return <SecretariaDeptoDashboard user={user} asignaturas={asignaturas} asignaturasCoordinadores={asignaturasCoordinadores} alumnos={alumnos} />;
+    return <SecretariaDeptoDashboard user={user} asignaturas={asignaturas} asignaturasCoordinadores={asignaturasCoordinadores} alumnos={alumnos} coordinadoresTodos={coordinadoresTodos} />;
 }

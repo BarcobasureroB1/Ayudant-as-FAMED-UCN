@@ -192,9 +192,9 @@ export const PostulanteVista = ({user, alumno, curriculum, actividadesExtracurri
                     <div className="space-y-4">
                         {ayudantiasAnteriores.map((a: AyudantiasAnteriores) => (
                             <div key={a.id} className="border-l-4 border-green-500 pl-4 py-2">
-                                <p className="font-medium text-gray-900">Nombre: {a.nombre_asig}</p>
-                                <p className="text-sm text-gray-600">Coordinador: {a.n_coordinador}</p>
-                                <p className="text-sm text-gray-600">RUT coordinador: {a.rut_coordinador_otro}</p>
+                                <p className="font-medium text-gray-900">Nombre: {a.asignatura.nombre}</p>
+                                <p className="text-sm text-gray-600">Coordinador: {a.coordinador.nombres} {a.coordinador.apellidos}</p>
+                                <p className="text-sm text-gray-600">RUT coordinador: {a.coordinador.rut}</p>
                                 <p className="text-sm text-gray-600">Evaluación: {a.evaluacion}</p>
                             </div>
                         ))}
