@@ -32,12 +32,15 @@ export class LlamadoPostulacionService {
 
     // build payload without the raw rut_secretaria field (we'll set the relation)
     const payload: any = { ...createLlamadoPostulacionDto };
+    const descripcionArray: string[] = Array.isArray(payload.descripcion) ? payload.descripcion : [];
     delete payload.rut_secretaria;
+    delete payload.descripcion;
 
     const entity = this.llamadoPostulacionRepository.create({
       ...payload,
       asignatura,
       secretaria,
+      requisitos: descripcionArray.map(d => ({ descripcion: d }))
     });
 
     return await this.llamadoPostulacionRepository.save(entity);
