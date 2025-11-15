@@ -219,7 +219,7 @@ export default function AperturaConcursoAdmin({ asignaturas = [] }: Props) {
   const abrirModalVerAfiche = async (a: AsignaturaData) => {
     try {
       setBuscandoAficheLocal(true);
-      const resp = await api.get("llamado_postulacion", { params: { id_asignatura: a.id } });
+      const resp = await api.get(`llamado-postulacion/${a.id}`);
       const data = resp.data;
 
       

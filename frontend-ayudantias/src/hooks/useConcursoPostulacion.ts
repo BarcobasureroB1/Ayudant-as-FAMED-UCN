@@ -23,7 +23,7 @@ export function useCrearConcurso() {
     const clienteQuery = useQueryClient();
     return useMutation({
         mutationFn: async (concurso: CrearConcursoData) => {
-            const respuesta = await api.post('llamado_postulacion', concurso);
+            const respuesta = await api.post('llamado-postulacion', concurso);
             return respuesta.data;
         },
         onSuccess: (_data) => {
@@ -34,9 +34,9 @@ export function useCrearConcurso() {
 
 export function useBuscarDatosAfiche(id_asignatura: number) {
     return useQuery({
-        queryKey: ['llamado_postulacion', id_asignatura],
+        queryKey: ['llamado-postulacion', id_asignatura],
         queryFn: async() => {
-            const respuesta = await api.get('llamado_postulacion', { params: { id_asignatura } });
+            const respuesta = await api.get(`llamado-postulacion/${id_asignatura}`);
             return respuesta.data
         },
         enabled: !!id_asignatura,
@@ -48,10 +48,10 @@ export function useCancelarAficheConcurso(){
     const clienteQuery = useQueryClient();
     return useMutation({
         mutationFn: async (id_concurso) => {
-            await api.patch('llamado_postulacion', id_concurso);
+            await api.patch('llamado-postulacion', id_concurso);
         },
         onSuccess: (_data) => {
-            clienteQuery.invalidateQueries({queryKey:['llamado_postulacion']});
+            clienteQuery.invalidateQueries({queryKey:['llamado-postulacion']});
             
         }                        
     });

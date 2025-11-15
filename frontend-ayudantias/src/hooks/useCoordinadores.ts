@@ -67,7 +67,7 @@ export function useCoordinadoresTodos() {
   return useQuery({
     queryKey: ["coordinadores"],
     queryFn: async () => {
-      const respuesta = await api.get("coordinadores/all");
+      const respuesta = await api.get("usuario/coordinadores/all");
       return respuesta.data;
     },
   });
