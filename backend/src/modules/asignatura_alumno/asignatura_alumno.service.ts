@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable, NotFoundException, ConflictException } from '@nestjs/common';
 import { CreateAsignaturaAlumnoDto } from './dto/create-asignatura_alumno.dto';
 import { UpdateAsignaturaAlumnoDto } from './dto/update-asignatura_alumno.dto';
 import { InjectRepository } from '@nestjs/typeorm';
@@ -33,6 +33,20 @@ export class AsignaturaAlumnoService {
       alumno,
       asignatura,
     });
+
+    // Evitar crear duplicados: verificar si ya existe una relación para
+    // este alumno y esta asignatura.
+    const existing = await this.asignaturaAlumnoRepository.findOne({
+      where: {
+        alumno: { rut_alumno: alumno.rut_alumno },
+        asignatura: { id: asignatura.id },
+      },
+      relations: ['alumno', 'asignatura'],
+    });
+
+    if (existing) {
+      throw new ConflictException('La relación alumno-asignatura ya existe');
+    }
 
     return await this.asignaturaAlumnoRepository.save(asignaturaAlumno);
   }
