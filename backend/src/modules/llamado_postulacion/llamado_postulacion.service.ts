@@ -29,6 +29,13 @@ export class LlamadoPostulacionService {
     if (!asignatura) {
       throw new Error('Asignatura no encontrada');
     }
+    // Marcar la asignatura como abierta para postulaciones
+    // Establecemos tanto el flag `abierta_postulacion` como el `estado` a 'abierta'
+    // para que quede disponible inmediatamente.
+    asignatura.abierta_postulacion = true;
+    asignatura.estado = 'abierto';
+    await this.asignaturaRepository.save(asignatura);
+    
 
     // build payload without the raw rut_secretaria field (we'll set the relation)
     const payload: any = { ...createLlamadoPostulacionDto };

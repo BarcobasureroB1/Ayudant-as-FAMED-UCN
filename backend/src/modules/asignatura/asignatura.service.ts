@@ -63,7 +63,7 @@ export class AsignaturaService {
       const aas = await this.asignaturaAlumnoRepository
         .createQueryBuilder('aa')
         .innerJoinAndSelect('aa.asignatura', 'asignatura')
-        .innerJoin('aa.alumno', 'alumno')
+        .innerJoinAndSelect('aa.alumno', 'alumno')
         .where('alumno.rut_alumno = :rut', { rut: alumno.rut_alumno })
         .andWhere('aa.nota IS NOT NULL')
         .getMany();
@@ -71,9 +71,17 @@ export class AsignaturaService {
       this.logger.debug(`asignatura_alumno rows found: ${aas.length}`);
 
       // Filtrar por semestre y estado, mapear a objetos planos
-      const estados = ['abierto', 'habilitada'];
+      // Normalizamos el estado a minúsculas porque en la BD algunas filas
+      // usan 'abierta' y otras 'abierto'. Aceptamos ambas variantes aquí.
+      const estados = ['abierto', 'abierta'];
+      console.log(aas);
       const result = aas
-        .filter((aa) => aa.asignatura && aa.asignatura.semestre <= nivel && estados.includes(aa.asignatura.estado))
+        .filter(
+          (aa) =>
+            aa.asignatura &&
+            aa.asignatura.semestre <= nivel &&
+            estados.includes(String(aa.asignatura.estado).toLowerCase()),
+        )
         .map((aa) => ({
           id: aa.asignatura.id,
           nombre: aa.asignatura.nombre,
