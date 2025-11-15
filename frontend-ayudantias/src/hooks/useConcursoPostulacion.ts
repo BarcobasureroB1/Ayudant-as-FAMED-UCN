@@ -39,7 +39,7 @@ export function useBuscarDatosAfiche(id_asignatura: number) {
             const respuesta = await api.get(`llamado-postulacion/${id_asignatura}`);
             return respuesta.data
         },
-        enabled: !!id_asignatura,
+        enabled: false,
         retry: false,
     })
 }
@@ -47,7 +47,7 @@ export function useBuscarDatosAfiche(id_asignatura: number) {
 export function useCancelarAficheConcurso(){
     const clienteQuery = useQueryClient();
     return useMutation({
-        mutationFn: async (id_concurso) => {
+        mutationFn: async (id_concurso : number) => {
             await api.patch('llamado-postulacion', id_concurso);
         },
         onSuccess: (_data) => {

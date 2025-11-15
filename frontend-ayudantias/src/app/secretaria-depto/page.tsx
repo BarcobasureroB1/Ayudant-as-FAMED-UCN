@@ -128,7 +128,8 @@ export const SecretariaDeptoDashboard = ({ user, asignaturas, asignaturasCoordin
                             {vista === 'Concurso' ? (
                                 <div className="space-y-6">
                                     {user.tipo === 'admin' && (
-                                        <AperturaConcursoAdmin 
+                                        <AperturaConcursoAdmin
+                                        rutSecretaria={user.rut} 
                                         asignaturas={asignaturas}
                                     />
                                     )}

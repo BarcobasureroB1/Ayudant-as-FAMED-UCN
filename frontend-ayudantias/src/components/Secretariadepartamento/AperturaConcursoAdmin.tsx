@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useMemo } from "react";
+import React, { useMemo, useState } from "react";
 import {
   useAbrirConcurso,
   useCerrarConcurso,
@@ -22,6 +22,7 @@ interface AsignaturaData {
 
 interface Props {
   asignaturas?: AsignaturaData[];
+  rutSecretaria: string;
 }
 
 const InfoCard = ({
@@ -33,9 +34,7 @@ const InfoCard = ({
   children?: React.ReactNode;
   className?: string;
 }) => (
-  <div
-    className={`bg-white rounded-xl shadow-sm border border-gray-200 p-6 ${className}`}
-  >
+  <div className={`bg-white rounded-xl shadow-sm border border-gray-200 p-6 ${className}`}>
     <h3 className="text-lg font-semibold text-gray-800 mb-4 pb-2 border-b border-gray-100 text-center">
       {title}
     </h3>
@@ -43,7 +42,7 @@ const InfoCard = ({
   </div>
 );
 
-export default function AperturaConcursoAdmin({ asignaturas = [] }: Props) {
+export default function AperturaConcursoAdmin({ asignaturas = [], rutSecretaria }: Props) {
   const [itemsPorPagina, setItemsPorPagina] = useState(5);
   const [paginaActual, setPaginaActual] = useState(1);
   const [busqueda, setBusqueda] = useState("");
@@ -52,21 +51,17 @@ export default function AperturaConcursoAdmin({ asignaturas = [] }: Props) {
   const [mostrarConfirmacion, setMostrarConfirmacion] = useState(false);
   const [idAConfirmar, setIdAConfirmar] = useState<string | null>(null);
 
-  
+  // hooks
   const { mutate: abrirConcurso } = useAbrirConcurso();
   const { mutate: cerrarConcurso } = useCerrarConcurso();
-
-  
   const crearConcurso = useCrearConcurso();
   const cancelarAfiche = useCancelarAficheConcurso();
 
-  
+  // Crear afiche modal state
   const [mostrarModalCrear, setMostrarModalCrear] = useState(false);
-  const [asignaturaParaCrear, setAsignaturaParaCrear] = useState<
-    AsignaturaData | null
-  >(null);
+  const [asignaturaParaCrear, setAsignaturaParaCrear] = useState<AsignaturaData | null>(null);
 
-  
+  // Form fields (crear afiche)
   const [semestre, setSemestre] = useState("");
   const [entregaAntecedentes, setEntregaAntecedentes] = useState("");
   const [fechaInicio, setFechaInicio] = useState("");
@@ -76,207 +71,26 @@ export default function AperturaConcursoAdmin({ asignaturas = [] }: Props) {
   const [horasMensuales, setHorasMensuales] = useState<number | "">("");
   const [horarioFijo, setHorarioFijo] = useState(false);
   const [cantAyudantes, setCantAyudantes] = useState<number | "">("");
-  const [rutSecretaria, setRutSecretaria] = useState("");
   const [descripciones, setDescripciones] = useState<string[]>([""]);
 
-  
-  const [asignaturaParaVerAfiche, setAsignaturaParaVerAfiche] =
-    useState<AsignaturaData | null>(null);
+  // Ver afiche
+  const [asignaturaParaVerAfiche, setAsignaturaParaVerAfiche] = useState<AsignaturaData | null>(null);
   const [datosAficheLocal, setDatosAficheLocal] = useState<any>(null);
   const [buscandoAficheLocal, setBuscandoAficheLocal] = useState(false);
 
-  
+  // mapa local que indica si existe afiche para una asignatura (true/false/undefined)
+  const [aficheExists, setAficheExists] = useState<Record<number, boolean | undefined>>({});
+
+  // helpers paginación + filtrado
   const asignaturasFiltradas = useMemo(
-    () =>
-      asignaturas.filter((a) =>
-        a.nombre.toLowerCase().includes(busqueda.toLowerCase())
-      ),
+    () => asignaturas.filter((a) => a.nombre.toLowerCase().includes(busqueda.toLowerCase())),
     [asignaturas, busqueda]
   );
 
-  const totalPaginasFiltradas = Math.ceil(
-    asignaturasFiltradas.length / (itemsPorPagina || 1)
-  );
+  const totalPaginasFiltradas = Math.ceil(asignaturasFiltradas.length / (itemsPorPagina || 1));
   const indiceInicio = (paginaActual - 1) * (itemsPorPagina || 1);
   const indiceFin = indiceInicio + (itemsPorPagina || 1);
-  const asignaturasPaginadas = asignaturasFiltradas.slice(
-    indiceInicio,
-    indiceFin
-  );
-
-  
-  const handleAbrirConcurso = (id: string) => {
-    abrirConcurso(id, {
-      onSuccess: () => {
-        setMensajePopup(
-          "Solicitud de apertura de concurso enviada, espere a que se apruebe su solicitud. Una vez aprobada, aparecerá la opción para abrir la postulación."
-        );
-        setMostrarPopup(true);
-      },
-      onError: () => {
-        setMensajePopup("Error al enviar la solicitud. Intente nuevamente.");
-        setMostrarPopup(true);
-      },
-    });
-  };
-
-  const handleCerrarConcurso = (id: string) => {
-    cerrarConcurso(id, {
-      onSuccess: () => {
-        setMensajePopup("Concurso cerrado exitosamente.");
-        setMostrarPopup(true);
-      },
-      onError: () => {
-        setMensajePopup("Error al cerrar el concurso. Intente nuevamente.");
-        setMostrarPopup(true);
-      },
-    });
-  };
-
-  const confirmarCierre = (id: string) => {
-    setIdAConfirmar(id);
-    setMostrarConfirmacion(true);
-  };
-
-  const ejecutarCierreConfirmado = () => {
-    if (idAConfirmar) {
-      handleCerrarConcurso(idAConfirmar);
-    }
-    setMostrarConfirmacion(false);
-    setIdAConfirmar(null);
-  };
-
-  
-  const abrirModalCrear = (a: AsignaturaData) => {
-    setAsignaturaParaCrear(a);
-    
-    setSemestre(a.semestre ?? "");
-    setDescripciones([""]);
-    setEntregaAntecedentes("");
-    setFechaInicio("");
-    setFechaTermino("");
-    setTipoAyudantia("");
-    setTipoRemuneracion("");
-    setHorasMensuales("");
-    setHorarioFijo(false);
-    setCantAyudantes("");
-    setRutSecretaria("");
-    setMostrarModalCrear(true);
-  };
-
-  const agregarDescripcion = () => {
-    setDescripciones((d) => [...d, ""]);
-  };
-  const quitarDescripcion = (idx: number) => {
-    setDescripciones((d) => d.filter((_, i) => i !== idx));
-  };
-  const cambiarDescripcion = (idx: number, value: string) => {
-    setDescripciones((d) => d.map((x, i) => (i === idx ? value : x)));
-  };
-
-  const handleSubmitCrear = (e?: React.FormEvent) => {
-    e?.preventDefault();
-    if (!asignaturaParaCrear) return;
-
-    
-    if (!fechaInicio || !fechaTermino || !tipoAyudantia || !tipoRemuneracion) {
-      setMensajePopup("Completa al menos: fecha inicio, fecha término, tipo ayudantía y tipo remuneración.");
-      setMostrarPopup(true);
-      return;
-    }
-
-    
-    const payload = {
-      id_asignatura: asignaturaParaCrear.id,
-      semestre: semestre,
-      entrega_antecedentes: new Date(entregaAntecedentes),
-      fecha_inicio: new Date(fechaInicio),
-      fecha_termino: new Date(fechaTermino),
-      tipo_ayudantia: tipoAyudantia,
-      tipo_remuneracion: tipoRemuneracion,
-      horas_mensuales: Number(horasMensuales) || 0,
-      horario_fijo: Boolean(horarioFijo),
-      cant_ayudantes: Number(cantAyudantes) || 0,
-      estado: "abierto",
-      rut_secretaria: rutSecretaria || "",
-      descripcion: descripciones,
-    };
-
-    crearConcurso.mutate(payload, {
-      onSuccess: () => {
-        setMensajePopup("Llamado/afiche creado correctamente.");
-        setMostrarPopup(true);
-        setMostrarModalCrear(false);
-      },
-      onError: () => {
-        setMensajePopup("Error al crear el llamado. Intenta nuevamente.");
-        setMostrarPopup(true);
-      },
-    });
-  };
-
-  
-  const abrirModalVerAfiche = async (a: AsignaturaData) => {
-    try {
-      setBuscandoAficheLocal(true);
-      const resp = await api.get(`llamado-postulacion/${a.id}`);
-      const data = resp.data;
-
-      
-      const exists =
-        (Array.isArray(data) && data.length > 0) ||
-        (data && (typeof data === "object") && Object.keys(data).length > 0);
-
-      if (exists) {
-        setAsignaturaParaVerAfiche(a);
-        setDatosAficheLocal(data);
-      } else {
-        setMensajePopup("No existe un afiche/llamado para esta asignatura.");
-        setMostrarPopup(true);
-      }
-    } catch (err) {
-      setMensajePopup("Error al consultar el afiche. Intenta nuevamente.");
-      setMostrarPopup(true);
-    } finally {
-      setBuscandoAficheLocal(false);
-    }
-  };
-
-  
-  const handleCancelarAfiche = async () => {
-    
-    let id_concurso: any = null;
-    if (!datosAficheLocal) {
-      setMensajePopup("No se encontró ID del concurso a cancelar.");
-      setMostrarPopup(true);
-      return;
-    }
-    if (Array.isArray(datosAficheLocal)) {
-      id_concurso = datosAficheLocal[0]?.id ?? null;
-    } else {
-      id_concurso = datosAficheLocal?.id ?? null;
-    }
-
-    if (!id_concurso) {
-      setMensajePopup("No se encontró ID del concurso a cancelar.");
-      setMostrarPopup(true);
-      return;
-    }
-
-    cancelarAfiche.mutate(id_concurso, {
-      onSuccess: () => {
-        setMensajePopup("Afiche / concurso cancelado correctamente.");
-        setMostrarPopup(true);
-        
-        setAsignaturaParaVerAfiche(null);
-        setDatosAficheLocal(null);
-      },
-      onError: () => {
-        setMensajePopup("Error al cancelar el afiche. Intenta nuevamente.");
-        setMostrarPopup(true);
-      },
-    });
-  };
+  const asignaturasPaginadas = asignaturasFiltradas.slice(indiceInicio, indiceFin);
 
   const handleChangeItemsPorPagina = (e: React.ChangeEvent<HTMLInputElement>) => {
     const valor = e.target.value;
@@ -297,6 +111,218 @@ export default function AperturaConcursoAdmin({ asignaturas = [] }: Props) {
     }
   };
 
+  // abrir solicitud de apertura (mutate)
+  const handleAbrirConcurso = (id: string) => {
+    abrirConcurso(id, {
+      onSuccess: () => {
+        setMensajePopup(
+          "Solicitud de apertura enviada. Cuando se apruebe, aparecerá la opción para crear el afiche/postulación."
+        );
+        setMostrarPopup(true);
+      },
+      onError: () => {
+        setMensajePopup("Error al solicitar apertura. Intenta de nuevo.");
+        setMostrarPopup(true);
+      },
+    });
+  };
+
+  // crear modal -> prefill
+  const abrirModalCrear = (a: AsignaturaData) => {
+    setAsignaturaParaCrear(a);
+    setSemestre(a.semestre ?? "");
+    setDescripciones([""]);
+    setEntregaAntecedentes("");
+    setFechaInicio("");
+    setFechaTermino("");
+    setTipoAyudantia("");
+    setTipoRemuneracion("");
+    setHorasMensuales("");
+    setHorarioFijo(false);
+    setCantAyudantes("");
+    setMostrarModalCrear(true);
+  };
+
+  const agregarDescripcion = () => setDescripciones((d) => [...d, ""]);
+  const quitarDescripcion = (idx: number) => setDescripciones((d) => d.filter((_, i) => i !== idx));
+  const cambiarDescripcion = (idx: number, value: string) =>
+    setDescripciones((d) => d.map((x, i) => (i === idx ? value : x)));
+
+  // submit crear afiche -> usar useCrearConcurso (descripcion como string[])
+  const handleSubmitCrear = (e?: React.FormEvent) => {
+    e?.preventDefault();
+    if (!asignaturaParaCrear) return;
+
+    // Validaciones simples (todos required)
+    if (!fechaInicio || !fechaTermino || !tipoAyudantia || !tipoRemuneracion || descripciones.length === 0 || descripciones.some(d => d.trim() === "")) {
+      setMensajePopup("Completa: fecha inicio, fecha término, tipo ayudantía, tipo remuneración y al menos una descripción válida.");
+      setMostrarPopup(true);
+      return;
+    }
+
+    const payload = {
+      id_asignatura: asignaturaParaCrear.id,
+      semestre: semestre,
+      entrega_antecedentes: new Date(entregaAntecedentes),
+      fecha_inicio: new Date(fechaInicio),
+      fecha_termino: new Date(fechaTermino),
+      tipo_ayudantia: tipoAyudantia,
+      tipo_remuneracion: tipoRemuneracion,
+      horas_mensuales: Number(horasMensuales) || 0,
+      horario_fijo: Boolean(horarioFijo),
+      cant_ayudantes: Number(cantAyudantes) || 0,
+      estado: "abierto",
+      rut_secretaria: String(rutSecretaria),
+      descripcion: descripciones,
+    };
+
+    crearConcurso.mutate(payload, {
+      onSuccess: (data: any) => {
+        // marcar localmente que existe afiche para esta asignatura
+        setAficheExists((prev) => ({ ...prev, [asignaturaParaCrear.id]: true }));
+
+        setMensajePopup("Afiche / llamado creado correctamente.");
+        setMostrarPopup(true);
+        setMostrarModalCrear(false);
+        setAsignaturaParaCrear(null);
+      },
+      onError: () => {
+        setMensajePopup("Error al crear el afiche. Intenta nuevamente.");
+        setMostrarPopup(true);
+      },
+    });
+  };
+
+  // Abrir modal ver afiche -> hacemos GET aquí para asegurar fetch al click
+  const abrirModalVerAfiche = async (a: AsignaturaData) => {
+    setAsignaturaParaVerAfiche(a);
+    setDatosAficheLocal(null);
+    setBuscandoAficheLocal(true);
+
+    try {
+      const resp = await api.get(`llamado-postulacion/${a.id}`);
+      const data = resp.data;
+      // backend devuelve array (0 o 1 elemento)
+      if (Array.isArray(data) && data.length > 0) {
+        setDatosAficheLocal(data);
+        setAficheExists((prev) => ({ ...prev, [a.id]: true }));
+      } else {
+        setDatosAficheLocal(null);
+        setAficheExists((prev) => ({ ...prev, [a.id]: false }));
+      }
+    } catch (err) {
+      setMensajePopup("Error al consultar el afiche. Intenta nuevamente.");
+      setMostrarPopup(true);
+      setDatosAficheLocal(null);
+      setAficheExists((prev) => ({ ...prev, [a.id]: false }));
+    } finally {
+      setBuscandoAficheLocal(false);
+    }
+  };
+
+  // Cerrar / cancelar concurso: ejecutar ambos patches (asignatura + afiche si existe)
+  const ejecutarCierreConfirmado = async () => {
+    if (!idAConfirmar) {
+      setMostrarConfirmacion(false);
+      return;
+    }
+
+    // 1) cerrar asignatura (patch)
+    cerrarConcurso(idAConfirmar, {
+      onSuccess: async () => {
+        // 2) obtener afiche asociado (si existe) y cancelar
+        try {
+          const resp = await api.get(`llamado-postulacion/${idAConfirmar}`);
+          const data = resp.data;
+          let id_concurso: number | null = null;
+          if (Array.isArray(data) && data.length > 0) id_concurso = data[0].id ?? null;
+          else if (data && typeof data === "object" && data.id) id_concurso = data.id;
+
+          if (id_concurso) {
+            // el hook puede tener tipado genérico, casteamos a any para evitar error TS puntual
+            cancelarAfiche.mutate(id_concurso as any, {
+              onSuccess: () => {
+                setMensajePopup("Concurso y afiche cancelados correctamente.");
+                setMostrarPopup(true);
+                setAficheExists((prev) => ({ ...prev, [Number(idAConfirmar)]: false }));
+              },
+              onError: () => {
+                setMensajePopup("Concurso cerrado pero error al cancelar afiche (intenta manualmente).");
+                setMostrarPopup(true);
+              },
+            });
+          } else {
+            setMensajePopup("Concurso cerrado (no se encontró afiche asociado).");
+            setMostrarPopup(true);
+            setAficheExists((prev) => ({ ...prev, [Number(idAConfirmar)]: false }));
+          }
+        } catch (err) {
+          setMensajePopup("Concurso cerrado, pero ocurrió un error al buscar el afiche.");
+          setMostrarPopup(true);
+        }
+      },
+      onError: () => {
+        setMensajePopup("Error al cerrar el concurso. Intenta nuevamente.");
+        setMostrarPopup(true);
+      },
+    });
+
+    setMostrarConfirmacion(false);
+    setIdAConfirmar(null);
+  };
+
+  // alterna mostrar confirmacion (se pasa id asignatura en string)
+  const confirmarCierre = (id: string) => {
+    setIdAConfirmar(id);
+    setMostrarConfirmacion(true);
+  };
+
+  // helper: cuando el usuario presiona "Cancelar afiche" desde el modal Ver Afiche
+  async function handleCancelarAfiche() {
+    if (!asignaturaParaVerAfiche) return;
+
+    try {
+      const resp = await api.get(`llamado-postulacion/${asignaturaParaVerAfiche.id}`);
+      const data = resp.data;
+      let id_concurso: number | null = null;
+      if (Array.isArray(data) && data.length > 0) id_concurso = data[0].id ?? null;
+      else if (data && typeof data === "object" && data.id) id_concurso = data.id;
+
+      if (!id_concurso) {
+        setMensajePopup("No se encontró ID del concurso a cancelar.");
+        setMostrarPopup(true);
+        return;
+      }
+
+      // 1) cerrar asignatura
+      cerrarConcurso(String(asignaturaParaVerAfiche.id), {
+        onSuccess: () => {
+          // 2) cancelar afiche (pasamos id_concurso casteado)
+          cancelarAfiche.mutate(id_concurso as any, {
+            onSuccess: () => {
+              setMensajePopup("Afiche / concurso cancelado correctamente.");
+              setMostrarPopup(true);
+              setAsignaturaParaVerAfiche(null);
+              setDatosAficheLocal(null);
+              setAficheExists((prev) => ({ ...prev, [asignaturaParaVerAfiche.id]: false }));
+            },
+            onError: () => {
+              setMensajePopup("Error al cancelar el afiche. Intenta nuevamente.");
+              setMostrarPopup(true);
+            },
+          });
+        },
+        onError: () => {
+          setMensajePopup("Error al cerrar la asignatura. Intenta nuevamente.");
+          setMostrarPopup(true);
+        },
+      });
+    } catch (err) {
+      setMensajePopup("Error al consultar el afiche. Intenta nuevamente.");
+      setMostrarPopup(true);
+    }
+  }
+
   return (
     <div className="flex justify-center items-center w-full">
       <div className="w-full max-w-7xl px-4 sm:px-6 lg:px-12">
@@ -308,16 +334,11 @@ export default function AperturaConcursoAdmin({ asignaturas = [] }: Props) {
                   type="text"
                   placeholder="Buscar asignatura..."
                   value={busqueda}
-                  onChange={(e) => {
-                    setBusqueda(e.target.value);
-                    setPaginaActual(1);
-                  }}
+                  onChange={(e) => { setBusqueda(e.target.value); setPaginaActual(1); }}
                   className="w-full sm:w-1/3 border border-gray-300 text-black rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
                 />
                 <div className="flex items-center gap-2">
-                  <label htmlFor="itemsPorPagina" className="text-sm text-gray-700">
-                    Mostrar
-                  </label>
+                  <label htmlFor="itemsPorPagina" className="text-sm text-gray-700">Mostrar</label>
                   <input
                     id="itemsPorPagina"
                     type="number"
@@ -328,30 +349,21 @@ export default function AperturaConcursoAdmin({ asignaturas = [] }: Props) {
                   />
                   <span className="text-sm text-gray-700">asignaturas</span>
                 </div>
+
                 {totalPaginasFiltradas > 1 && (
                   <div className="flex items-center gap-2 mt-2 sm:mt-0">
                     <button
                       onClick={() => handlePaginaChange(paginaActual - 1)}
                       disabled={paginaActual === 1}
-                      className={`px-3 py-1 rounded-md text-sm font-medium border ${
-                        paginaActual === 1
-                          ? "bg-gray-100 text-gray-400 cursor-not-allowed"
-                          : "bg-blue-600 text-white hover:bg-blue-700"
-                      }`}
+                      className={`px-3 py-1 rounded-md text-sm font-medium border ${paginaActual === 1 ? "bg-gray-100 text-gray-400 cursor-not-allowed" : "bg-blue-600 text-white hover:bg-blue-700"}`}
                     >
                       ← Anterior
                     </button>
-                    <span className="text-sm text-gray-700">
-                      Página {paginaActual} de {totalPaginasFiltradas}
-                    </span>
+                    <span className="text-sm text-gray-700">Página {paginaActual} de {totalPaginasFiltradas}</span>
                     <button
                       onClick={() => handlePaginaChange(paginaActual + 1)}
                       disabled={paginaActual === totalPaginasFiltradas}
-                      className={`px-3 py-1 rounded-md text-sm font-medium border ${
-                        paginaActual === totalPaginasFiltradas
-                          ? "bg-gray-100 text-gray-400 cursor-not-allowed"
-                          : "bg-blue-600 text-white hover:bg-blue-700"
-                      }`}
+                      className={`px-3 py-1 rounded-md text-sm font-medium border ${paginaActual === totalPaginasFiltradas ? "bg-gray-100 text-gray-400 cursor-not-allowed" : "bg-blue-600 text-white hover:bg-blue-700"}`}
                     >
                       Siguiente →
                     </button>
@@ -372,13 +384,15 @@ export default function AperturaConcursoAdmin({ asignaturas = [] }: Props) {
                     {asignaturasPaginadas.map((a) => {
                       const estadoLower = a.estado?.trim().toLowerCase();
                       const puedeGestionarAfiche = estadoLower === "abierto" && a.abierta_postulacion === true;
+                      const tieneAfiche = aficheExists[a.id];
 
                       return (
                         <tr key={a.id} className="border-b hover:bg-gray-50 transition">
                           <td className="p-3 text-center">{a.nombre}</td>
                           <td className="p-3 text-center">{a.estado}</td>
                           <td className="p-3 text-center space-x-2">
-                            {(estadoLower === "cerrado" && !a.abierta_postulacion) && (
+                            {/* CERRADO -> solicitar apertura */}
+                            {estadoLower === "cerrado" && !a.abierta_postulacion && (
                               <button
                                 onClick={() => handleAbrirConcurso(a.id.toString())}
                                 className="bg-green-600 hover:bg-green-700 text-white px-3 py-1.5 rounded-lg text-sm font-medium transition"
@@ -387,45 +401,55 @@ export default function AperturaConcursoAdmin({ asignaturas = [] }: Props) {
                               </button>
                             )}
 
-                            
-                            {(estadoLower === "pendiente" && a.abierta_postulacion) && (
+                            {/* PENDIENTE */}
+                            {estadoLower === "pendiente" && a.abierta_postulacion && (
                               <button
-                                onClick={() => {
-                                  alert(`Placeholder: abrir postulación para asignatura ID ${a.id}`);
-                                }}
+                                onClick={() => abrirModalCrear(a)}
                                 className="bg-blue-600 hover:bg-blue-700 text-white px-3 py-1.5 rounded-lg text-sm font-medium transition"
                               >
                                 Abrir concurso de postulación
                               </button>
                             )}
 
-                            
-                            {puedeGestionarAfiche && (
-                              <button
-                                onClick={() => abrirModalCrear(a)}
-                                className="bg-indigo-600 hover:bg-indigo-700 text-white px-3 py-1.5 rounded-lg text-sm font-medium transition"
-                              >
-                                Crear afiche
-                              </button>
-                            )}
-
-                            
-                            {puedeGestionarAfiche && (
-                              <button
-                                onClick={() => abrirModalVerAfiche(a)}
-                                className="bg-teal-600 hover:bg-teal-700 text-white px-3 py-1.5 rounded-lg text-sm font-medium transition"
-                              >
-                                Ver afiche
-                              </button>
-                            )}
-
-                            {["pendiente", "abierto"].includes(estadoLower) && (
+                            {estadoLower === "pendiente" && !a.abierta_postulacion && (
                               <button
                                 onClick={() => confirmarCierre(a.id.toString())}
                                 className="bg-red-600 hover:bg-red-700 text-white px-3 py-1.5 rounded-lg text-sm font-medium transition"
                               >
                                 Cerrar/Cancelar concurso
                               </button>
+                            )}
+
+                            {/* ABIERTO */}
+                            {estadoLower === "abierto" && (
+                              <>
+                                {/* Si sabemos que existe afiche, mostramos Ver; si sabemos que NO existe, mostrar Crear; si no sabemos, mostramos Crear (comportamiento conservador) */}
+                                {tieneAfiche === true && (
+                                  <button
+                                    onClick={() => abrirModalVerAfiche(a)}
+                                    className="bg-teal-600 hover:bg-teal-700 text-white px-3 py-1.5 rounded-lg text-sm font-medium transition"
+                                  >
+                                    Ver afiche
+                                  </button>
+                                )}
+
+                                {tieneAfiche !== true && (
+                                  <button
+                                    onClick={() => abrirModalCrear(a)}
+                                    className="bg-indigo-600 hover:bg-indigo-700 text-white px-3 py-1.5 rounded-lg text-sm font-medium transition"
+                                  >
+                                    Crear afiche
+                                  </button>
+                                )}
+
+                                {/* Cerrar/Cancelar concurso */}
+                                <button
+                                  onClick={() => confirmarCierre(a.id.toString())}
+                                  className="bg-red-600 hover:bg-red-700 text-white px-3 py-1.5 rounded-lg text-sm font-medium transition"
+                                >
+                                  Cerrar/Cancelar concurso
+                                </button>
+                              </>
                             )}
                           </td>
                         </tr>
@@ -435,13 +459,12 @@ export default function AperturaConcursoAdmin({ asignaturas = [] }: Props) {
                 </table>
               </div>
 
-              
+              {/* Confirmación cierre concurso */}
               {mostrarConfirmacion && (
                 <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-40 z-50">
                   <div className="bg-white rounded-lg shadow-lg p-6 w-11/12 sm:w-96 text-center">
                     <p className="text-gray-800 mb-4">
-                      Para volver a abrir el concurso de postulación deberá aceptarse su solicitud, esto puede llevar un poco de tiempo.<br/><br/>
-                      ¿Está seguro/a de cancelar/cerrar este concurso?
+                      Para volver a abrir la postulación deberá aceptarse la solicitud. ¿Está seguro/a de cancelar/cerrar este concurso?
                     </p>
                     <div className="flex justify-center gap-4">
                       <button
@@ -461,7 +484,7 @@ export default function AperturaConcursoAdmin({ asignaturas = [] }: Props) {
                 </div>
               )}
 
-              
+              {/* Popup simple */}
               {mostrarPopup && (
                 <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-40 z-50">
                   <div className="bg-white rounded-lg shadow-lg p-6 w-11/12 sm:w-96 text-center">
@@ -476,7 +499,7 @@ export default function AperturaConcursoAdmin({ asignaturas = [] }: Props) {
                 </div>
               )}
 
-              
+              {/* Modal Crear Afiche */}
               {mostrarModalCrear && asignaturaParaCrear && (
                 <div className="fixed inset-0 flex items-start justify-center pt-16 bg-black bg-opacity-40 z-50">
                   <div className="bg-white rounded-lg shadow-lg p-6 w-full max-w-3xl">
@@ -492,18 +515,8 @@ export default function AperturaConcursoAdmin({ asignaturas = [] }: Props) {
                         </label>
 
                         <label className="text-sm">
-                          Rut secretaria
-                          <input value={rutSecretaria} onChange={(e) => setRutSecretaria(e.target.value)} className="w-full mt-1 border rounded px-2 py-1" />
-                        </label>
-
-                        <label className="text-sm">
                           Entrega antecedentes (fecha)
                           <input value={entregaAntecedentes} onChange={(e) => setEntregaAntecedentes(e.target.value)} type="date" className="w-full mt-1 border rounded px-2 py-1" />
-                        </label>
-
-                        <label className="text-sm">
-                          Tipo ayudantía
-                          <input value={tipoAyudantia} onChange={(e) => setTipoAyudantia(e.target.value)} className="w-full mt-1 border rounded px-2 py-1" />
                         </label>
 
                         <label className="text-sm">
@@ -512,13 +525,18 @@ export default function AperturaConcursoAdmin({ asignaturas = [] }: Props) {
                         </label>
 
                         <label className="text-sm">
-                          Tipo remuneración
-                          <input value={tipoRemuneracion} onChange={(e) => setTipoRemuneracion(e.target.value)} className="w-full mt-1 border rounded px-2 py-1" />
+                          Fecha término
+                          <input value={fechaTermino} onChange={(e) => setFechaTermino(e.target.value)} type="date" className="w-full mt-1 border rounded px-2 py-1" />
                         </label>
 
                         <label className="text-sm">
-                          Fecha término
-                          <input value={fechaTermino} onChange={(e) => setFechaTermino(e.target.value)} type="date" className="w-full mt-1 border rounded px-2 py-1" />
+                          Tipo ayudantía
+                          <input value={tipoAyudantia} onChange={(e) => setTipoAyudantia(e.target.value)} className="w-full mt-1 border rounded px-2 py-1" />
+                        </label>
+
+                        <label className="text-sm">
+                          Tipo remuneración
+                          <input value={tipoRemuneracion} onChange={(e) => setTipoRemuneracion(e.target.value)} className="w-full mt-1 border rounded px-2 py-1" />
                         </label>
 
                         <label className="text-sm">
@@ -539,7 +557,7 @@ export default function AperturaConcursoAdmin({ asignaturas = [] }: Props) {
 
                       <div>
                         <h4 className="font-medium">Descripciones</h4>
-                        <p className="text-xs text-gray-500 mb-2">Puedes añadir varias descripciones. Se enviarán como JSON array.</p>
+                        <p className="text-xs text-gray-500 mb-2">Puedes añadir varias descripciones. Se enviarán como array.</p>
                         <div className="space-y-2">
                           {descripciones.map((d, idx) => (
                             <div key={idx} className="flex gap-2">
@@ -557,7 +575,7 @@ export default function AperturaConcursoAdmin({ asignaturas = [] }: Props) {
                       </div>
 
                       <div className="flex justify-end gap-2 mt-4">
-                        <button type="button" onClick={() => setMostrarModalCrear(false)} className="px-4 py-2 bg-gray-300 rounded">Cancelar</button>
+                        <button type="button" onClick={() => { setMostrarModalCrear(false); setAsignaturaParaCrear(null); }} className="px-4 py-2 bg-gray-300 rounded">Cancelar</button>
                         <button type="submit" className="px-4 py-2 bg-indigo-600 text-white rounded">Crear afiche</button>
                       </div>
                     </form>
@@ -565,7 +583,7 @@ export default function AperturaConcursoAdmin({ asignaturas = [] }: Props) {
                 </div>
               )}
 
-              
+              {/* Modal Ver Afiche */}
               {asignaturaParaVerAfiche && (
                 <div className="fixed inset-0 flex items-start justify-center pt-16 bg-black bg-opacity-40 z-50">
                   <div className="bg-white rounded-lg shadow-lg p-6 w-full max-w-3xl">
@@ -573,7 +591,7 @@ export default function AperturaConcursoAdmin({ asignaturas = [] }: Props) {
 
                     {buscandoAficheLocal ? (
                       <p className="text-center">Buscando datos...</p>
-                    ) : datosAficheLocal ? (
+                    ) : datosAficheLocal && Array.isArray(datosAficheLocal) && datosAficheLocal.length > 0 ? (
                       <div className="space-y-3">
                         <pre className="bg-gray-50 p-3 rounded overflow-auto text-xs">{JSON.stringify(datosAficheLocal, null, 2)}</pre>
                         <div className="flex justify-end gap-2">
@@ -582,7 +600,12 @@ export default function AperturaConcursoAdmin({ asignaturas = [] }: Props) {
                         </div>
                       </div>
                     ) : (
-                      <p className="text-center text-gray-600">No se encontraron datos de afiche para esta asignatura.</p>
+                      <div className="space-y-3">
+                        <p className="text-center text-gray-600">No se encontraron datos de afiche para esta asignatura.</p>
+                        <div className="flex justify-end gap-2">
+                          <button onClick={() => { setAsignaturaParaVerAfiche(null); setDatosAficheLocal(null); }} className="px-3 py-2 bg-gray-300 rounded">Cerrar</button>
+                        </div>
+                      </div>
                     )}
                   </div>
                 </div>
@@ -596,3 +619,4 @@ export default function AperturaConcursoAdmin({ asignaturas = [] }: Props) {
     </div>
   );
 }
+
