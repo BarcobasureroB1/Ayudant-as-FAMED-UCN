@@ -50,6 +50,7 @@ export class LlamadoPostulacionService {
   async findbyAsignatura(id_asignatura: number) {
     return await this.llamadoPostulacionRepository.find({
       where: { asignatura: { id: id_asignatura }, estado: 'abierto' },
+      relations: ['asignatura'],
     });
 
   }
