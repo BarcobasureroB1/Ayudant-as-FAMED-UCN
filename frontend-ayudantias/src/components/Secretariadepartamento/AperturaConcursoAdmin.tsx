@@ -1,7 +1,15 @@
 "use client";
 
-import React, { useState } from "react";
-import { useAbrirConcurso, useCerrarConcurso } from "@/hooks/useAsignaturas";
+import React, { useState, useMemo } from "react";
+import {
+  useAbrirConcurso,
+  useCerrarConcurso,
+} from "@/hooks/useAsignaturas";
+import {
+  useCrearConcurso,
+  useCancelarAficheConcurso,
+} from "@/hooks/useConcursoPostulacion";
+import api from "@/api/axios";
 
 interface AsignaturaData {
   id: number;
@@ -25,7 +33,9 @@ const InfoCard = ({
   children?: React.ReactNode;
   className?: string;
 }) => (
-  <div className={`bg-white rounded-xl shadow-sm border border-gray-200 p-6 ${className}`}>
+  <div
+    className={`bg-white rounded-xl shadow-sm border border-gray-200 p-6 ${className}`}
+  >
     <h3 className="text-lg font-semibold text-gray-800 mb-4 pb-2 border-b border-gray-100 text-center">
       {title}
     </h3>
@@ -42,13 +52,65 @@ export default function AperturaConcursoAdmin({ asignaturas = [] }: Props) {
   const [mostrarConfirmacion, setMostrarConfirmacion] = useState(false);
   const [idAConfirmar, setIdAConfirmar] = useState<string | null>(null);
 
+  
   const { mutate: abrirConcurso } = useAbrirConcurso();
   const { mutate: cerrarConcurso } = useCerrarConcurso();
 
+  
+  const crearConcurso = useCrearConcurso();
+  const cancelarAfiche = useCancelarAficheConcurso();
+
+  
+  const [mostrarModalCrear, setMostrarModalCrear] = useState(false);
+  const [asignaturaParaCrear, setAsignaturaParaCrear] = useState<
+    AsignaturaData | null
+  >(null);
+
+  
+  const [semestre, setSemestre] = useState("");
+  const [entregaAntecedentes, setEntregaAntecedentes] = useState("");
+  const [fechaInicio, setFechaInicio] = useState("");
+  const [fechaTermino, setFechaTermino] = useState("");
+  const [tipoAyudantia, setTipoAyudantia] = useState("");
+  const [tipoRemuneracion, setTipoRemuneracion] = useState("");
+  const [horasMensuales, setHorasMensuales] = useState<number | "">("");
+  const [horarioFijo, setHorarioFijo] = useState(false);
+  const [cantAyudantes, setCantAyudantes] = useState<number | "">("");
+  const [rutSecretaria, setRutSecretaria] = useState("");
+  const [descripciones, setDescripciones] = useState<string[]>([""]);
+
+  
+  const [asignaturaParaVerAfiche, setAsignaturaParaVerAfiche] =
+    useState<AsignaturaData | null>(null);
+  const [datosAficheLocal, setDatosAficheLocal] = useState<any>(null);
+  const [buscandoAficheLocal, setBuscandoAficheLocal] = useState(false);
+
+  
+  const asignaturasFiltradas = useMemo(
+    () =>
+      asignaturas.filter((a) =>
+        a.nombre.toLowerCase().includes(busqueda.toLowerCase())
+      ),
+    [asignaturas, busqueda]
+  );
+
+  const totalPaginasFiltradas = Math.ceil(
+    asignaturasFiltradas.length / (itemsPorPagina || 1)
+  );
+  const indiceInicio = (paginaActual - 1) * (itemsPorPagina || 1);
+  const indiceFin = indiceInicio + (itemsPorPagina || 1);
+  const asignaturasPaginadas = asignaturasFiltradas.slice(
+    indiceInicio,
+    indiceFin
+  );
+
+  
   const handleAbrirConcurso = (id: string) => {
     abrirConcurso(id, {
       onSuccess: () => {
-        setMensajePopup("Solicitud de apertura de concurso enviada, espere a que se apruebe su solicitud. Una vez aprobada, aparecerá la opción para abrir la postulación.");
+        setMensajePopup(
+          "Solicitud de apertura de concurso enviada, espere a que se apruebe su solicitud. Una vez aprobada, aparecerá la opción para abrir la postulación."
+        );
         setMostrarPopup(true);
       },
       onError: () => {
@@ -84,14 +146,137 @@ export default function AperturaConcursoAdmin({ asignaturas = [] }: Props) {
     setIdAConfirmar(null);
   };
 
-  const asignaturasFiltradas = asignaturas.filter((a) =>
-    a.nombre.toLowerCase().includes(busqueda.toLowerCase())
-  );
+  
+  const abrirModalCrear = (a: AsignaturaData) => {
+    setAsignaturaParaCrear(a);
+    
+    setSemestre(a.semestre ?? "");
+    setDescripciones([""]);
+    setEntregaAntecedentes("");
+    setFechaInicio("");
+    setFechaTermino("");
+    setTipoAyudantia("");
+    setTipoRemuneracion("");
+    setHorasMensuales("");
+    setHorarioFijo(false);
+    setCantAyudantes("");
+    setRutSecretaria("");
+    setMostrarModalCrear(true);
+  };
 
-  const totalPaginasFiltradas = Math.ceil(asignaturasFiltradas.length / (itemsPorPagina || 1));
-  const indiceInicio = (paginaActual - 1) * (itemsPorPagina || 1);
-  const indiceFin = indiceInicio + (itemsPorPagina || 1);
-  const asignaturasPaginadas = asignaturasFiltradas.slice(indiceInicio, indiceFin);
+  const agregarDescripcion = () => {
+    setDescripciones((d) => [...d, ""]);
+  };
+  const quitarDescripcion = (idx: number) => {
+    setDescripciones((d) => d.filter((_, i) => i !== idx));
+  };
+  const cambiarDescripcion = (idx: number, value: string) => {
+    setDescripciones((d) => d.map((x, i) => (i === idx ? value : x)));
+  };
+
+  const handleSubmitCrear = (e?: React.FormEvent) => {
+    e?.preventDefault();
+    if (!asignaturaParaCrear) return;
+
+    
+    if (!fechaInicio || !fechaTermino || !tipoAyudantia || !tipoRemuneracion) {
+      setMensajePopup("Completa al menos: fecha inicio, fecha término, tipo ayudantía y tipo remuneración.");
+      setMostrarPopup(true);
+      return;
+    }
+
+    
+    const payload = {
+      id_asignatura: asignaturaParaCrear.id,
+      semestre: semestre,
+      entrega_antecedentes: new Date(entregaAntecedentes),
+      fecha_inicio: new Date(fechaInicio),
+      fecha_termino: new Date(fechaTermino),
+      tipo_ayudantia: tipoAyudantia,
+      tipo_remuneracion: tipoRemuneracion,
+      horas_mensuales: Number(horasMensuales) || 0,
+      horario_fijo: Boolean(horarioFijo),
+      cant_ayudantes: Number(cantAyudantes) || 0,
+      estado: "abierto",
+      rut_secretaria: rutSecretaria || "",
+      descripcion: descripciones,
+    };
+
+    crearConcurso.mutate(payload, {
+      onSuccess: () => {
+        setMensajePopup("Llamado/afiche creado correctamente.");
+        setMostrarPopup(true);
+        setMostrarModalCrear(false);
+      },
+      onError: () => {
+        setMensajePopup("Error al crear el llamado. Intenta nuevamente.");
+        setMostrarPopup(true);
+      },
+    });
+  };
+
+  
+  const abrirModalVerAfiche = async (a: AsignaturaData) => {
+    try {
+      setBuscandoAficheLocal(true);
+      const resp = await api.get("llamado_postulacion", { params: { id_asignatura: a.id } });
+      const data = resp.data;
+
+      
+      const exists =
+        (Array.isArray(data) && data.length > 0) ||
+        (data && (typeof data === "object") && Object.keys(data).length > 0);
+
+      if (exists) {
+        setAsignaturaParaVerAfiche(a);
+        setDatosAficheLocal(data);
+      } else {
+        setMensajePopup("No existe un afiche/llamado para esta asignatura.");
+        setMostrarPopup(true);
+      }
+    } catch (err) {
+      setMensajePopup("Error al consultar el afiche. Intenta nuevamente.");
+      setMostrarPopup(true);
+    } finally {
+      setBuscandoAficheLocal(false);
+    }
+  };
+
+  
+  const handleCancelarAfiche = async () => {
+    
+    let id_concurso: any = null;
+    if (!datosAficheLocal) {
+      setMensajePopup("No se encontró ID del concurso a cancelar.");
+      setMostrarPopup(true);
+      return;
+    }
+    if (Array.isArray(datosAficheLocal)) {
+      id_concurso = datosAficheLocal[0]?.id ?? null;
+    } else {
+      id_concurso = datosAficheLocal?.id ?? null;
+    }
+
+    if (!id_concurso) {
+      setMensajePopup("No se encontró ID del concurso a cancelar.");
+      setMostrarPopup(true);
+      return;
+    }
+
+    cancelarAfiche.mutate(id_concurso, {
+      onSuccess: () => {
+        setMensajePopup("Afiche / concurso cancelado correctamente.");
+        setMostrarPopup(true);
+        
+        setAsignaturaParaVerAfiche(null);
+        setDatosAficheLocal(null);
+      },
+      onError: () => {
+        setMensajePopup("Error al cancelar el afiche. Intenta nuevamente.");
+        setMostrarPopup(true);
+      },
+    });
+  };
 
   const handleChangeItemsPorPagina = (e: React.ChangeEvent<HTMLInputElement>) => {
     const valor = e.target.value;
@@ -180,48 +365,77 @@ export default function AperturaConcursoAdmin({ asignaturas = [] }: Props) {
                     <tr>
                       <th className="p-3 font-semibold text-center">Asignatura</th>
                       <th className="p-3 font-semibold text-center">Estado del concurso</th>
-                      <th className="p-3 font-semibold text-center">Abrir/Cerrar concurso</th>
+                      <th className="p-3 font-semibold text-center">Acciones</th>
                     </tr>
                   </thead>
                   <tbody>
-                    {asignaturasPaginadas.map((a) => (
-                      <tr key={a.id} className="border-b hover:bg-gray-50 transition">
-                        <td className="p-3 text-center">{a.nombre}</td>
-                        <td className="p-3 text-center">{a.estado}</td>
-                        <td className="p-3 text-center">
-                          {(a.estado.trim().toLowerCase() === "cerrado" && !a.abierta_postulacion) && (
-                            <button
-                              onClick={() => handleAbrirConcurso(a.id.toString())}
-                              className="bg-green-600 hover:bg-green-700 text-white px-4 py-1.5 rounded-lg text-sm font-medium transition"
-                            >
-                              Abrir concurso
-                            </button>
-                          )}
-                          {(a.estado.trim().toLowerCase() === "pendiente" && a.abierta_postulacion) && (
-                            <button
-                              onClick={() => {
-                                alert(`Placeholder: abrir postulación para asignatura ID ${a.id}`);
-                              }}
-                              className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-1.5 rounded-lg text-sm font-medium transition"
-                            >
-                              Abrir concurso de postulación
-                            </button>
-                          )}
-                          {["pendiente", "abierto"].includes(a.estado.trim().toLowerCase()) && (
-                            <button
-                              onClick={() => confirmarCierre(a.id.toString())}
-                              className="bg-red-600 hover:bg-red-700 text-white px-4 py-1.5 rounded-lg text-sm font-medium transition"
-                            >
-                              Cerrar/Cancelar concurso
-                            </button>
-                          )}
-                        </td>
-                      </tr>
-                    ))}
+                    {asignaturasPaginadas.map((a) => {
+                      const estadoLower = a.estado?.trim().toLowerCase();
+                      const puedeGestionarAfiche = estadoLower === "abierto" && a.abierta_postulacion === true;
+
+                      return (
+                        <tr key={a.id} className="border-b hover:bg-gray-50 transition">
+                          <td className="p-3 text-center">{a.nombre}</td>
+                          <td className="p-3 text-center">{a.estado}</td>
+                          <td className="p-3 text-center space-x-2">
+                            {(estadoLower === "cerrado" && !a.abierta_postulacion) && (
+                              <button
+                                onClick={() => handleAbrirConcurso(a.id.toString())}
+                                className="bg-green-600 hover:bg-green-700 text-white px-3 py-1.5 rounded-lg text-sm font-medium transition"
+                              >
+                                Solicitar apertura
+                              </button>
+                            )}
+
+                            
+                            {(estadoLower === "pendiente" && a.abierta_postulacion) && (
+                              <button
+                                onClick={() => {
+                                  alert(`Placeholder: abrir postulación para asignatura ID ${a.id}`);
+                                }}
+                                className="bg-blue-600 hover:bg-blue-700 text-white px-3 py-1.5 rounded-lg text-sm font-medium transition"
+                              >
+                                Abrir concurso de postulación
+                              </button>
+                            )}
+
+                            
+                            {puedeGestionarAfiche && (
+                              <button
+                                onClick={() => abrirModalCrear(a)}
+                                className="bg-indigo-600 hover:bg-indigo-700 text-white px-3 py-1.5 rounded-lg text-sm font-medium transition"
+                              >
+                                Crear afiche
+                              </button>
+                            )}
+
+                            
+                            {puedeGestionarAfiche && (
+                              <button
+                                onClick={() => abrirModalVerAfiche(a)}
+                                className="bg-teal-600 hover:bg-teal-700 text-white px-3 py-1.5 rounded-lg text-sm font-medium transition"
+                              >
+                                Ver afiche
+                              </button>
+                            )}
+
+                            {["pendiente", "abierto"].includes(estadoLower) && (
+                              <button
+                                onClick={() => confirmarCierre(a.id.toString())}
+                                className="bg-red-600 hover:bg-red-700 text-white px-3 py-1.5 rounded-lg text-sm font-medium transition"
+                              >
+                                Cerrar/Cancelar concurso
+                              </button>
+                            )}
+                          </td>
+                        </tr>
+                      );
+                    })}
                   </tbody>
                 </table>
               </div>
 
+              
               {mostrarConfirmacion && (
                 <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-40 z-50">
                   <div className="bg-white rounded-lg shadow-lg p-6 w-11/12 sm:w-96 text-center">
@@ -247,6 +461,7 @@ export default function AperturaConcursoAdmin({ asignaturas = [] }: Props) {
                 </div>
               )}
 
+              
               {mostrarPopup && (
                 <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-40 z-50">
                   <div className="bg-white rounded-lg shadow-lg p-6 w-11/12 sm:w-96 text-center">
@@ -257,6 +472,118 @@ export default function AperturaConcursoAdmin({ asignaturas = [] }: Props) {
                     >
                       Cerrar
                     </button>
+                  </div>
+                </div>
+              )}
+
+              
+              {mostrarModalCrear && asignaturaParaCrear && (
+                <div className="fixed inset-0 flex items-start justify-center pt-16 bg-black bg-opacity-40 z-50">
+                  <div className="bg-white rounded-lg shadow-lg p-6 w-full max-w-3xl">
+                    <h3 className="text-lg font-semibold mb-4 text-center">
+                      Crear llamado / afiche - {asignaturaParaCrear.nombre}
+                    </h3>
+
+                    <form onSubmit={handleSubmitCrear} className="space-y-3">
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                        <label className="text-sm">
+                          Semestre
+                          <input value={semestre} onChange={(e) => setSemestre(e.target.value)} className="w-full mt-1 border rounded px-2 py-1" />
+                        </label>
+
+                        <label className="text-sm">
+                          Rut secretaria
+                          <input value={rutSecretaria} onChange={(e) => setRutSecretaria(e.target.value)} className="w-full mt-1 border rounded px-2 py-1" />
+                        </label>
+
+                        <label className="text-sm">
+                          Entrega antecedentes (fecha)
+                          <input value={entregaAntecedentes} onChange={(e) => setEntregaAntecedentes(e.target.value)} type="date" className="w-full mt-1 border rounded px-2 py-1" />
+                        </label>
+
+                        <label className="text-sm">
+                          Tipo ayudantía
+                          <input value={tipoAyudantia} onChange={(e) => setTipoAyudantia(e.target.value)} className="w-full mt-1 border rounded px-2 py-1" />
+                        </label>
+
+                        <label className="text-sm">
+                          Fecha inicio
+                          <input value={fechaInicio} onChange={(e) => setFechaInicio(e.target.value)} type="date" className="w-full mt-1 border rounded px-2 py-1" />
+                        </label>
+
+                        <label className="text-sm">
+                          Tipo remuneración
+                          <input value={tipoRemuneracion} onChange={(e) => setTipoRemuneracion(e.target.value)} className="w-full mt-1 border rounded px-2 py-1" />
+                        </label>
+
+                        <label className="text-sm">
+                          Fecha término
+                          <input value={fechaTermino} onChange={(e) => setFechaTermino(e.target.value)} type="date" className="w-full mt-1 border rounded px-2 py-1" />
+                        </label>
+
+                        <label className="text-sm">
+                          Horas mensuales
+                          <input value={horasMensuales} onChange={(e) => setHorasMensuales(e.target.value ? Number(e.target.value) : "")} type="number" min={0} className="w-full mt-1 border rounded px-2 py-1" />
+                        </label>
+
+                        <label className="text-sm flex items-center gap-2">
+                          <input type="checkbox" checked={horarioFijo} onChange={(e) => setHorarioFijo(e.target.checked)} />
+                          Horario fijo
+                        </label>
+
+                        <label className="text-sm">
+                          Cant. ayudantes
+                          <input value={cantAyudantes} onChange={(e) => setCantAyudantes(e.target.value ? Number(e.target.value) : "")} type="number" min={0} className="w-full mt-1 border rounded px-2 py-1" />
+                        </label>
+                      </div>
+
+                      <div>
+                        <h4 className="font-medium">Descripciones</h4>
+                        <p className="text-xs text-gray-500 mb-2">Puedes añadir varias descripciones. Se enviarán como JSON array.</p>
+                        <div className="space-y-2">
+                          {descripciones.map((d, idx) => (
+                            <div key={idx} className="flex gap-2">
+                              <input
+                                className="flex-1 border rounded px-2 py-1"
+                                value={d}
+                                onChange={(e) => cambiarDescripcion(idx, e.target.value)}
+                                placeholder={`Descripción ${idx + 1}`}
+                              />
+                              <button type="button" onClick={() => quitarDescripcion(idx)} className="px-3 py-1 bg-red-500 text-white rounded">Eliminar</button>
+                            </div>
+                          ))}
+                          <button type="button" onClick={agregarDescripcion} className="mt-2 px-3 py-2 bg-green-600 text-white rounded">Añadir descripción</button>
+                        </div>
+                      </div>
+
+                      <div className="flex justify-end gap-2 mt-4">
+                        <button type="button" onClick={() => setMostrarModalCrear(false)} className="px-4 py-2 bg-gray-300 rounded">Cancelar</button>
+                        <button type="submit" className="px-4 py-2 bg-indigo-600 text-white rounded">Crear afiche</button>
+                      </div>
+                    </form>
+                  </div>
+                </div>
+              )}
+
+              
+              {asignaturaParaVerAfiche && (
+                <div className="fixed inset-0 flex items-start justify-center pt-16 bg-black bg-opacity-40 z-50">
+                  <div className="bg-white rounded-lg shadow-lg p-6 w-full max-w-3xl">
+                    <h3 className="text-lg font-semibold mb-3 text-center">Afiche / Llamado - {asignaturaParaVerAfiche.nombre}</h3>
+
+                    {buscandoAficheLocal ? (
+                      <p className="text-center">Buscando datos...</p>
+                    ) : datosAficheLocal ? (
+                      <div className="space-y-3">
+                        <pre className="bg-gray-50 p-3 rounded overflow-auto text-xs">{JSON.stringify(datosAficheLocal, null, 2)}</pre>
+                        <div className="flex justify-end gap-2">
+                          <button onClick={() => { setAsignaturaParaVerAfiche(null); setDatosAficheLocal(null); }} className="px-3 py-2 bg-gray-300 rounded">Cerrar</button>
+                          <button onClick={handleCancelarAfiche} className="px-3 py-2 bg-red-600 text-white rounded">Cancelar afiche</button>
+                        </div>
+                      </div>
+                    ) : (
+                      <p className="text-center text-gray-600">No se encontraron datos de afiche para esta asignatura.</p>
+                    )}
                   </div>
                 </div>
               )}

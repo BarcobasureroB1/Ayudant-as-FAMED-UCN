@@ -15,8 +15,8 @@ interface CrearConcursoData
     horario_fijo: boolean;
     cant_ayudantes: number;
     estado: string;
-    rut_secretaria: number;
-    descripcion: string;
+    rut_secretaria: string;
+    descripcion: string[];
 }
 
 export function useCrearConcurso() {
