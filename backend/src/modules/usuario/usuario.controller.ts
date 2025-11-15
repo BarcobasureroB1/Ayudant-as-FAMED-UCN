@@ -33,7 +33,7 @@ export class UsuarioController {
     return this.usuarioService.guardar(usuario);
   }
 
-  @Get('coordinadores')
+  @Get('coordinadores/all')
   findCoordinadores() {
     return this.usuarioService.findcoordinadores();
   }
