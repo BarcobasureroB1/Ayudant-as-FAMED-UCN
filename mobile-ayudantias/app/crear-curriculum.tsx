@@ -145,7 +145,7 @@ export default function CrearCurriculumScreen() {
         crearCurriculum.mutate(form, {
             onSuccess: async () => {
                 Alert.alert("¡Éxito!", "Currículum creado correctamente.");
-                await clienteQuery.invalidateQueries({queryKey: ['curriculum', user?.rut]});
+                await clienteQuery.refetchQueries({queryKey: ['curriculum', user?.rut]});
                 router.replace('/(tabs)');
             },
             onError: (error: any) => {

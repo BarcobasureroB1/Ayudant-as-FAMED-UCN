@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import {
   StyleSheet,
   ScrollView,
@@ -8,6 +8,7 @@ import {
   TextInput,
   TextInputProps,
   Platform,
+  useColorScheme
 } from 'react-native';
 import { ThemedText } from '@/components/themed-text';
 import { ThemedView } from '@/components/themed-view';
@@ -31,10 +32,11 @@ interface FormInputProps {
   autoCapitalize?: TextInputProps['autoCapitalize'];
 }
 
-const FormInput: React.FC<FormInputProps> = ({
+const FormInput: React.FC<FormInputProps & { styles: any }> = ({
   label,
   value,
   onChangeText,
+  styles,
   ...props
 }) => (
   <View style={styles.inputContainer}>
@@ -50,7 +52,7 @@ const FormInput: React.FC<FormInputProps> = ({
   </View>
 );
 
-const FormPicker = ({ label, value, onValueChange, items, placeholder, disabled }: any) => (
+const FormPicker = ({ label, value, onValueChange, items, placeholder, disabled, styles, pickerSelectStyles, pickerProps }: any) => (
   <View style={styles.inputContainer}>
     <ThemedText style={styles.inputLabel}>{label}</ThemedText>
     <RNPickerSelect
@@ -61,6 +63,7 @@ const FormPicker = ({ label, value, onValueChange, items, placeholder, disabled 
       style={pickerSelectStyles}
       useNativeAndroidPickerStyle={false}
       disabled={disabled}
+      pickerProps={pickerProps}
       Icon={() => {
         return <Ionicons name="chevron-down" size={20} color="gray" style={styles.pickerIcon} />;
       }}
@@ -71,6 +74,7 @@ const FormPicker = ({ label, value, onValueChange, items, placeholder, disabled 
 export default function PostularScreen() {
   const router = useRouter();
   const clienteQuery = useQueryClient();
+  const colorScheme = useColorScheme() ?? 'light';
 
   const { user, asignaturasDisponibles, asignaturasTodas } = usePostulante();
 
@@ -160,6 +164,157 @@ export default function PostularScreen() {
     });
   };
 
+  const themeColors = useMemo(() => ({
+    background: colorScheme === 'dark' ? '#000' : '#fff',
+    text: colorScheme === 'dark' ? '#fff' : '#000',
+    textLabel: colorScheme === 'dark' ? '#eee' : '#333',
+    textPlaceholder: colorScheme === 'dark' ? '#888' : '#999',
+    inputBackground: colorScheme === 'dark' ? '#1c1c1e' : '#fff',
+    borderColor: colorScheme === 'dark' ? '#444' : '#ccc',
+    disabledText: colorScheme === 'dark' ? '#555' : '#999',
+    buttonBackText: colorScheme === 'dark' ? '#fff' : '#333',
+    buttonBackBackground: colorScheme === 'dark' ? '#2c2c2e' : '#f0f0f0',
+    buttonBackBorder: colorScheme === 'dark' ? '#444' : '#ddd',
+  }), [colorScheme]);
+
+  const styles = useMemo(() => StyleSheet.create({
+    container: {
+      flex: 1,
+      backgroundColor: themeColors.background,
+    },
+    scrollContent: {
+      padding: 20,
+      paddingBottom: 60,
+    },
+    formContainer: {
+    gap: 16,
+    },
+    title: {
+    textAlign: 'center',
+    fontSize: 24,
+    },
+    subtitle: {
+      textAlign: 'center',
+      fontSize: 16,
+      color: '#666',
+      marginBottom: 24,
+    },
+    sectionTitle: {
+      fontSize: 18,
+      fontWeight: '600',
+      marginTop: 16,
+      borderTopWidth: 1,
+      borderTopColor: '#eee',
+      paddingTop: 16,
+    },
+    inputContainer: {
+      marginBottom: 4,
+    },
+    inputLabel: {
+      fontSize: 14,
+      fontWeight: '600',
+      marginBottom: 6,
+      color: themeColors.textLabel, 
+    },
+    input: {
+      borderWidth: 1,
+      borderColor: themeColors.borderColor, 
+      borderRadius: 8,
+      paddingHorizontal: 14,
+      paddingVertical: 12,
+      fontSize: 16,
+      backgroundColor: themeColors.inputBackground, 
+      color: themeColors.text,
+    },
+    disabledText: {
+      fontSize: 16,
+      color: themeColors.disabledText,
+      fontStyle: 'italic',
+      paddingVertical: 12, 
+      paddingHorizontal: 4,
+    },
+    textArea: {
+      height: 120,
+      textAlignVertical: 'top',
+    },
+    row: {
+    flexDirection: 'row',
+    gap: 12,
+    },
+    col: {
+      flex: 1,
+    },
+    button: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      justifyContent: 'center',
+      paddingVertical: 14,
+      borderRadius: 10,
+      gap: 10,
+    },
+    buttonText: {
+      color: '#fff',
+      fontSize: 16,
+      fontWeight: '600',
+    },
+    buttonRow: {
+      flexDirection: 'row',
+      gap: 12,
+      marginTop: 24,
+    },
+    buttonBack: {
+      flex: 1,
+      backgroundColor: themeColors.buttonBackBackground, 
+      borderWidth: 1,
+      borderColor: themeColors.buttonBackBorder, 
+    },
+    buttonTextBack: {
+      color: themeColors.buttonBackText,
+      fontSize: 16,
+      fontWeight: '600',
+    },
+    buttonSubmit: {
+    flex: 2,
+    backgroundColor: '#28a745',
+    },
+    pickerIcon: {
+      top: Platform.OS === 'ios' ? 0 : 16,
+      right: 10,
+    },
+  }), [themeColors]);
+
+  const dynamicPickerProps = {
+    itemStyle: { color: 'black' }
+  };
+
+  const pickerSelectStyles = useMemo(() => StyleSheet.create({
+      inputIOS: {
+        fontSize: 16,
+        paddingVertical: 12,
+        paddingHorizontal: 14,
+        borderWidth: 1,
+        borderColor: themeColors.borderColor, 
+        borderRadius: 8,
+        backgroundColor: themeColors.inputBackground, 
+        color: themeColors.text,
+      },
+      inputAndroid: {
+        fontSize: 16,
+        paddingVertical: 12,
+        paddingHorizontal: 14,
+        borderWidth: 1,
+        borderColor: themeColors.borderColor,
+        borderRadius: 8,
+        backgroundColor: themeColors.inputBackground,
+        color: themeColors.text,
+      },
+      placeholder: {
+        color: themeColors.textPlaceholder,
+      },
+    }), [themeColors]);
+
+
+
   return (
     <ThemedView style={styles.container}>
       <ScrollView
@@ -177,6 +332,9 @@ export default function PostularScreen() {
             <FormPicker
             label="Asignatura"
             items={opcionesAsignaturas}
+            styles={styles}
+            pickerSelectStyles={pickerSelectStyles}
+            pickerProps={dynamicPickerProps}
             placeholder={placeholderAsignaturas.label}
             value={form.id_asignatura}
             disabled={opcionesAsignaturas.length === 0}
@@ -204,6 +362,7 @@ export default function PostularScreen() {
 
           <FormInput
             label="Carta de Interés"
+            styles={styles}
             value={form.descripcion_carta}
             onChangeText={(t) => handleChange('descripcion_carta', t)}
             placeholder="Describe por qué estás interesado..."
@@ -215,6 +374,7 @@ export default function PostularScreen() {
 
           <FormInput
             label="Correo del Profesor (para recomendación)"
+            styles={styles}
             value={form.correo_profe}
             onChangeText={(t) => handleChange('correo_profe', t)}
             placeholder="profesor@universidad.cl"
@@ -223,6 +383,7 @@ export default function PostularScreen() {
 
           <FormInput
             label="Actividad Propuesta"
+            styles={styles}
             value={form.actividad}
             onChangeText={(t) => handleChange('actividad', t)}
             placeholder="Ej: Resolución de ejercicios"
@@ -230,6 +391,7 @@ export default function PostularScreen() {
 
           <FormInput
             label="Metodología"
+            styles={styles}
             value={form.metodologia}
             onChangeText={(t) => handleChange('metodologia', t)}
             placeholder="Ej: Aprendizaje activo"
@@ -239,7 +401,10 @@ export default function PostularScreen() {
             <View style={styles.col}>
               <FormPicker
                 label="Día Preferente"
+                styles={styles}
+                pickerSelectStyles={pickerSelectStyles}
                 items={opcionesDias}
+                pickerProps={dynamicPickerProps}
                 placeholder="Seleccione un día"
                 value={form.dia}
                 onValueChange={(value: string) => handleChange('dia', value)}
@@ -248,7 +413,10 @@ export default function PostularScreen() {
             <View style={styles.col}>
               <FormPicker
                 label="Bloque Horario"
+                styles={styles}
+                pickerSelectStyles={pickerSelectStyles}
                 items={opcionesBloques}
+                pickerProps={dynamicPickerProps}
                 placeholder="Seleccione un bloque"
                 value={form.bloque}
                 onValueChange={(value: string) => handleChange('bloque', value)}
@@ -279,140 +447,5 @@ export default function PostularScreen() {
       </ScrollView>
     </ThemedView>
   )
-
-
-
-
-
 }
-
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-  },
-  scrollContent: {
-    padding: 20,
-    paddingBottom: 60,
-  },
-  formContainer: {
-    gap: 16,
-  },
-  title: {
-    textAlign: 'center',
-    fontSize: 24,
-  },
-  subtitle: {
-    textAlign: 'center',
-    fontSize: 16,
-    color: '#666',
-    marginBottom: 24,
-  },
-  sectionTitle: {
-    fontSize: 18,
-    fontWeight: '600',
-    marginTop: 16,
-    borderTopWidth: 1,
-    borderTopColor: '#eee',
-    paddingTop: 16,
-  },
-  inputContainer: {
-    marginBottom: 4,
-  },
-  inputLabel: {
-    fontSize: 14,
-    fontWeight: '600',
-    marginBottom: 6,
-    color: '#333',
-  },
-  input: {
-    borderWidth: 1,
-    borderColor: '#ccc',
-    borderRadius: 8,
-    paddingHorizontal: 14,
-    paddingVertical: 12,
-    fontSize: 16,
-    backgroundColor: '#fff',
-  },
-  disabledText: {
-    fontSize: 16,
-    color: '#666', 
-    fontStyle: 'italic',
-    paddingVertical: 12, 
-    paddingHorizontal: 4,
-  },
-  textArea: {
-    height: 120,
-    textAlignVertical: 'top',
-  },
-  row: {
-    flexDirection: 'row',
-    gap: 12,
-  },
-  col: {
-    flex: 1,
-  },
-  button: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    paddingVertical: 14,
-    borderRadius: 10,
-    gap: 10,
-  },
-  buttonText: {
-    color: '#fff',
-    fontSize: 16,
-    fontWeight: '600',
-  },
-  buttonRow: {
-    flexDirection: 'row',
-    gap: 12,
-    marginTop: 24,
-  },
-  buttonBack: {
-    flex: 1,
-    backgroundColor: '#f0f0f0',
-    borderWidth: 1,
-    borderColor: '#ddd',
-  },
-  buttonTextBack: {
-    color: '#333',
-    fontSize: 16,
-    fontWeight: '600',
-  },
-  buttonSubmit: {
-    flex: 2,
-    backgroundColor: '#28a745',
-  },
-  pickerIcon: {
-    top: Platform.OS === 'ios' ? 0 : 16,
-    right: 10,
-  },
-  });
-
-const pickerSelectStyles = StyleSheet.create({
-  inputIOS: {
-    fontSize: 16,
-    paddingVertical: 12,
-    paddingHorizontal: 14,
-    borderWidth: 1,
-    borderColor: '#ccc',
-    borderRadius: 8,
-    backgroundColor: '#fff',
-    color: 'black',
-  },
-  inputAndroid: {
-    fontSize: 16,
-    paddingVertical: 12,
-    paddingHorizontal: 14,
-    borderWidth: 1,
-    borderColor: '#ccc',
-    borderRadius: 8,
-    backgroundColor: '#fff',
-    color: 'black',
-  },
-});
-
-
 
