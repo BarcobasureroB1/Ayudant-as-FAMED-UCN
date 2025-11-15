@@ -13,6 +13,8 @@ export class CreateAyudantiaDto {
     periodo:string
     @IsString()
     remunerada:string
+    @IsString()
+    tipo_ayudantia:string
 
 
 }

@@ -21,5 +21,9 @@ export class AlumnoService {
     return await this.alumnoRepository.findOneBy({ rut_alumno: rut });
   }
 
+  async findall() {
+    return await this.alumnoRepository.find();
+  }
+
  
 }

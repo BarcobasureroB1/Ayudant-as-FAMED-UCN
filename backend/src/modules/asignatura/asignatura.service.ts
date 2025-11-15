@@ -6,6 +6,7 @@ import { Asignatura } from './entities/asignatura.entity';
 import { AsignaturaAlumno } from '../asignatura_alumno/entities/asignatura_alumno.entity';
 import { Not, IsNull } from 'typeorm';
 import { Departamento } from '../departamento/entities/departamento.entity';
+import { Coordinador } from '../coordinador/entities/coordinador.entity';
 import { UsuarioService } from '../usuario/usuario.service';
 import { AlumnoService } from '../alumno/alumno.service';
 import { Alumno } from '../alumno/entities/alumno.entity';
@@ -37,6 +38,9 @@ export class AsignaturaService {
     if (createAsignaturaDto.estado) {
       asignatura.estado = createAsignaturaDto.estado;
     }
+    if (createAsignaturaDto.abierta_postulacion !== undefined) {
+      asignatura.abierta_postulacion = createAsignaturaDto.abierta_postulacion;
+    }
     // ManyToMany relation expects an array of departamentos
     asignatura.departamentos = [departamento];
 
@@ -67,7 +71,7 @@ export class AsignaturaService {
       this.logger.debug(`asignatura_alumno rows found: ${aas.length}`);
 
       // Filtrar por semestre y estado, mapear a objetos planos
-      const estados = ['abierta', 'habilitada'];
+      const estados = ['abierto', 'habilitada'];
       const result = aas
         .filter((aa) => aa.asignatura && aa.asignatura.semestre <= nivel && estados.includes(aa.asignatura.estado))
         .map((aa) => ({
@@ -87,7 +91,7 @@ export class AsignaturaService {
   async findpostulablesByRut(rut_alumno: string) {
     const postulables = await this.asignaturaRepository.find({
       where: {
-        estado: 'abierta',
+        estado: 'abierto',
         asignaturasAlumnos: {
           alumno: {
             rut_alumno: rut_alumno,
@@ -103,5 +107,154 @@ export class AsignaturaService {
   async findAll() {
     return await this.asignaturaRepository.find();
   }
+
+  /**
+   * Devuelve las asignaturas que pertenecen a un departamento dado (por id)
+   * en el formato solicitado por el cliente.
+   */
+  async findByDepartamentoId(departamentoId: number) {
+    const asignaturas = await this.asignaturaRepository
+      .createQueryBuilder('asignatura')
+      .innerJoin('asignatura.departamentos', 'departamento', 'departamento.id = :depId', { depId: departamentoId })
+      .getMany();
+
+    return asignaturas.map((a) => ({
+      id: a.id,
+      nombre: a.nombre,
+      estado: a.estado,
+      semestre: String(a.semestre),
+      nrc: a.nrc,
+      abierta_postulacion: a.abierta_postulacion,
+    }));
+  }
+
+  //cambia el estado de una asignatura a pendiente
+  async estadoAsignatura(id: number) {
+    const asignatura = await this.asignaturaRepository.findOneBy({ id });
+    if (!asignatura) {
+      return null;
+    } 
+    asignatura.estado = 'pendiente';
+    return await this.asignaturaRepository.save(asignatura);
+  }
+  //cambia el estado de una asignatura a cerrado y deshabilita postulaciones
+  async cerrarAsignatura(id: number) {
+    const asignatura = await this.asignaturaRepository.findOneBy({ id });
+    if (!asignatura) {
+      return null;
+    }
+    asignatura.estado = 'cerrado';
+    asignatura.abierta_postulacion = false;
+    return await this.asignaturaRepository.save(asignatura);
+  }
+
+  async findwithcoordinador(DepartamentoId: number) {
+    console.log("ENTRE AQUI CON DEPARTAMENTO ID: ", DepartamentoId);
+    // Traemos todos los coordinadores (histórico + actual) para las asignaturas
+    // del departamento dado, y luego agrupamos por asignatura para devolver
+    // un listado de coordinadores por asignatura.
+    const rows = await this.asignaturaRepository
+      .createQueryBuilder('asignatura')
+      .innerJoin('asignatura.departamentos', 'departamento', 'departamento.id = :depId', { depId: DepartamentoId })
+      .leftJoin('asignatura.coordinador', 'coord', 'coord.actual = :actual', { actual: true })
+      .leftJoin('coord.usuario', 'usuario')
+      .select([
+        'asignatura.id',
+        'asignatura.nombre',
+        'asignatura.estado',
+        'asignatura.semestre',
+        'asignatura.nrc',
+        'asignatura.abierta_postulacion',
+        'coord.id AS coord_id',
+        'coord.actual AS coord_actual',
+        'usuario.rut AS usuario_rut',
+        'usuario.nombres AS usuario_nombres',
+        'usuario.apellidos AS usuario_apellidos',
+      ])
+      .getRawMany();
+
+    const map = new Map<number, any>();
+    for (const r of rows) {
+      const aid = r.asignatura_id;
+      if (!map.has(aid)) {
+        map.set(aid, {
+          id: r.asignatura_id,
+          nombre: r.asignatura_nombre,
+          estado: r.asignatura_estado,
+          semestre: String(r.asignatura_semestre),
+          nrc: r.asignatura_nrc,
+          abierta_postulacion: r.asignatura_abierta_postulacion,
+          coordinadores: [],
+        });
+      }
+      const item = map.get(aid);
+      if (r.coord_id) {
+        item.coordinadores.push({
+          id: r.coord_id,
+          rut: r.usuario_rut,
+          nombres: r.usuario_nombres,
+          apellidos: r.usuario_apellidos,
+          actual: Boolean(r.coord_actual),
+        });
+      }
+    }
+
+    return Array.from(map.values());
+  }
+
+  
+  async findallwithcoordinador() {
+    console.log("ENTRE AQUI");
+    const rows = await this.asignaturaRepository
+      .createQueryBuilder('asignatura')
+      .leftJoin('asignatura.departamentos', 'departamento')
+      .leftJoin('asignatura.coordinador', 'coord', 'coord.actual = :actual', { actual: true })
+      .leftJoin('coord.usuario', 'usuario')
+      .select([
+        'asignatura.id',
+        'asignatura.nombre',
+        'asignatura.estado',
+        'asignatura.semestre',
+        'asignatura.nrc',
+        'asignatura.abierta_postulacion',
+        'coord.id AS coord_id',
+        'coord.actual AS coord_actual',
+        'usuario.rut AS usuario_rut',
+        'usuario.nombres AS usuario_nombres',
+        'usuario.apellidos AS usuario_apellidos',
+      ])
+      .getRawMany();
+
+    const map = new Map<number, any>();
+    for (const r of rows) {
+      const aid = r.asignatura_id;
+      if (!map.has(aid)) {
+        map.set(aid, {
+          id: r.asignatura_id,
+          nombre: r.asignatura_nombre,
+          estado: r.asignatura_estado,
+          semestre: String(r.asignatura_semestre),
+          nrc: r.asignatura_nrc,
+          abierta_postulacion: r.asignatura_abierta_postulacion,
+          coordinadores: [],
+        });
+      }
+      const item = map.get(aid);
+      if (r.coord_id) {
+        item.coordinadores.push({
+          id: r.coord_id,
+          rut: r.usuario_rut,
+          nombres: r.usuario_nombres,
+          apellidos: r.usuario_apellidos,
+          actual: Boolean(r.coord_actual),
+        });
+      }
+    }
+
+    return Array.from(map.values());
+    
+    
+  }
+
 
 }

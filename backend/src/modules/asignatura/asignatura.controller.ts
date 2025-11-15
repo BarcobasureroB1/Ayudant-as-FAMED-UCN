@@ -24,5 +24,26 @@ export class AsignaturaController {
     return this.asignaturaService.findpostulablesByRut(rut_alumno);
   }
 
-  
+  @Get('por-departamento/:id_departamento')
+  findByDepartamento(@Param('id_departamento') id_departamento: string) {
+    return this.asignaturaService.findByDepartamentoId(+id_departamento);
+  }
+
+  @Patch('estado/:id')
+  estadoAsignatura(@Param('id') id: string) {
+    return this.asignaturaService.estadoAsignatura(+id);
+  }
+
+  @Patch('cerrar/:id')
+  cerrarAsignatura(@Param('id') id: string) {
+    return this.asignaturaService.cerrarAsignatura(+id);
+  }
+  @Get('coordinadores/:id_departamento')
+  findwithcoordinador(@Param('id_departamento') id_departamento: string) {
+    return this.asignaturaService.findwithcoordinador(+id_departamento);
+  }
+  @Get('coordinadores/sinfiltro/dif')
+  findallwithcoordinador() {
+    return this.asignaturaService.findallwithcoordinador();
+  }
 }

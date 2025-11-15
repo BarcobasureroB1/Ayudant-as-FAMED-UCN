@@ -59,5 +59,7 @@ async create(createUsuarioDto: CreateUsuarioDto) {
     return AlumnoData;
   }
 
+  
+
 
 }
