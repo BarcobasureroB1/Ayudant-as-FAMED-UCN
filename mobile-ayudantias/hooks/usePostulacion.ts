@@ -5,7 +5,7 @@ export interface PostulacionData
 {
     id: number;
     rut_alumno: string;
-    id_asignatura: string;
+    nombre_asignatura: string;
     descripcion_carta: string;
     correo_profe: string;
     actividad: string;
@@ -27,6 +27,20 @@ export interface CrearPostulacion
     bloque: string;
 }
 
+export interface EditarPostulacion
+{
+    id: number;
+    rut_alumno: string;
+    id_asignatura: string;
+    nombre_asignatura: string;
+    descripcion_carta: string;
+    correo_profe: string;
+    actividad: string;
+    metodologia: string;
+    dia: string;
+    bloque: string;
+}
+
 export function usePostulacionesPorAlumno(rut_alumno?: string){
     return useQuery<PostulacionData, Error>({
         queryKey:['postulaciones', rut_alumno],
@@ -35,6 +49,9 @@ export function usePostulacionesPorAlumno(rut_alumno?: string){
             const respuesta = await api.get(`postulacion/${rut_alumno}`);
             return respuesta.data;
         },
+
+        enabled: !!rut_alumno,
+        retry: false,
     });
 }
 
