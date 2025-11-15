@@ -22,7 +22,7 @@ interface AsignaturaData {
 
 interface Props {
   asignaturas?: AsignaturaData[];
-  rutSecretaria: string;
+  rutSecretaria: string; 
 }
 
 const InfoCard = ({
@@ -51,17 +51,14 @@ export default function AperturaConcursoAdmin({ asignaturas = [], rutSecretaria 
   const [mostrarConfirmacion, setMostrarConfirmacion] = useState(false);
   const [idAConfirmar, setIdAConfirmar] = useState<string | null>(null);
 
-  // hooks
   const { mutate: abrirConcurso } = useAbrirConcurso();
   const { mutate: cerrarConcurso } = useCerrarConcurso();
   const crearConcurso = useCrearConcurso();
   const cancelarAfiche = useCancelarAficheConcurso();
 
-  // Crear afiche modal state
   const [mostrarModalCrear, setMostrarModalCrear] = useState(false);
   const [asignaturaParaCrear, setAsignaturaParaCrear] = useState<AsignaturaData | null>(null);
 
-  // Form fields (crear afiche)
   const [semestre, setSemestre] = useState("");
   const [entregaAntecedentes, setEntregaAntecedentes] = useState("");
   const [fechaInicio, setFechaInicio] = useState("");
@@ -73,15 +70,14 @@ export default function AperturaConcursoAdmin({ asignaturas = [], rutSecretaria 
   const [cantAyudantes, setCantAyudantes] = useState<number | "">("");
   const [descripciones, setDescripciones] = useState<string[]>([""]);
 
-  // Ver afiche
   const [asignaturaParaVerAfiche, setAsignaturaParaVerAfiche] = useState<AsignaturaData | null>(null);
   const [datosAficheLocal, setDatosAficheLocal] = useState<any>(null);
   const [buscandoAficheLocal, setBuscandoAficheLocal] = useState(false);
 
-  // mapa local que indica si existe afiche para una asignatura (true/false/undefined)
+
   const [aficheExists, setAficheExists] = useState<Record<number, boolean | undefined>>({});
 
-  // helpers paginación + filtrado
+
   const asignaturasFiltradas = useMemo(
     () => asignaturas.filter((a) => a.nombre.toLowerCase().includes(busqueda.toLowerCase())),
     [asignaturas, busqueda]
@@ -111,7 +107,7 @@ export default function AperturaConcursoAdmin({ asignaturas = [], rutSecretaria 
     }
   };
 
-  // abrir solicitud de apertura (mutate)
+
   const handleAbrirConcurso = (id: string) => {
     abrirConcurso(id, {
       onSuccess: () => {
@@ -127,7 +123,7 @@ export default function AperturaConcursoAdmin({ asignaturas = [], rutSecretaria 
     });
   };
 
-  // crear modal -> prefill
+
   const abrirModalCrear = (a: AsignaturaData) => {
     setAsignaturaParaCrear(a);
     setSemestre(a.semestre ?? "");
@@ -148,12 +144,11 @@ export default function AperturaConcursoAdmin({ asignaturas = [], rutSecretaria 
   const cambiarDescripcion = (idx: number, value: string) =>
     setDescripciones((d) => d.map((x, i) => (i === idx ? value : x)));
 
-  // submit crear afiche -> usar useCrearConcurso (descripcion como string[])
   const handleSubmitCrear = (e?: React.FormEvent) => {
     e?.preventDefault();
     if (!asignaturaParaCrear) return;
 
-    // Validaciones simples (todos required)
+
     if (!fechaInicio || !fechaTermino || !tipoAyudantia || !tipoRemuneracion || descripciones.length === 0 || descripciones.some(d => d.trim() === "")) {
       setMensajePopup("Completa: fecha inicio, fecha término, tipo ayudantía, tipo remuneración y al menos una descripción válida.");
       setMostrarPopup(true);
@@ -172,13 +167,12 @@ export default function AperturaConcursoAdmin({ asignaturas = [], rutSecretaria 
       horario_fijo: Boolean(horarioFijo),
       cant_ayudantes: Number(cantAyudantes) || 0,
       estado: "abierto",
-      rut_secretaria: String(rutSecretaria),
+      rut_secretaria: String(rutSecretaria), 
       descripcion: descripciones,
     };
 
     crearConcurso.mutate(payload, {
       onSuccess: (data: any) => {
-        // marcar localmente que existe afiche para esta asignatura
         setAficheExists((prev) => ({ ...prev, [asignaturaParaCrear.id]: true }));
 
         setMensajePopup("Afiche / llamado creado correctamente.");
@@ -193,7 +187,7 @@ export default function AperturaConcursoAdmin({ asignaturas = [], rutSecretaria 
     });
   };
 
-  // Abrir modal ver afiche -> hacemos GET aquí para asegurar fetch al click
+
   const abrirModalVerAfiche = async (a: AsignaturaData) => {
     setAsignaturaParaVerAfiche(a);
     setDatosAficheLocal(null);
@@ -202,7 +196,6 @@ export default function AperturaConcursoAdmin({ asignaturas = [], rutSecretaria 
     try {
       const resp = await api.get(`llamado-postulacion/${a.id}`);
       const data = resp.data;
-      // backend devuelve array (0 o 1 elemento)
       if (Array.isArray(data) && data.length > 0) {
         setDatosAficheLocal(data);
         setAficheExists((prev) => ({ ...prev, [a.id]: true }));
@@ -220,17 +213,15 @@ export default function AperturaConcursoAdmin({ asignaturas = [], rutSecretaria 
     }
   };
 
-  // Cerrar / cancelar concurso: ejecutar ambos patches (asignatura + afiche si existe)
   const ejecutarCierreConfirmado = async () => {
     if (!idAConfirmar) {
       setMostrarConfirmacion(false);
       return;
     }
 
-    // 1) cerrar asignatura (patch)
+
     cerrarConcurso(idAConfirmar, {
       onSuccess: async () => {
-        // 2) obtener afiche asociado (si existe) y cancelar
         try {
           const resp = await api.get(`llamado-postulacion/${idAConfirmar}`);
           const data = resp.data;
@@ -239,7 +230,6 @@ export default function AperturaConcursoAdmin({ asignaturas = [], rutSecretaria 
           else if (data && typeof data === "object" && data.id) id_concurso = data.id;
 
           if (id_concurso) {
-            // el hook puede tener tipado genérico, casteamos a any para evitar error TS puntual
             cancelarAfiche.mutate(id_concurso as any, {
               onSuccess: () => {
                 setMensajePopup("Concurso y afiche cancelados correctamente.");
@@ -271,13 +261,13 @@ export default function AperturaConcursoAdmin({ asignaturas = [], rutSecretaria 
     setIdAConfirmar(null);
   };
 
-  // alterna mostrar confirmacion (se pasa id asignatura en string)
+
   const confirmarCierre = (id: string) => {
     setIdAConfirmar(id);
     setMostrarConfirmacion(true);
   };
 
-  // helper: cuando el usuario presiona "Cancelar afiche" desde el modal Ver Afiche
+
   async function handleCancelarAfiche() {
     if (!asignaturaParaVerAfiche) return;
 
@@ -294,10 +284,8 @@ export default function AperturaConcursoAdmin({ asignaturas = [], rutSecretaria 
         return;
       }
 
-      // 1) cerrar asignatura
       cerrarConcurso(String(asignaturaParaVerAfiche.id), {
         onSuccess: () => {
-          // 2) cancelar afiche (pasamos id_concurso casteado)
           cancelarAfiche.mutate(id_concurso as any, {
             onSuccess: () => {
               setMensajePopup("Afiche / concurso cancelado correctamente.");
@@ -391,7 +379,6 @@ export default function AperturaConcursoAdmin({ asignaturas = [], rutSecretaria 
                           <td className="p-3 text-center">{a.nombre}</td>
                           <td className="p-3 text-center">{a.estado}</td>
                           <td className="p-3 text-center space-x-2">
-                            {/* CERRADO -> solicitar apertura */}
                             {estadoLower === "cerrado" && !a.abierta_postulacion && (
                               <button
                                 onClick={() => handleAbrirConcurso(a.id.toString())}
@@ -401,7 +388,6 @@ export default function AperturaConcursoAdmin({ asignaturas = [], rutSecretaria 
                               </button>
                             )}
 
-                            {/* PENDIENTE */}
                             {estadoLower === "pendiente" && a.abierta_postulacion && (
                               <button
                                 onClick={() => abrirModalCrear(a)}
@@ -420,29 +406,15 @@ export default function AperturaConcursoAdmin({ asignaturas = [], rutSecretaria 
                               </button>
                             )}
 
-                            {/* ABIERTO */}
                             {estadoLower === "abierto" && (
                               <>
-                                {/* Si sabemos que existe afiche, mostramos Ver; si sabemos que NO existe, mostrar Crear; si no sabemos, mostramos Crear (comportamiento conservador) */}
-                                {tieneAfiche === true && (
-                                  <button
-                                    onClick={() => abrirModalVerAfiche(a)}
-                                    className="bg-teal-600 hover:bg-teal-700 text-white px-3 py-1.5 rounded-lg text-sm font-medium transition"
-                                  >
-                                    Ver afiche
-                                  </button>
-                                )}
+                                <button
+                                  onClick={() => abrirModalVerAfiche(a)}
+                                  className="bg-teal-600 hover:bg-teal-700 text-white px-3 py-1.5 rounded-lg text-sm font-medium transition"
+                                >
+                                  Ver afiche
+                                </button>
 
-                                {tieneAfiche !== true && (
-                                  <button
-                                    onClick={() => abrirModalCrear(a)}
-                                    className="bg-indigo-600 hover:bg-indigo-700 text-white px-3 py-1.5 rounded-lg text-sm font-medium transition"
-                                  >
-                                    Crear afiche
-                                  </button>
-                                )}
-
-                                {/* Cerrar/Cancelar concurso */}
                                 <button
                                   onClick={() => confirmarCierre(a.id.toString())}
                                   className="bg-red-600 hover:bg-red-700 text-white px-3 py-1.5 rounded-lg text-sm font-medium transition"
@@ -459,10 +431,14 @@ export default function AperturaConcursoAdmin({ asignaturas = [], rutSecretaria 
                 </table>
               </div>
 
-              {/* Confirmación cierre concurso */}
               {mostrarConfirmacion && (
-                <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-40 z-50">
-                  <div className="bg-white rounded-lg shadow-lg p-6 w-11/12 sm:w-96 text-center">
+                <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-40 z-50 p-4">
+                  <div
+                    className="
+                      bg-white rounded shadow-lg w-full max-w-xl 
+                      max-h-[90vh] overflow-y-auto p-6
+                    "
+                  >
                     <p className="text-gray-800 mb-4">
                       Para volver a abrir la postulación deberá aceptarse la solicitud. ¿Está seguro/a de cancelar/cerrar este concurso?
                     </p>
@@ -484,7 +460,6 @@ export default function AperturaConcursoAdmin({ asignaturas = [], rutSecretaria 
                 </div>
               )}
 
-              {/* Popup simple */}
               {mostrarPopup && (
                 <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-40 z-50">
                   <div className="bg-white rounded-lg shadow-lg p-6 w-11/12 sm:w-96 text-center">
@@ -499,66 +474,65 @@ export default function AperturaConcursoAdmin({ asignaturas = [], rutSecretaria 
                 </div>
               )}
 
-              {/* Modal Crear Afiche */}
               {mostrarModalCrear && asignaturaParaCrear && (
-                <div className="fixed inset-0 flex items-start justify-center pt-16 bg-black bg-opacity-40 z-50">
+                <div className="fixed inset-0 flex items-start justify-center pt-16 bg-black bg-opacity-40 z-50 overflow-y-auto">
                   <div className="bg-white rounded-lg shadow-lg p-6 w-full max-w-3xl">
-                    <h3 className="text-lg font-semibold mb-4 text-center">
+                    <h3 className="text-lg font-semibold mb-4 text-center text-black ">
                       Crear llamado / afiche - {asignaturaParaCrear.nombre}
                     </h3>
 
                     <form onSubmit={handleSubmitCrear} className="space-y-3">
                       <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                        <label className="text-sm">
+                        <label className="text-sm  text-black ">
                           Semestre
-                          <input value={semestre} onChange={(e) => setSemestre(e.target.value)} className="w-full mt-1 border rounded px-2 py-1" />
+                          <input value={semestre} onChange={(e) => setSemestre(e.target.value)} className="w-full mt-1 border rounded text-black px-2 py-1" />
                         </label>
 
-                        <label className="text-sm">
+                        <label className="text-sm text-black ">
                           Entrega antecedentes (fecha)
-                          <input value={entregaAntecedentes} onChange={(e) => setEntregaAntecedentes(e.target.value)} type="date" className="w-full mt-1 border rounded px-2 py-1" />
+                          <input value={entregaAntecedentes} onChange={(e) => setEntregaAntecedentes(e.target.value)} type="date" className="w-full mt-1 border rounded text-black px-2 py-1" />
                         </label>
 
-                        <label className="text-sm">
+                        <label className="text-sm text-black ">
                           Fecha inicio
-                          <input value={fechaInicio} onChange={(e) => setFechaInicio(e.target.value)} type="date" className="w-full mt-1 border rounded px-2 py-1" />
+                          <input value={fechaInicio} onChange={(e) => setFechaInicio(e.target.value)} type="date" className="w-full mt-1 border rounded text-black px-2 py-1" />
                         </label>
 
-                        <label className="text-sm">
+                        <label className="text-sm  text-black ">
                           Fecha término
-                          <input value={fechaTermino} onChange={(e) => setFechaTermino(e.target.value)} type="date" className="w-full mt-1 border rounded px-2 py-1" />
+                          <input value={fechaTermino} onChange={(e) => setFechaTermino(e.target.value)} type="date" className="w-full mt-1 border rounded text-black px-2 py-1" />
                         </label>
 
-                        <label className="text-sm">
+                        <label className="text-sm text-black ">
                           Tipo ayudantía
-                          <input value={tipoAyudantia} onChange={(e) => setTipoAyudantia(e.target.value)} className="w-full mt-1 border rounded px-2 py-1" />
+                          <input value={tipoAyudantia} onChange={(e) => setTipoAyudantia(e.target.value)} className="w-full mt-1 border rounded text-black px-2 py-1" />
                         </label>
 
-                        <label className="text-sm">
+                        <label className="text-sm text-black ">
                           Tipo remuneración
-                          <input value={tipoRemuneracion} onChange={(e) => setTipoRemuneracion(e.target.value)} className="w-full mt-1 border rounded px-2 py-1" />
+                          <input value={tipoRemuneracion} onChange={(e) => setTipoRemuneracion(e.target.value)} className="w-full mt-1 border rounded text-black px-2 py-1" />
                         </label>
 
-                        <label className="text-sm">
+                        <label className="text-sm text-black ">
                           Horas mensuales
-                          <input value={horasMensuales} onChange={(e) => setHorasMensuales(e.target.value ? Number(e.target.value) : "")} type="number" min={0} className="w-full mt-1 border rounded px-2 py-1" />
+                          <input value={horasMensuales} onChange={(e) => setHorasMensuales(e.target.value ? Number(e.target.value) : "")} type="number" min={0} className="w-full mt-1 border rounded text-black px-2 py-1" />
                         </label>
 
-                        <label className="text-sm flex items-center gap-2">
+                        <label className="text-sm flex items-center gap-2  text-black ">
                           <input type="checkbox" checked={horarioFijo} onChange={(e) => setHorarioFijo(e.target.checked)} />
                           Horario fijo
                         </label>
 
-                        <label className="text-sm">
+                        <label className="text-sm text-black ">
                           Cant. ayudantes
-                          <input value={cantAyudantes} onChange={(e) => setCantAyudantes(e.target.value ? Number(e.target.value) : "")} type="number" min={0} className="w-full mt-1 border rounded px-2 py-1" />
+                          <input value={cantAyudantes} onChange={(e) => setCantAyudantes(e.target.value ? Number(e.target.value) : "")} type="number" min={0} className="w-full mt-1 border rounded text-black px-2 py-1" />
                         </label>
                       </div>
 
                       <div>
-                        <h4 className="font-medium">Descripciones</h4>
-                        <p className="text-xs text-gray-500 mb-2">Puedes añadir varias descripciones. Se enviarán como array.</p>
-                        <div className="space-y-2">
+                        <h4 className="font-medium text-black">Descripción de requerimientos específicos</h4>
+
+                        <div className="space-y-2 text-black max-h-56 overflow-y-auto pr-2 border rounded p-2">
                           {descripciones.map((d, idx) => (
                             <div key={idx} className="flex gap-2">
                               <input
@@ -567,15 +541,29 @@ export default function AperturaConcursoAdmin({ asignaturas = [], rutSecretaria 
                                 onChange={(e) => cambiarDescripcion(idx, e.target.value)}
                                 placeholder={`Descripción ${idx + 1}`}
                               />
-                              <button type="button" onClick={() => quitarDescripcion(idx)} className="px-3 py-1 bg-red-500 text-white rounded">Eliminar</button>
+                              <button
+                                type="button"
+                                onClick={() => quitarDescripcion(idx)}
+                                className="px-3 py-1 bg-red-500 text-white rounded"
+                              >
+                                Eliminar
+                              </button>
                             </div>
                           ))}
-                          <button type="button" onClick={agregarDescripcion} className="mt-2 px-3 py-2 bg-green-600 text-white rounded">Añadir descripción</button>
                         </div>
+
+                        
+                        <button
+                          type="button"
+                          onClick={agregarDescripcion}
+                          className="mt-2 px-3 py-2 bg-green-600 text-white rounded"
+                        >
+                          Añadir descripción
+                        </button>
                       </div>
 
                       <div className="flex justify-end gap-2 mt-4">
-                        <button type="button" onClick={() => { setMostrarModalCrear(false); setAsignaturaParaCrear(null); }} className="px-4 py-2 bg-gray-300 rounded">Cancelar</button>
+                        <button type="button" onClick={() => { setMostrarModalCrear(false); setAsignaturaParaCrear(null); }} className="px-4 py-2 bg-gray-500 rounded">Cancelar</button>
                         <button type="submit" className="px-4 py-2 bg-indigo-600 text-white rounded">Crear afiche</button>
                       </div>
                     </form>
@@ -583,20 +571,18 @@ export default function AperturaConcursoAdmin({ asignaturas = [], rutSecretaria 
                 </div>
               )}
 
-              {/* Modal Ver Afiche */}
               {asignaturaParaVerAfiche && (
                 <div className="fixed inset-0 flex items-start justify-center pt-16 bg-black bg-opacity-40 z-50">
                   <div className="bg-white rounded-lg shadow-lg p-6 w-full max-w-3xl">
-                    <h3 className="text-lg font-semibold mb-3 text-center">Afiche / Llamado - {asignaturaParaVerAfiche.nombre}</h3>
+                    <h3 className="text-lg font-semibold mb-3 text-center text-black">Afiche / Llamado - {asignaturaParaVerAfiche.nombre}</h3>
 
                     {buscandoAficheLocal ? (
-                      <p className="text-center">Buscando datos...</p>
+                      <p className="text-center text-black">Buscando datos...</p>
                     ) : datosAficheLocal && Array.isArray(datosAficheLocal) && datosAficheLocal.length > 0 ? (
-                      <div className="space-y-3">
+                      <div className="space-y-3 text-black ">
                         <pre className="bg-gray-50 p-3 rounded overflow-auto text-xs">{JSON.stringify(datosAficheLocal, null, 2)}</pre>
                         <div className="flex justify-end gap-2">
-                          <button onClick={() => { setAsignaturaParaVerAfiche(null); setDatosAficheLocal(null); }} className="px-3 py-2 bg-gray-300 rounded">Cerrar</button>
-                          <button onClick={handleCancelarAfiche} className="px-3 py-2 bg-red-600 text-white rounded">Cancelar afiche</button>
+                          <button onClick={() => { setAsignaturaParaVerAfiche(null); setDatosAficheLocal(null); }} className="px-3 py-2 bg-gray-400 rounded text-black">Cerrar</button>
                         </div>
                       </div>
                     ) : (
@@ -619,4 +605,3 @@ export default function AperturaConcursoAdmin({ asignaturas = [], rutSecretaria 
     </div>
   );
 }
-
