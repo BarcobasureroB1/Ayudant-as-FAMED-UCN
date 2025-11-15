@@ -59,6 +59,13 @@ async create(createUsuarioDto: CreateUsuarioDto) {
     return AlumnoData;
   }
 
+  async findcoordinadores() {
+    // Devolver todos los usuarios cuyo `tipo` es 'coordinador',
+    // incluso si todavía no tienen filas en la tabla `coordinador`.
+    return await this.usuarioRepository.find({ where: { tipo: 'coordinador' } });
+  }
+  
+
   
 
 
