@@ -32,12 +32,15 @@ export class LlamadoPostulacionService {
 
     // build payload without the raw rut_secretaria field (we'll set the relation)
     const payload: any = { ...createLlamadoPostulacionDto };
+    const descripcionArray: string[] = Array.isArray(payload.descripcion) ? payload.descripcion : [];
     delete payload.rut_secretaria;
+    delete payload.descripcion;
 
     const entity = this.llamadoPostulacionRepository.create({
       ...payload,
       asignatura,
       secretaria,
+      requisitos: descripcionArray.map(d => ({ descripcion: d }))
     });
 
     return await this.llamadoPostulacionRepository.save(entity);
@@ -48,10 +51,27 @@ export class LlamadoPostulacionService {
   }
 
   async findbyAsignatura(id_asignatura: number) {
-    return await this.llamadoPostulacionRepository.find({
+    // Include requisitos relation and return descripcion list for each llamado
+    const llamados = await this.llamadoPostulacionRepository.find({
       where: { asignatura: { id: id_asignatura }, estado: 'abierto' },
-      relations: ['asignatura'],
+      relations: ['asignatura', 'requisitos'],
     });
+
+    return llamados.map(l => ({
+      id: l.id,
+      semestre: l.semestre,
+      entrega_antecedentes: l.entrega_antecedentes,
+      fecha_inicio: l.fecha_inicio,
+      fecha_termino: l.fecha_termino,
+      tipo_ayudantia: l.tipo_ayudantia,
+      tipo_remuneracion: l.tipo_remuneracion,
+      horas_mensuales: l.horas_mensuales,
+      horario_fijo: l.horario_fijo,
+      cant_ayudantes: l.cant_ayudantes,
+      estado: l.estado,
+      descripcion: (l.requisitos || []).map(r => r.descripcion),
+      asignatura: l.asignatura ? { id: l.asignatura.id, nombre: l.asignatura.nombre } : null,
+    }));
 
   }
 
