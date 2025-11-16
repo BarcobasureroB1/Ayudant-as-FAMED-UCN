@@ -1,5 +1,13 @@
-import { IsNumber, IsString, IsBoolean, IsArray, IsDate } from 'class-validator';
+import { IsNumber, IsString, IsBoolean, IsArray, IsDate, ValidateNested, ArrayMinSize } from 'class-validator';
 import { Type } from 'class-transformer';
+
+class HorarioDto {
+  @IsString()
+  dia: string;
+
+  @IsString()
+  bloque: string;
+}
 
 export class CreateLlamadoPostulacionDto {
   @IsNumber()
@@ -44,4 +52,14 @@ export class CreateLlamadoPostulacionDto {
   @IsArray()
   @IsString({ each: true })
   descripcion: string[];
+
+  @IsArray()
+  @ValidateNested({ each: true })
+  @Type(() => HorarioDto)
+  horarios: HorarioDto[];
+
+  @IsArray()
+  @IsString({ each: true })
+  @ArrayMinSize(1)
+  coordinadores: string[];
 }

@@ -1,6 +1,6 @@
 import { Asignatura } from 'src/modules/asignatura/entities/asignatura.entity';
 import { Usuario } from 'src/modules/usuario/entities/usuario.entity';
-import { Column, Entity, JoinColumn, ManyToOne, PrimaryGeneratedColumn, OneToMany } from 'typeorm';
+import { Column, Entity, JoinColumn, ManyToOne, PrimaryGeneratedColumn, OneToMany, ManyToMany, JoinTable } from 'typeorm';
 import { RequisitoExtra } from './requisito_extra.entity';
 
 @Entity({ name: 'llamado_postulacion' })
@@ -36,6 +36,9 @@ export class LlamadoPostulacion {
   @Column()
   horario_fijo: boolean;
 
+  @Column({ type: 'json', nullable: true })
+  horarios?: { dia: string; bloque: string }[];
+
   @Column()
   cant_ayudantes: number;
 
@@ -47,5 +50,14 @@ export class LlamadoPostulacion {
 
   @OneToMany(() => RequisitoExtra, (r) => r.llamado, { cascade: true })
   requisitos?: RequisitoExtra[];
+
+  // Relación a usuarios que actúan como coordinadores sugeridos para este llamado
+  @ManyToMany(() => Usuario)
+  @JoinTable({
+    name: 'llamado_coordinador',
+    joinColumn: { name: 'llamado_id', referencedColumnName: 'id' },
+    inverseJoinColumn: { name: 'rut_coordinador', referencedColumnName: 'rut' },
+  })
+  coordinadores?: Usuario[];
 }
 
