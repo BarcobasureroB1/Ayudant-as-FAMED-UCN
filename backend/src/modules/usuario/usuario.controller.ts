@@ -2,6 +2,7 @@ import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/commo
 import { UsuarioService } from './usuario.service';
 import { CreateUsuarioDto } from './dto/create-usuario.dto';
 import { Usuario } from './entities/usuario.entity';
+import { CambiarTipoDto } from './dto/cambiar-tipo.dto';
 
 
 @Controller('usuario')
@@ -36,6 +37,11 @@ export class UsuarioController {
   @Get('coordinadores/all')
   findCoordinadores() {
     return this.usuarioService.findcoordinadores();
+  }
+  @Patch('cambiar-tipo')
+  cambiarTipo(@Body() cambiarTipoDto: CambiarTipoDto) {
+    const { rut_usuario, nuevo_tipo } = cambiarTipoDto;
+    return this.usuarioService.cambiartipo(rut_usuario, nuevo_tipo);
   }
 
 }
