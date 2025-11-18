@@ -80,6 +80,7 @@ export class AyudantiaService {
       ])
       .where('ayudantia.rut_alumno = :rut OR ayudantia.rut_coordinador_otro = :rut', { rut })
       .getRawMany();
+      console.log('Raw ayudantia records:', raws);
 
     const mapped = raws.map(r => ({
       id: r.id,

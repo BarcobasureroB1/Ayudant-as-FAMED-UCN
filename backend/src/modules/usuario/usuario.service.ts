@@ -64,9 +64,13 @@ async create(createUsuarioDto: CreateUsuarioDto) {
     // incluso si todavía no tienen filas en la tabla `coordinador`.
     return await this.usuarioRepository.find({ where: { tipo: 'coordinador' } });
   }
-  
+  async cambiartipo(rut_usuario: string, nuevo_tipo: string) {
+    const usuario = await this.usuarioRepository.findOneBy({ rut: rut_usuario  });
+    if (!usuario) {
+      throw new Error('Usuario no encontrado');
+    }
+    usuario.tipo = nuevo_tipo;
+    return await this.usuarioRepository.save(usuario);
 
-  
-
-
+  }
 }
