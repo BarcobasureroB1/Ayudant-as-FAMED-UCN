@@ -1,4 +1,4 @@
-import {useQuery} from '@tanstack/react-query';
+import {useMutation, useQuery, useQueryClient} from '@tanstack/react-query';
 import api from '../api/axios';
 
 
@@ -30,4 +30,31 @@ export function useAlumnos(){
             return respuesta.data;
         },
     });
+}
+
+interface CrearAlumnoData{
+    rut_alumno: string,
+    nombres: string,
+    apellidos: string,
+    correo: string,
+    fecha_admision: string,
+    codigo_carrera: string,
+    nombre_carrera: string,
+    promedio: number,
+    nivel: number,
+    periodo: string
+
+}
+
+export function useCrearAlumno() {
+  const clienteQuery = useQueryClient();
+  return useMutation({
+    mutationFn: async (Alumno: CrearAlumnoData) => {
+      const respuesta = await api.post("alumno", Alumno);
+      return respuesta.data;
+    },
+    onSuccess: () => {
+      clienteQuery.invalidateQueries({ queryKey: ['usuarios'] });
+    },
+  });
 }
