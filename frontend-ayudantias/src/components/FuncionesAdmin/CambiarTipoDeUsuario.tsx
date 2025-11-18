@@ -396,6 +396,7 @@ export default function AdministrarUsuarios({
                             <input className="border px-3 py-2 rounded" value={formAlumno.nombres} readOnly />
                             <input className="border px-3 py-2 rounded" value={formAlumno.apellidos} readOnly />
 
+                            <p className="text-black">Correo electrónico</p>
                             <input
                                 className="border px-3 py-2 rounded"
                                 value={formAlumno.correo}
@@ -403,6 +404,7 @@ export default function AdministrarUsuarios({
                                 placeholder="Correo"
                             />
 
+                            <p className="text-black">Fecha de admisión</p>
                             <input
                                 className="border px-3 py-2 rounded"
                                 type="date"
@@ -410,6 +412,7 @@ export default function AdministrarUsuarios({
                                 onChange={(e) => setFormAlumno({ ...formAlumno, fecha_admision: e.target.value })}
                             />
 
+                            <p className="text-black">Nivel</p>
                             <input
                                 className="border px-3 py-2 rounded"
                                 type="number"
@@ -418,6 +421,7 @@ export default function AdministrarUsuarios({
                                 onChange={(e) => setFormAlumno({ ...formAlumno, nivel: e.target.value })}
                             />
 
+                            <p className="text-black">Código de carrera</p>
                             <input
                                 className="border px-3 py-2 rounded"
                                 placeholder="Código de carrera"
@@ -425,6 +429,7 @@ export default function AdministrarUsuarios({
                                 onChange={(e) => setFormAlumno({ ...formAlumno, codigo_carrera: e.target.value })}
                             />
 
+                            <p className="text-black">Nombre de la carrera</p>
                             <input
                                 className="border px-3 py-2 rounded"
                                 placeholder="Nombre de la carrera"
@@ -432,6 +437,7 @@ export default function AdministrarUsuarios({
                                 onChange={(e) => setFormAlumno({ ...formAlumno, nombre_carrera: e.target.value })}
                             />
 
+                            <p className="text-black">Promedio de notas</p>
                             <input
                                 className="border px-3 py-2 rounded"
                                 type="number"
@@ -440,6 +446,7 @@ export default function AdministrarUsuarios({
                                 onChange={(e) => setFormAlumno({ ...formAlumno, promedio: e.target.value })}
                             />
 
+                            <p className="text-black">Periodo entre ingreso y actualidad/término</p>
                             <input
                                 className="border px-3 py-2 rounded"
                                 placeholder="Periodo"
