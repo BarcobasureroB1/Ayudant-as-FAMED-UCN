@@ -1,4 +1,4 @@
 export class CambiarTipoDto {
-  rut: string;
-  nuevoTipo: string;
+  rut_usuario: string;
+  nuevo_tipo: string;
 }
