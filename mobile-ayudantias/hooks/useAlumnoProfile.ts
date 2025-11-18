@@ -16,5 +16,8 @@ export function useAlumnoProfile(rut_alumno?: string){
             console.log("datos alumno: ", respuesta.data);
             return respuesta.data;
         },
+
+        enabled: !!rut_alumno,
+        retry: false
     });
 }

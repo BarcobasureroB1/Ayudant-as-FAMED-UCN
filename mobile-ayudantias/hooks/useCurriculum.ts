@@ -1,25 +1,37 @@
 import {useQuery,useMutation,useQueryClient} from '@tanstack/react-query';
 import api from '../api/axios';
+import { CurriculumDataEditar } from '@/app/editar-curriculum';
 
-interface Ayudantia {
+export interface Ayudantia {
+  id?: number;
   nombre_asig: string;
   nombre_coordinador: string;
   evaluacion_obtenida: string;
 }
 
-interface CursoTituloGrado {
+export interface AyudantiaResponse {
+  id?: number;
+  nombre_asig: string;
+  nombre_coordinador: string;
+  evaluacion: string;
+}
+
+export interface CursoTituloGrado {
+  id?:number;
   nombre_asig: string;
   n_coordinador: string;
   evaluacion: string;
 }
 
-interface ActividadCientifica {
+export interface ActividadCientifica {
+  id?: number;
   nombre: string;
   descripcion: string;
   periodo_participacion: string;
 }
 
-interface ActividadExtracurricular {
+export interface ActividadExtracurricular {
+  id?:number;
   nombre: string;
   docente: string;
   descripcion: string;
@@ -185,11 +197,17 @@ export function useAyudantias(rut_alumno?: string) {
 export function useEditarCurriculum(){
     const clienteQuery = useQueryClient();
     return useMutation({
-        mutationFn: async ({id}:{id: number}) => {
-            await api.patch(`curriculum/${id}`)
+        mutationFn: async (curriculum: CurriculumDataEditar) => {
+            await api.patch(`curriculum/${curriculum.id}`, curriculum)
+            console.log("ID hook: ", curriculum.id);
         },
         onSuccess: (_data) => {
+            console.log("datos: ", _data);
             clienteQuery.invalidateQueries({queryKey:['curriculum']});
+            clienteQuery.invalidateQueries({queryKey:['curriculum_ayudantias']});
+            clienteQuery.invalidateQueries({queryKey:['curriculum_cursos_titulos_grados']});
+            clienteQuery.invalidateQueries({queryKey:['curriculum_actividades_cientificas']});
+            clienteQuery.invalidateQueries({queryKey:['curriculum_extracurricular']});
         }                        
     });
 
