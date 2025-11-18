@@ -19,7 +19,7 @@ export class Usuario {
     password: string;
     @Column()
     tipo: string;
-    @Column({nullable: true})
+    @Column({nullable: true, default : 0})
     c_ayudantias : number;
     @Column()
     deshabilitado: boolean;

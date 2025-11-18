@@ -72,6 +72,50 @@ export class PostulacionService {
 }
 
   /**
+   * Lista todas las postulaciones cuyo campo `es_actual` es true.
+   * Devuelve objetos planos con: id, alumno (rut/nombres/apellidos), descripcion_carta,
+   * correo_profe, actividad, metodologia, dia, bloque, puntuacion_etapa1, puntuacion_etapa2
+   */
+  async findAllCurrent() {
+    const rows = await this.postulacionRepository
+      .createQueryBuilder('postulacion')
+      .leftJoin('postulacion.usuario', 'usuario')
+      .select([
+        'postulacion.id AS id',
+        'usuario.rut AS alumno_rut',
+        'usuario.nombres AS alumno_nombres',
+        'usuario.apellidos AS alumno_apellidos',
+        'postulacion.descripcion_carta AS descripcion_carta',
+        'postulacion.correo_profe AS correo_profe',
+        'postulacion.actividad AS actividad',
+        'postulacion.metodologia AS metodologia',
+        'postulacion.dia AS dia',
+        'postulacion.bloque AS bloque',
+        'postulacion.puntuacion_etapa1 AS puntuacion_etapa1',
+        'postulacion.puntuacion_etapa2 AS puntuacion_etapa2',
+      ])
+      .where('postulacion.es_actual = :actual', { actual: true })
+      .getRawMany();
+
+    return rows.map((r) => ({
+      id: r.id,
+      alumno: {
+        rut: r.alumno_rut,
+        nombres: r.alumno_nombres,
+        apellidos: r.alumno_apellidos,
+      },
+      descripcion_carta: r.descripcion_carta,
+      correo_profe: r.correo_profe,
+      actividad: r.actividad,
+      metodologia: r.metodologia,
+      dia: r.dia,
+      bloque: r.bloque,
+      puntuacion_etapa1: Number(r.puntuacion_etapa1) || 0,
+      puntuacion_etapa2: Number(r.puntuacion_etapa2) || 0,
+    }));
+  }
+
+  /**
    * Actualiza una postulacion parcialmente. Los campos opcionales en el DTO
    * se mantienen si no vienen en la petición.
    * editDto: { id: number, rut_alumno?, id_asignatura?, nombre_asignatura?, descripcion_carta?, correo_profe?, actividad?, metodologia?, dia?, bloque? }
@@ -115,4 +159,7 @@ export class PostulacionService {
     // Guardar y devolver
     return await this.postulacionRepository.save(postulacion);
   }
+
+
+  
 }

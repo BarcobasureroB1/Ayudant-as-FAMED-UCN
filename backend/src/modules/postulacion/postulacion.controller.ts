@@ -27,4 +27,9 @@ export class PostulacionController {
     return this.postulacionService.update(updatePostulacionDto);
   }
 
+  @Get()
+  findAll() {
+    return this.postulacionService.findAllCurrent();
+  }
+
 }
