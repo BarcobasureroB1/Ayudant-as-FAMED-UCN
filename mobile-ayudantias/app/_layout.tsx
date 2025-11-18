@@ -8,7 +8,7 @@ import { StatusBar } from 'expo-status-bar';
 import 'react-native-reanimated';
 import { useColorScheme } from '@/hooks/use-color-scheme';
 
-SplashScreen.preventAutoHideAsync(); //
+SplashScreen.preventAutoHideAsync(); //para evitar que se oculte la pantalla de inicio
 
 const queryCliente = new QueryClient();
 
@@ -30,10 +30,15 @@ function RootLayoutNav() {
     const authGrupo = segmentos[0] === '(auth)';
     const appGrupo = segmentos[0] === '(tabs)';
 
+    const appPantallas = 
+      segmentos[0] === 'crear-curriculum' || 
+      segmentos[0] === 'editar-curriculum' ||
+      segmentos[0] === 'editar-postulacion';
+
     if (token && tipoUser === 'alumno')
     {
       // si se logueo y es postulante se manda a la app
-      if(!appGrupo)
+      if(!appGrupo && !appPantallas)
       {
         router.replace('/(tabs)');
       }
@@ -71,6 +76,32 @@ function RootLayoutNav() {
         <Stack screenOptions={{headerShown: false }}>
           <Stack.Screen name = "(auth)"/>
           <Stack.Screen name="(tabs)"/>
+
+          <Stack.Screen
+            name="crear-curriculum"
+            options={{
+              headerShown: true,
+              title: 'Crear Currículum',
+              headerBackVisible: false,
+            }}
+          />
+          <Stack.Screen
+            name="editar-curriculum"
+            options={{
+              headerShown: true,
+              title: 'Editar Currículum',
+              headerBackTitle: 'Atrás'
+            }}
+          />
+          <Stack.Screen
+            name="editar-postulacion/[id]"
+            options={{
+              headerShown: true,
+              title: 'Editar Postulación',
+              headerBackTitle: 'Atrás'
+            }}
+          />
+
           <Stack.Screen name="modal" options={{presentation: 'modal', title: 'Modal'}}/>
         </Stack>
         <StatusBar style = {colorScheme === 'dark' ? 'light' : 'dark'}/>

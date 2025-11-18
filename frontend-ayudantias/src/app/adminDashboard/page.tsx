@@ -1,12 +1,16 @@
 "use client";
 
-import React, {useEffect} from 'react';
+import React, {useEffect, useState} from 'react';
 import { useRouter } from 'next/navigation';
 import { useUserProfile,User } from '@/hooks/useUserProfile';
 import { useAuth } from '@/context/AuthContext';
 import Cookies from 'js-cookie';
+import CambiarTipoDeUsuario from '@/components/FuncionesAdmin/CambiarTipoDeUsuario';
+import { useUsuarios } from "@/hooks/useUsuarios";
+
 interface UserProps {
     user:User
+    usuarios: any[];
 }
 const DashboardCard = ({ 
         title, 
@@ -45,9 +49,11 @@ const DashboardCard = ({
         );
     };
 
-export const AdminDashboard = ({user}:UserProps) => {
+export const AdminDashboard = ({user, usuarios}:UserProps) => {
 
     const {setToken, setUsertipo} = useAuth();
+
+    const [mostrarCambiarTipo, setMostrarCambiarTipo] = useState(false);
 
     const router = useRouter();
 
@@ -113,23 +119,42 @@ export const AdminDashboard = ({user}:UserProps) => {
                 </div>
             </div>
 
-            <div className="bg-white rounded-lg shadow-sm p-6 border border-gray-200">
-                <h2 className="text-xl font-semibold text-gray-800 mb-6">
-                    Acciones Rápidas
-                </h2>
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                    {dashboardItems.map((item, index) => (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+
+                {!mostrarCambiarTipo && (
+                    <>
                         <DashboardCard
-                            key={index}
-                            title={item.title}
-                            description={item.description}
-                            icon={item.icon}
-                            color={item.color}
-                            onClick={() => handleNavigation(item.path)}
+                            title="Cambiar Tipo de Usuario"
+                            description="Modificar roles de usuarios"
+                            icon="🛠️"
+                            color="purple"
+                            onClick={() => setMostrarCambiarTipo(true)}
                         />
-                    ))}
-                </div>
+
+                        {dashboardItems.map((item, index) => (
+                            <DashboardCard
+                                key={index}
+                                title={item.title}
+                                description={item.description}
+                                icon={item.icon}
+                                color={item.color}
+                                onClick={() => handleNavigation(item.path)}
+                            />
+                        ))}
+                    </>
+                )}
+
+                {mostrarCambiarTipo && (
+                    <div className="col-span-1 md:col-span-2 lg:col-span-3">
+                        <CambiarTipoDeUsuario 
+                            onClose={() => setMostrarCambiarTipo(false)} 
+                            usuarios={usuarios}
+                        />
+                    </div>
+                )}
             </div>
+
+
         </div>
     );
 };
@@ -137,6 +162,9 @@ export const AdminDashboard = ({user}:UserProps) => {
 export default function AdminPage()
 {
     const { data: user, isLoading: cargauser, isError } = useUserProfile();
+
+    const { data: usuarios, isLoading: cargandoUsuarios } = useUsuarios();
+
         const router = useRouter();
     
         useEffect(() => {
@@ -167,5 +195,5 @@ export default function AdminPage()
             );
         }
     
-        return <AdminDashboard user={user}/>;
+        return <AdminDashboard user={user} usuarios={usuarios} />;
 };

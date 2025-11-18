@@ -10,7 +10,7 @@ export interface AyudantiasAnteriores
     id_asignatura: string;
     nombre_asig: string;
     n_coordinador: string;
-    evaluacion: number;
+    evaluacion: string;
     rut_coordinador_otro: string;
     periodo: string;
     remunerada: string;
@@ -23,5 +23,7 @@ export function useAyudantiasPorAlumno(rut_alumno?: string){
             const respuesta = await api.get(`ayudantia/${rut_alumno}`);
             return respuesta.data;
         },
+        enabled: !!rut_alumno,
+        retry: false,
     });
 }

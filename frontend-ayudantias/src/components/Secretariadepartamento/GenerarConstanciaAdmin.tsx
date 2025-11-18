@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
-import { useAyudantiasPorAlumno, AyudantiasAnteriores } from "@/hooks/useAyudantia"; 
+import { useAyudantiasPorAlumno, AyudantiasAnteriores } from "@/hooks/useAyudantia";
 
 interface AlumnosData {
   rut_alumno: string;
@@ -74,7 +74,6 @@ export default function GenerarConstanciaAdmin({ alumnos = [] }: Props) {
 
   const handleGenerarPDF = (ayudantia: AyudantiasAnteriores) => {
     console.log("Generar PDF para ayudantía:", ayudantia);
-    
   };
 
   return (
@@ -83,7 +82,7 @@ export default function GenerarConstanciaAdmin({ alumnos = [] }: Props) {
         <InfoCard title="Todos los Alumnos" className="shadow-lg">
           {alumnos.length > 0 ? (
             <>
-              
+              {/* BUSCADOR + ITEMS POR PÁGINA + PAGINACIÓN */}
               <div className="flex flex-col sm:flex-row justify-between items-center mb-4">
                 <input
                   type="text"
@@ -143,7 +142,7 @@ export default function GenerarConstanciaAdmin({ alumnos = [] }: Props) {
                 )}
               </div>
 
-              
+              {/* TABLA ALUMNOS */}
               <div className="overflow-x-auto rounded-lg border border-gray-200">
                 <table className="min-w-full text-sm text-gray-700 bg-white">
                   <thead className="bg-gray-100">
@@ -177,13 +176,26 @@ export default function GenerarConstanciaAdmin({ alumnos = [] }: Props) {
                 </table>
               </div>
 
-              
+              {/* POPUP */}
               {rutSeleccionado && (
                 <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-40 z-50">
                   <div className="bg-white rounded-xl shadow-lg p-6 w-full max-w-5xl relative">
-                    <h2 className="text-lg font-semibold text-gray-800 mb-4 text-center">
-                      Ayudantías de {rutSeleccionado}
-                    </h2>
+
+                    {/* TÍTULO – AHORA CON NOMBRE COMPLETO */}
+                    {(() => {
+                      const alumnoSeleccionado = alumnos.find(
+                        (a) => a.rut_alumno === rutSeleccionado
+                      );
+                      const nombreCompleto = alumnoSeleccionado
+                        ? `${alumnoSeleccionado.nombres} ${alumnoSeleccionado.apellidos}`
+                        : rutSeleccionado;
+
+                      return (
+                        <h2 className="text-lg font-semibold text-gray-800 mb-4 text-center">
+                          Ayudantías de {nombreCompleto}
+                        </h2>
+                      );
+                    })()}
 
                     {isLoading ? (
                       <p className="text-center text-gray-600">Cargando...</p>
@@ -191,7 +203,9 @@ export default function GenerarConstanciaAdmin({ alumnos = [] }: Props) {
                       <p className="text-center text-red-600">
                         Error al cargar ayudantías.
                       </p>
-                    ) : ayudantias && Array.isArray(ayudantias) && ayudantias.length > 0 ? (
+                    ) : ayudantias &&
+                      Array.isArray(ayudantias) &&
+                      ayudantias.length > 0 ? (
                       <div className="overflow-x-auto border rounded-lg">
                         <table className="min-w-full text-sm text-gray-700 bg-white">
                           <thead className="bg-gray-100">
@@ -209,7 +223,9 @@ export default function GenerarConstanciaAdmin({ alumnos = [] }: Props) {
                             {ayudantias.map((ay: AyudantiasAnteriores) => (
                               <tr key={ay.id} className="border-b hover:bg-gray-50">
                                 <td className="p-2 text-center">{ay.tipo_ayudantia}</td>
-                                <td className="p-2 text-center">{ay.alumno.nombres} {ay.alumno.apellidos}</td>
+                                <td className="p-2 text-center">
+                                  {ay.alumno.nombres} {ay.alumno.apellidos}
+                                </td>
                                 <td className="p-2 text-center">{ay.alumno.nombre_carrera}</td>
                                 <td className="p-2 text-center">{ay.periodo}</td>
                                 <td className="p-2 text-center">{ay.asignatura.nombre}</td>
