@@ -9,7 +9,23 @@ import {
   useCrearConcurso,
   useCancelarAficheConcurso,
 } from "@/hooks/useConcursoPostulacion";
+import {
+  useCoordinadoresTodos,
+  CoordinadorData,
+} from '@/hooks/useCoordinadores';
 import api from "@/api/axios";
+import {Document, Page, Text, View, StyleSheet, Image } from "@react-pdf/renderer";
+import dynamic from "next/dynamic";
+
+const PDFViewerDynamic = dynamic(
+  () => import("@react-pdf/renderer").then((mod) => mod.PDFViewer),
+  {
+    ssr: false,
+    loading: () => (
+      <p className="text-center text-black flex-1 pt-20">Cargando Visor...</p>
+    )
+  }
+)
 
 interface AsignaturaData {
   id: number;
@@ -24,6 +40,337 @@ interface Props {
   asignaturas?: AsignaturaData[];
   rutSecretaria: string; 
 }
+
+const opcionesDias = [
+  { label: 'Lunes', value: 'Lunes' },
+  { label: 'Martes', value: 'Martes' },
+  { label: 'Miércoles', value: 'Miércoles' },
+  { label: 'Jueves', value: 'Jueves' },
+  { label: 'Viernes', value: 'Viernes' },
+  { label: 'Sábado', value: 'Sábado' },
+];
+
+const opcionesBloques = [
+  { label: 'A (08:10 - 09:30)', value: 'A' },
+  { label: 'B (09:55 - 11:20)', value: 'B' },
+  { label: 'C (11:40 - 13:10)', value: 'C' },
+  { label: 'C2 (13:10 - 14:30)', value: 'C2' },
+  { label: 'D (14:30 - 16:00)', value: 'D' },
+  { label: 'E (16:15 - 17:47)', value: 'E' },
+  { label: 'F (18:00 - 19:30)', value: 'F' },
+];
+
+interface HorarioSeleccionado {
+  dia: string;
+  bloque: string;
+}
+
+const formatDate = (dateString: string) => {
+  if (!dateString)
+  {
+    return "No definida";
+  }
+
+  try {
+    const date = new Date(dateString);
+    const userTimezone = date.getTimezoneOffset() * 60000;
+    const correctedDate = new Date(date.getTime() + userTimezone);
+    return correctedDate.toLocaleDateString("es-CL", {
+      day: "2-digit",
+      month: "2-digit",
+      year: "numeric",
+    });
+  } catch (e) {
+    return "Fecha invalida";
+  }
+}
+
+const styles = StyleSheet.create({
+  page: {
+    flexDirection: "column",
+    backgroundColor: "#FFFFFF",
+    padding: 30,
+    fontFamily: "Helvetica",
+  },
+  header: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    borderBottomWidth: 2,
+    borderBottomColor: "#003366",
+    paddingBottom: 10,
+  },
+  headerText: {
+    fontSize: 10,
+    color: "#003366",
+  },
+  logo: {
+    width: 100,
+    height: "auto",
+  },
+  title: {
+    fontSize: 16,
+    textAlign: "center",
+    marginVertical: 15,
+    fontWeight: "bold",
+    color: "#003366",
+  },
+  subtitle: {
+    fontSize: 11,
+    textAlign: "center",
+    marginHorizontal: 40,
+    marginBottom: 15,
+  },
+  table: {
+    borderWidth: 1,
+    borderColor: "#000",
+  },
+  tableRow: {
+    flexDirection: "row",
+  },
+  tableCol: {
+    flex: 1,
+    borderWidth: 1,
+    borderColor: "#000",
+    padding: 5,
+  },
+  tableColHalf: {
+    flex: 0.5,
+    borderWidth: 1,
+    borderColor: "#000",
+    padding: 5,
+  },
+  tableColSmall: {
+    flex: 0.3,
+    borderWidth: 1,
+    borderColor: "#000",
+    padding: 5,
+  },
+  tableColLarge: {
+    flex: 0.7,
+    borderWidth: 1,
+    borderColor: "#000",
+    padding: 5,
+  },
+  cellLabel: {
+    fontSize: 10,
+    fontWeight: "bold",
+  },
+  cellText: {
+    fontSize: 10,
+    paddingLeft: 4,
+  },
+  inLineRow:{
+    flexDirection: 'row',
+    alignItems: 'center'
+  },
+  sectionTitle: {
+    fontSize: 12,
+    fontWeight: "bold",
+    marginTop: 15,
+    marginBottom: 5,
+    color: "#003366",
+  },
+  listItem: {
+    fontSize: 10,
+    marginLeft: 10,
+    marginBottom: 3,
+  },
+  footer: {
+    //bottom: 30,
+    //left: 30,
+   // right: 30,
+    marginTop: 30,
+    textAlign: "center",
+  },
+  footerText: {
+    fontSize: 11,
+    fontWeight: "bold",
+  },
+  footerDate: {
+    fontSize: 14,
+    marginTop: 4,
+    backgroundColor: "#FFFF00",
+    paddingVertical: 3,
+    paddingHorizontal: 8,
+    borderRadius:2,
+    alignSelf: 'center'
+  },
+});
+
+const AfichePDFDocument = ({ datos }: { datos: any }) => (
+  <Document>
+    <Page size="A4" style={styles.page}>
+      <View style={styles.header}>
+        <View style={{ flexDirection: "column" }}>
+          <Text style={styles.headerText}>FACULTAD DE MEDICINA</Text>
+          <Text style={styles.headerText}>SECRETARÍA DOCENTE</Text>
+        </View>
+        <Image
+          style={styles.logo}
+          src="/logo-ucn.png"
+        />
+      </View>
+
+      <Text style={styles.title}>LLAMADO A CONCURSO AYUDANTÍA</Text>
+      <Text style={styles.subtitle}>
+        SE INVITA A LOS ALUMNOS DE LAS CARRERAS DE ENFERMERÍA, KINESIOLOGÍA,
+        MEDICINA Y NUTRICIÓN & DIETÉTICA A PARTICIPAR DEL LLAMADO A CONCURSO
+      </Text>
+
+      <View style={styles.table}>
+        <View style={styles.tableRow}>
+          <View style={styles.tableColHalf}>
+            <Text style={styles.cellLabel}>Asignatura:</Text>
+            <Text style={styles.cellText}>{datos.asignatura?.nombre || "Cargando..."}</Text> 
+          </View>
+        <View style={styles.tableColHalf}>
+            <Text style={styles.cellLabel}>-------------------------------------------</Text>
+          </View>
+        </View>
+
+        <View style={styles.tableRow}>
+          <View style={styles.tableColHalf}>
+            <Text style={styles.cellLabel}>Semestre:</Text>
+            <Text style={styles.cellText}>{datos.semestre}</Text>
+          </View>
+          <View style={styles.tableColHalf}>
+            <Text style={styles.cellLabel}>Fecha de inicio de Ayudantía:</Text>
+            <Text style={styles.cellText}>{formatDate(datos.fecha_inicio)}</Text>
+            <Text style={styles.cellLabel}>Fecha de Término de Ayudantía:</Text>
+            <Text style={styles.cellText}>{formatDate(datos.fecha_termino)}</Text>
+          </View>
+        </View>
+
+        <View style={styles.tableRow}>
+          <View style={styles.tableColHalf}>
+            <View style={styles.inLineRow}>
+              <Text style={styles.cellLabel}>Ayudantía Docente:</Text>
+              <Text style={styles.cellText}>
+                {datos.tipo_ayudantia === "Docente" ? "X" : ""}
+              </Text>
+            </View>
+            <View style={styles.inLineRow}>
+              <Text style={styles.cellLabel}>Ayudantía en Investigación:</Text>
+              <Text style={styles.cellText}>
+                {datos.tipo_ayudantia === "Investigacion" ? "X" : ""}
+              </Text>
+            </View>
+          </View>
+          <View style={styles.tableColHalf}>
+            <View style={styles.inLineRow}>
+              <Text style={styles.cellLabel}>Ayudantía Ad Honorem:</Text>
+              <Text style={styles.cellText}>
+                {datos.tipo_remuneracion === "Ad Honorem" ? "X" : ""}
+              </Text>
+            </View>
+            <View style={styles.inLineRow}>
+              <Text style={styles.cellLabel}>Ayudantía Remunerada:</Text>
+              <Text style={styles.cellText}>
+                {datos.tipo_remuneracion === "Remunerada" ? "X" : ""}
+              </Text>
+            </View>
+          </View>
+        </View>
+
+        <View style={styles.tableRow}>
+          <View style={styles.tableColHalf}>
+            <Text style={styles.cellLabel}>Coordinador(es):</Text>
+            {datos.coordinadores && datos.coordinadores.length > 0 ? (
+              datos.coordinadores.map(
+                (coord: {nombreCompleto: string}, index: number) => (
+                  <Text key={index} style={styles.cellText}>
+                    - {coord.nombreCompleto}
+                  </Text>
+                )
+              )
+            ): (
+              <Text style={styles.cellText}>No asignado</Text>
+            )}
+          </View>
+          <View style={styles.tableColHalf}>
+            <Text style={styles.cellLabel}>N° de horas semanales/mensuales:</Text>
+            <Text style={styles.cellText}>{datos.horas_mensuales} horas/mensuales</Text>
+          </View>
+        </View>
+
+        <View style={styles.tableRow}>
+          <View style={styles.tableColSmall}>
+            <Text style={styles.cellLabel}>Requiere Horario fijo:</Text>
+            <View style={styles.inLineRow}>
+              <Text style={styles.cellLabel}>Si:</Text>
+              <Text style={styles.cellText}>{datos.horario_fijo ? "X" : ""}</Text>
+            </View>
+            <View style={styles.inLineRow}>
+              <Text style={styles.cellLabel}>No:</Text>
+              <Text style={styles.cellText}>{datos.horario_fijo ? "" : "X"}</Text>
+            </View>
+          </View>
+          <View style={styles.tableColLarge}>
+            <Text style={styles.cellLabel}>Horario:</Text>
+            {datos.horario_fijo && datos.horarios && datos.horarios.length > 0 ? (
+              datos.horarios.map((h: HorarioSeleccionado, index: number) => (
+                <Text key={index} style={styles.cellText}>
+                  {h.dia} - Bloque {h.bloque}
+                </Text>
+              ))
+            ) : (
+              <Text style={styles.cellText}>A consensuar</Text>
+            )}
+          </View>
+        </View>
+        
+        <View style={styles.tableRow}>
+          <View style={styles.tableCol}>
+            <Text style={styles.cellLabel}>Nº ayudantes requeridos:</Text>
+            <Text style={styles.cellText}>{datos.cant_ayudantes}</Text>
+          </View>
+        </View>
+      </View>
+
+      <Text style={styles.sectionTitle}>Requisitos Generales de Postulación:</Text>
+      <Text style={styles.listItem}>
+        • Ser alumno regular de la UCN, estar matriculado, en el semestre
+        académico en que efectúa la postulación.
+      </Text>
+      <Text style={styles.listItem}>
+        • Contar con una hoja académica intachable, sin amonestaciones, que no
+        haya sido ni estén sometidos a sanciones disciplinares ni académicas.
+      </Text>
+      <Text style={styles.listItem}>
+        • Haber aprobado las asignaturas en que se desarrollan las funciones de
+        ayudantía.
+      </Text>
+      <Text style={styles.listItem}>
+        • Haber aprobado no menos de dos semestres completos del Plan de estudios
+        de la Carrera a la cual se encuentra adscrito(a).
+      </Text>
+      <Text style={styles.listItem}>
+        • Cumplir con los siguientes requisitos:
+      </Text>
+      
+      <Text style={styles.sectionTitle}>Requisitos Específicos Alumno Ayudante:</Text>
+      {datos.descripcion && datos.descripcion.length > 0 ? (
+        datos.descripcion.map((req: string, index: number) => (
+          <Text key={index} style={styles.listItem}>
+            • {req}
+          </Text>
+        ))
+      ) : (
+        <Text style={styles.listItem}>No hay requisitos específicos definidos.</Text>
+      )}
+      
+      <View style={styles.footer}>
+        <Text style={styles.footerText}>PLAZO DE ENTREGA ANTECEDENTES</Text>
+        <View>
+          <Text style={styles.footerDate}>{formatDate(datos.entrega_antecedentes)}</Text>
+        </View>
+      </View>
+
+    </Page>
+  </Document>
+);
+
 
 const InfoCard = ({
   title,
@@ -66,9 +413,14 @@ export default function AperturaConcursoAdmin({ asignaturas = [], rutSecretaria 
   const [tipoAyudantia, setTipoAyudantia] = useState("");
   const [tipoRemuneracion, setTipoRemuneracion] = useState("");
   const [horasMensuales, setHorasMensuales] = useState<number | "">("");
-  const [horarioFijo, setHorarioFijo] = useState(false);
   const [cantAyudantes, setCantAyudantes] = useState<number | "">("");
   const [descripciones, setDescripciones] = useState<string[]>([""]);
+
+
+  const [horarioFijo, setHorarioFijo] = useState(false);
+  const [horarios, setHorarios] = useState<HorarioSeleccionado[]>([]);
+  const [diaActual, setDiaActual] = useState(opcionesDias[0].value);
+  const [bloqueActual, setBloqueActual] = useState(opcionesBloques[0].value);
 
   const [asignaturaParaVerAfiche, setAsignaturaParaVerAfiche] = useState<AsignaturaData | null>(null);
   const [datosAficheLocal, setDatosAficheLocal] = useState<any>(null);
@@ -77,6 +429,26 @@ export default function AperturaConcursoAdmin({ asignaturas = [], rutSecretaria 
 
   const [aficheExists, setAficheExists] = useState<Record<number, boolean | undefined>>({});
 
+  const { data: listaCoordinadores, isLoading: cargaCoord} = useCoordinadoresTodos();
+
+  const [coordinadoresSeleccionados, setCoordinadoresSeleccionados] = useState<string[]>([]);
+
+  const [busquedaCoordinador, setBusquedaCoordinador] = useState("");
+
+  const coordinadoresFiltrados = useMemo(() => {
+    if (!listaCoordinadores)
+    {
+      return [];
+    }
+    const busquedaMin = busquedaCoordinador.toLowerCase();
+    return (listaCoordinadores as CoordinadorData[]).filter(
+      (coord: CoordinadorData) => {
+        const nombreCompleto = 
+          `${coord.nombres} ${coord.apellidos}`.toLowerCase();
+        return nombreCompleto.includes(busquedaMin);
+      }
+    );
+  }, [listaCoordinadores, busquedaCoordinador]);
 
   const asignaturasFiltradas = useMemo(
     () => asignaturas.filter((a) => a.nombre.toLowerCase().includes(busqueda.toLowerCase())),
@@ -135,7 +507,12 @@ export default function AperturaConcursoAdmin({ asignaturas = [], rutSecretaria 
     setTipoRemuneracion("");
     setHorasMensuales("");
     setHorarioFijo(false);
+    setHorarios([]);
+    setDiaActual(opcionesDias[0].value);
+    setBloqueActual(opcionesBloques[0].value);
     setCantAyudantes("");
+    setCoordinadoresSeleccionados([]);
+    setBusquedaCoordinador("");
     setMostrarModalCrear(true);
   };
 
@@ -144,13 +521,60 @@ export default function AperturaConcursoAdmin({ asignaturas = [], rutSecretaria 
   const cambiarDescripcion = (idx: number, value: string) =>
     setDescripciones((d) => d.map((x, i) => (i === idx ? value : x)));
 
+
+  const handleAgregarHorario = () => {
+    if (!diaActual || !bloqueActual)
+    {
+      setMensajePopup("Selecciona un dia y un bloque");
+      setMostrarPopup(true);
+      return;      
+    }
+    const existe = horarios.find(h => h.dia === diaActual && h.bloque === bloqueActual);
+    if (existe)
+    {
+      setMensajePopup("Ese horario ya fue añadido");
+      setMostrarPopup(true);
+      return;
+    }
+
+    setHorarios(prev => [...prev, {dia: diaActual, bloque: bloqueActual}]);
+  };
+
+  const handleQuitarHorario = (index: number) => {
+    setHorarios(prev => prev.filter((_, i) => i !== index));
+  }
+
+  const handleToggleCoordinador = (rut: string) => {
+    setCoordinadoresSeleccionados((prev) => {
+      if (prev.includes(rut))
+      {
+        return prev.filter((r) => r !== rut);  
+      } else {
+        return [...prev, rut];
+      }
+    });
+  };
+
   const handleSubmitCrear = (e?: React.FormEvent) => {
     e?.preventDefault();
     if (!asignaturaParaCrear) return;
 
+    if (coordinadoresSeleccionados.length === 0)
+    {
+      setMensajePopup("Debes seleccionar al menos un coordinador");
+      setMostrarPopup(true);
+      return;
+    }
 
     if (!fechaInicio || !fechaTermino || !tipoAyudantia || !tipoRemuneracion || descripciones.length === 0 || descripciones.some(d => d.trim() === "")) {
       setMensajePopup("Completa: fecha inicio, fecha término, tipo ayudantía, tipo remuneración y al menos una descripción válida.");
+      setMostrarPopup(true);
+      return;
+    }
+
+    if (horarioFijo && horarios.length === 0)
+    {
+      setMensajePopup("Si seleccionas 'Horario fijo', se debe añadir al menos un bloque horario");
       setMostrarPopup(true);
       return;
     }
@@ -165,10 +589,12 @@ export default function AperturaConcursoAdmin({ asignaturas = [], rutSecretaria 
       tipo_remuneracion: tipoRemuneracion,
       horas_mensuales: Number(horasMensuales) || 0,
       horario_fijo: Boolean(horarioFijo),
+      horarios: horarioFijo ? horarios: [],
       cant_ayudantes: Number(cantAyudantes) || 0,
       estado: "abierto",
       rut_secretaria: String(rutSecretaria), 
       descripcion: descripciones,
+      coordinadores: coordinadoresSeleccionados,
     };
 
     crearConcurso.mutate(payload, {
@@ -192,16 +618,42 @@ export default function AperturaConcursoAdmin({ asignaturas = [], rutSecretaria 
     setAsignaturaParaVerAfiche(a);
     setDatosAficheLocal(null);
     setBuscandoAficheLocal(true);
-
     try {
       const resp = await api.get(`llamado-postulacion/${a.id}`);
       const data = resp.data;
+      let datosConcurso = null;
       if (Array.isArray(data) && data.length > 0) {
-        setDatosAficheLocal(data);
-        setAficheExists((prev) => ({ ...prev, [a.id]: true }));
+        datosConcurso = data[0];
+      }else if (data && typeof data === 'object' && !Array.isArray(data) && data.id)
+      {
+        datosConcurso = data;
+      }
+
+      if (datosConcurso)
+      {
+        const coordinadoresNombres = (
+          datosConcurso.coordinadores || []
+        ).map((rut: string) => {
+          const coord = (listaCoordinadores || []).find(
+            (c: CoordinadorData) => c.rut === rut
+          );
+          return {
+            rut: rut,
+            nombreCompleto: coord
+              ? `${coord.nombres} ${coord.apellidos}`
+              : rut,
+          };
+        });
+
+        setDatosAficheLocal({
+          ...datosConcurso,
+          asignatura: {nombre: a.nombre},
+          coordinadores: coordinadoresNombres,
+        });
+        setAficheExists((prev) => ({ ...prev, [a.id]: true}));
       } else {
         setDatosAficheLocal(null);
-        setAficheExists((prev) => ({ ...prev, [a.id]: false }));
+        setAficheExists((prev) => ({ ...prev, [a.id]: false}));
       }
     } catch (err) {
       setMensajePopup("Error al consultar el afiche. Intenta nuevamente.");
@@ -505,28 +957,137 @@ export default function AperturaConcursoAdmin({ asignaturas = [], rutSecretaria 
 
                         <label className="text-sm text-black ">
                           Tipo ayudantía
-                          <input value={tipoAyudantia} onChange={(e) => setTipoAyudantia(e.target.value)} className="w-full mt-1 border rounded text-black px-2 py-1" />
+                          <select value={tipoAyudantia} onChange={(e) => setTipoAyudantia(e.target.value)} className="w-full mt-1 border rounded text-black px-2 py-1 bg-white">
+                            <option value="">Seleccione el tipo</option>
+                            <option value="Docente">Docente</option>
+                            <option value="Investigacion">Investigación</option>
+                          </select>
                         </label>
 
                         <label className="text-sm text-black ">
                           Tipo remuneración
-                          <input value={tipoRemuneracion} onChange={(e) => setTipoRemuneracion(e.target.value)} className="w-full mt-1 border rounded text-black px-2 py-1" />
+                          <select value={tipoRemuneracion} onChange={(e) => setTipoRemuneracion(e.target.value)} className="w-full mt-1 border rounded text-black px-2 py-1 bg-white">
+                            <option value="">Seleccione el tipo</option>
+                            <option value="Ad Honorem">Ad Honorem</option>
+                            <option value="Remunerada">Remunerada</option>
+                          </select>
                         </label>
 
                         <label className="text-sm text-black ">
                           Horas mensuales
                           <input value={horasMensuales} onChange={(e) => setHorasMensuales(e.target.value ? Number(e.target.value) : "")} type="number" min={0} className="w-full mt-1 border rounded text-black px-2 py-1" />
                         </label>
-
-                        <label className="text-sm flex items-center gap-2  text-black ">
-                          <input type="checkbox" checked={horarioFijo} onChange={(e) => setHorarioFijo(e.target.checked)} />
-                          Horario fijo
-                        </label>
-
+                        
                         <label className="text-sm text-black ">
                           Cant. ayudantes
-                          <input value={cantAyudantes} onChange={(e) => setCantAyudantes(e.target.value ? Number(e.target.value) : "")} type="number" min={0} className="w-full mt-1 border rounded text-black px-2 py-1" />
+                          <input value={cantAyudantes} onChange={(e) => setCantAyudantes(e.target.value ? Number(e.target.value) : "")} type="number" min={0} className="w-full mt-1 border rounded text-black px-2 py-1"/>
                         </label>
+
+                        <div className="sm:col-span-2">
+                          <label className="text-sm text-black">
+                            Coordinador(es)
+                          </label>
+                            <input
+                              type="text"
+                              placeholder="Buscar coordinador por nombre..."
+                              value={busquedaCoordinador}
+                              onChange={(e) => setBusquedaCoordinador(e.target.value)}
+                              className="w-full mt-1 border rounded text-black px-2 py-1 mb-2"
+                            />
+                            <div className="w-full mt-1 border rounded text-black px-3 py-2 bg-white h-32 overflow-y-auto space-y-2">
+                              {cargaCoord ? (
+                                <p className="text-gray-500 text-sm italic">Cargando coordinadores...</p>
+                              ) : coordinadoresFiltrados.length === 0 ? (
+                                <p className="text-gray-500 text-sm italic">No se encontraron coordinadores</p>
+                              ):(
+                                coordinadoresFiltrados.map(
+                                  (coord: CoordinadorData) => (
+                                    <div key={coord.rut} className="flex items-center gap-2">
+                                      <input
+                                        type="checkbox"
+                                        id={`coord-${coord.rut}`}
+                                        value={coord.rut}
+                                        checked={coordinadoresSeleccionados.includes(coord.rut)}
+                                        onChange={() => handleToggleCoordinador(coord.rut)}
+                                        className="h-4 w-4 rounded text-blue-600 focus:ring-blue-500"
+                                      />
+                                      <label
+                                        htmlFor={`coord-${coord.rut}`}
+                                        className="text-sm text-black"
+                                      >
+                                        {coord.nombres} {coord.apellidos}
+                                      </label>
+                                    </div>
+                                  )
+                                )
+                              )}
+                            </div>
+                        </div>
+
+
+
+                        <div className="sm:col-span-1">
+                          <label className="text-sm flex items-center gap-2 text-black">
+                            <input type="checkbox" checked={horarioFijo} onChange={(e) => setHorarioFijo(e.target.checked)}/>
+                            Horario fijo
+                          </label>
+
+                          {horarioFijo && (
+                            <div className="mt-2 p-3 border rounded-lg bg-gray-50 space-y-3 shadow-inner">
+                              <h5 className="text-sm font-medium text-black">Añadir Horario</h5>
+                              <div className="flex flex-col sm:flex-row gap-2 items-end">
+                                <label className="flex-1 text-sm text-black w-full">
+                                  Día
+                                  <select value={diaActual} onChange={(e) => setDiaActual(e.target.value)} className="w-full mt-1 border rounded text-black px-2 py-1 bg-white">
+                                    {opcionesDias.map(d => <option key={d.value} value={d.value}>{d.label}</option>)}
+                                  </select>
+                                </label>
+                                <label className="flex-1 text-sm text-black w-full">
+                                  Bloque
+                                  <select value={bloqueActual} onChange={(e) => setBloqueActual(e.target.value)} className="w-full mt-1 border rounded text-black px-2 py-1 bg-white">
+                                    {opcionesBloques.map(b => <option key={b.value} value={b.value}>{b.label}</option>)}
+                                  </select>
+                                </label>
+                                <button
+                                  type="button"
+                                  onClick={handleAgregarHorario}
+                                  className="px-3 py-1 bg-green-600 text-white rounded w-full sm:w-auto mt-2 sm:mt-0 hover:bg-green-700"
+                                >
+                                  Añadir
+                                </button>
+                              </div>
+
+                              <div className="mt-3">
+                                <h5 className="text-sm font-medium text-black">Horarios añadidos:</h5>
+                                {horarios.length === 0 ? (
+                                  <p className="text-xs text-gray-500 italic mt-1">No hay horarios fijos añadidos</p>
+                                ):(
+                                  <ul className="list-none space-y-1 mt-1 max-h-24 overflow-y-auto pr-1">
+                                    {horarios.map((h, index) => (
+                                      <li key={index} className="flex justify-between items-center bg-white p-1.5 rounded border text-sm shadow-sm">
+                                        <span className="text-black">{h.dia} - {h.bloque}</span>
+                                        <button
+                                          type="button"
+                                          onClick={() => handleQuitarHorario(index)}
+                                          className="px-2 py-0.5 bg-red-500 text-white rounded text-xs hover:bg-red-600"
+                                        >
+                                          Quitar
+                                        </button>
+                                      </li>
+                                    ))}
+                                  </ul>
+                                )}
+                              </div>
+                            </div>
+                          )}
+                        </div>
+
+                        {/*<label className="text-sm flex items-center gap-2  text-black ">
+                          <input type="checkbox" checked={horarioFijo} onChange={(e) => setHorarioFijo(e.target.checked)} />
+                          Horario fijo
+                        </label>*/}
+
+                        
                       </div>
 
                       <div>
@@ -572,27 +1133,38 @@ export default function AperturaConcursoAdmin({ asignaturas = [], rutSecretaria 
               )}
 
               {asignaturaParaVerAfiche && (
-                <div className="fixed inset-0 flex items-start justify-center pt-16 bg-black bg-opacity-40 z-50">
-                  <div className="bg-white rounded-lg shadow-lg p-6 w-full max-w-3xl">
-                    <h3 className="text-lg font-semibold mb-3 text-center text-black">Afiche / Llamado - {asignaturaParaVerAfiche.nombre}</h3>
+                <div className="fixed inset-0 flex items-center justify-center p-4 sm:p-10 bg-black bg-opacity-40 z-50">
+                  <div className="bg-white rounded-lg shadow-lg p-4 sm:p-6 w-full max-w-4xl h-full max-h-[90vh] flex flex-col">
+                    <h3 className="text-lg font-semibold mb-3 text-center text-black flex-shrink-0">Afiche / Llamado - {asignaturaParaVerAfiche.nombre}</h3>
 
                     {buscandoAficheLocal ? (
-                      <p className="text-center text-black">Buscando datos...</p>
-                    ) : datosAficheLocal && Array.isArray(datosAficheLocal) && datosAficheLocal.length > 0 ? (
-                      <div className="space-y-3 text-black ">
-                        <pre className="bg-gray-50 p-3 rounded overflow-auto text-xs">{JSON.stringify(datosAficheLocal, null, 2)}</pre>
-                        <div className="flex justify-end gap-2">
-                          <button onClick={() => { setAsignaturaParaVerAfiche(null); setDatosAficheLocal(null); }} className="px-3 py-2 bg-gray-400 rounded text-black">Cerrar</button>
-                        </div>
+                      <p className="text-center text-black flex-1">Buscando datos...</p>
+                    ) : datosAficheLocal ? (
+                      <div className="flex-1 w-full h-full overflow-hidden">
+                        <PDFViewerDynamic width="100%" height="100%">
+                          <AfichePDFDocument datos={datosAficheLocal}/>
+                        </PDFViewerDynamic>
                       </div>
                     ) : (
-                      <div className="space-y-3">
-                        <p className="text-center text-gray-600">No se encontraron datos de afiche para esta asignatura.</p>
-                        <div className="flex justify-end gap-2">
-                          <button onClick={() => { setAsignaturaParaVerAfiche(null); setDatosAficheLocal(null); }} className="px-3 py-2 bg-gray-300 rounded">Cerrar</button>
-                        </div>
+                      <div className="space-y-3 flex-1 flex items-center justify-center">
+                        <p className="text-center text-gray-600">
+                          No se encontraron datos de afiche para esta asignatura.
+                        </p>
                       </div>
+
                     )}
+                      <div className="flex justify-end gap-2 mt-4 flex-shrink-0">
+                        <button
+                          onClick={() => {
+                            setAsignaturaParaVerAfiche(null);
+                            setDatosAficheLocal(null);
+                          }}
+                          className="px-3 py-2 bg-gray-400 rounded text-black"
+                        >
+                          Cerrar
+                        </button>
+                      </div>
+                    
                   </div>
                 </div>
               )}

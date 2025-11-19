@@ -2,6 +2,235 @@
 
 import React, { useState } from "react";
 import { useAyudantiasPorAlumno, AyudantiasAnteriores } from "@/hooks/useAyudantia";
+import dynamic from "next/dynamic";
+import { Document, Page, Text, View, StyleSheet, Image, Font } from '@react-pdf/renderer';
+
+const PDFViewerDynamic = dynamic(
+  () => import("@react-pdf/renderer").then((mod) => mod.PDFViewer),
+  {
+    ssr: false,
+    loading: () => (
+      <p className="text-center text-black flex-1 pt-20">Cargando previsualización....</p>
+    ),
+  }
+);
+
+const styles = StyleSheet.create({
+  page: {
+    flexDirection: "column",
+    backgroundColor: "#FFFFFF",
+    padding: "2.5cm",
+    fontFamily: "Times-Roman",
+  },
+  header: {
+    flexDirection: "row",
+    justifyContent: "flex-start",
+    alignItems: "center",
+    marginBottom: 20,
+  },
+  logo: {
+    width: 80,
+    height: "auto",
+  },
+  headerTextContainer: {
+    flexDirection: "column",
+    marginLeft: 15,
+  },
+  headerTextMain: {
+    fontSize: 13,
+    fontFamily: "Times-Bold",
+    color: "#333",
+    textDecoration: "underline"
+  },
+  headerTextSecondary: {
+    fontSize: 11,
+    color: "#333",
+    marginTop: 2,
+  },
+  /*headerText: {
+    fontSize: 20,
+    textAlign: "left",
+    color: "#333",
+  }*/
+  title: {
+    fontSize: 12,
+    textAlign: "center",
+    fontFamily: "Times-Bold",
+    marginBottom: 10,
+  },
+  body: {
+    fontSize: 13,
+    textAlign: "justify",
+    lineHeight: 1.5,
+    marginBottom: 10,
+    //paddingHorizontal: "2.5cm",
+    //textIndent: 30,
+  },
+  bold: {
+    fontFamily: "Times-Bold",
+  },
+  signatureLine: {
+    position: "absolute",
+    bottom: 130,
+    left: "2.5cm",
+    right: "2.5cm",
+    borderTopWidth: 1,
+    borderTopColor: "#000",
+  },
+  footer: {
+    position: "absolute",
+    bottom: 190, 
+    left: "2.5cm",
+    right: "2.5cm",
+    flexDirection: "row",
+    justifyContent: "space-around",
+    //paddingTop: 40,
+    //borderTopWidth: 1,
+    //borderTopColor: "#000",
+  },
+  footerLine: {
+    position: "absolute",
+    bottom: 100, 
+    left: "2.5cm",
+    right: "2.5cm",
+    borderTopWidth: 1,
+    borderTopColor: "#000",
+  },
+  signature: {
+    fontSize: 10,
+    textAlign: "center",
+    flexDirection: "column",
+    alignItems: "center",     
+    width: "45%",
+  },
+  dateFooter: {
+    position: "absolute",
+    bottom: 80,
+    left: 0,
+    right: "2.5cm",
+    textAlign: "right",
+    fontSize: 11,
+  },
+});
+
+const formatSimpleDate = (dateString: string) => {
+  if (!dateString) {
+    return "No definida";
+  }
+  try {
+    const date = new Date(dateString);
+    const userTimezone = date.getTimezoneOffset() * 60000;
+    const correctedDate = new Date(date.getTime() + userTimezone);
+    return correctedDate.toLocaleDateString("es-CL", {
+      day: "2-digit",
+      month: "2-digit",
+      year: "numeric",
+    });
+  } catch (e) {
+    return "Fecha invalida";
+  }
+};
+
+const stringPeriodo = (periodo: string) => {
+  if(!periodo)
+  {
+    return { inicio: null, fin: null, semestre: "No definidi"};
+  }
+
+  try{
+
+    const partes = periodo.split("-");
+    if(partes.length < 3)
+    {
+      return {inicio: null, fin: null, semestre: periodo};
+    }
+
+    const [fechaInicio, fechaFin, codigoSem] = partes;
+
+    const anio = fechaInicio.split("/")[0];
+    const numSemestre = parseInt(codigoSem, 10);
+    const textSemestre = `${anio}-${numSemestre}`;
+
+    return {
+      inicio: fechaInicio,
+      fin: fechaFin,
+      semestre: textSemestre
+    };
+  } catch (error) {
+    console.log("error al extraer los datos del string", error);
+    return { inicio: null, fin: null, semestre: "error formato"};
+  }
+};
+
+const ConstanciaPDFDocument = ({
+  ayudantia,
+}: {
+  ayudantia: AyudantiasAnteriores;
+}) => {
+  const getFechaActual = () => {
+    const fecha = new Date();
+    return `Coquimbo, ${fecha.toLocaleDateString("es-CL", {
+      day: "numeric",
+      month:"long",
+      year:"numeric",
+    })}`;
+  };
+
+  const { inicio, fin, semestre } = stringPeriodo(ayudantia.periodo);
+
+  return (
+    <Document>
+      <Page size="A4" style={styles.page}>
+        <View style={styles.header}>
+          <Image style={styles.logo} src="/logo-ucn.png" />
+          <View style={styles.headerTextContainer}>
+            <Text style={styles.headerTextMain}>Universidad Católica del Norte</Text>
+            <Text style={styles.headerTextSecondary}>Facultad de Medicina</Text>
+          </View>
+        </View>
+
+        <Text style={[styles.title, {fontSize: 13}]}>Constancia</Text>
+        <Text style={[styles.title, {fontSize: 13}]}>A</Text>
+        <Text style={[styles.title, {marginBottom: 30}, {fontSize: 14}]}>
+          {ayudantia.alumno.nombres.toUpperCase()}{" "}
+          {ayudantia.alumno.apellidos.toUpperCase()}
+        </Text>
+
+        <Text style={[styles.body, {fontSize: 13}]} hyphenationCallback={(word) => [word]}>
+          Ha realizado{" "}<Text style={styles.bold}>{ayudantia.tipo_ayudantia}</Text>{" "}
+          para la asignatura de{" "}
+          <Text style={styles.bold}>{ayudantia.asignatura.nombre}</Text>,
+          estudiante de la carrera de{" "}
+          <Text style={styles.bold}>{ayudantia.alumno.nombre_carrera}</Text>{" "},
+          de la Facultad de Medicina de la Universidad Católica del Norte,
+          durante el semestre <Text style={styles.bold}>{semestre}</Text>
+          , desde el{" "}
+          <Text style={styles.bold}>
+            {formatSimpleDate(inicio || "")}
+          </Text>{" "}
+          hasta el{" "}
+          <Text style={styles.bold}>
+            {formatSimpleDate(fin || "")}.
+          </Text>
+        </Text>
+
+        <Text style={styles.body}>
+          Esta ayudantia es{" "}
+          <Text style={styles.bold}>{ayudantia.remunerada}</Text>
+        </Text>
+
+        
+        <Text style={styles.body}>
+          Se le concede la presente Constancia de participación.
+        </Text>
+
+
+        <View style={styles.footerLine}/>
+        <Text style={styles.dateFooter}>{getFechaActual()}</Text>
+      </Page>
+    </Document>
+  );
+};
 
 interface AlumnosData {
   rut_alumno: string;
@@ -37,6 +266,8 @@ export default function GenerarConstanciaAdmin({ alumnos = [] }: Props) {
   const [paginaActual, setPaginaActual] = useState(1);
   const [busqueda, setBusqueda] = useState("");
   const [rutSeleccionado, setRutSeleccionado] = useState<string | null>(null);
+  const [ayudantiaParaPDF, setAyudantiaParaPDF] = useState<AyudantiasAnteriores | null>(null);
+
 
   const { data: ayudantias, isLoading, isError } = useAyudantiasPorAlumno(
     rutSeleccionado ?? undefined
@@ -71,9 +302,11 @@ export default function GenerarConstanciaAdmin({ alumnos = [] }: Props) {
       setPaginaActual(nuevaPagina);
     }
   };
+ 
 
   const handleGenerarPDF = (ayudantia: AyudantiasAnteriores) => {
     console.log("Generar PDF para ayudantía:", ayudantia);
+    setAyudantiaParaPDF(ayudantia);
   };
 
   return (
@@ -175,7 +408,6 @@ export default function GenerarConstanciaAdmin({ alumnos = [] }: Props) {
                   </tbody>
                 </table>
               </div>
-
               {/* POPUP */}
               {rutSeleccionado && (
                 <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-40 z-50">
@@ -230,7 +462,7 @@ export default function GenerarConstanciaAdmin({ alumnos = [] }: Props) {
                                 <td className="p-2 text-center">{ay.periodo}</td>
                                 <td className="p-2 text-center">{ay.asignatura.nombre}</td>
                                 <td className="p-2 text-center">{ay.remunerada}</td>
-                                <td className="p-2 text-center">
+                                <td className="p-3 text-center">
                                   <button
                                     onClick={() => handleGenerarPDF(ay)}
                                     className="bg-green-600 text-white px-3 py-1 rounded-md hover:bg-green-700"
@@ -253,6 +485,30 @@ export default function GenerarConstanciaAdmin({ alumnos = [] }: Props) {
                       <button
                         onClick={() => setRutSeleccionado(null)}
                         className="bg-gray-500 text-white px-4 py-2 rounded-md hover:bg-gray-600"
+                      >
+                        Cerrar
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {ayudantiaParaPDF && (
+                <div className="fixed inset-0 flex items-center justify-center p-4 sm:p-10 bg-black bg-opacity-60 z-[60]">
+                  <div className="bg-white rounded-lg shadow-lg p-4 sm:p-6 w-full max-w-4xl h-full max-h-[90vh] flex flex-col">
+                    <h3 className="text-lg font-semibold mb-3 text-center text-black flex-shrink-0">
+                      Certificado de Ayudantía -{" "}
+                      {ayudantiaParaPDF.alumno.nombres}
+                    </h3>
+                    <div className="flex-1 w-full h-full overflow-hidden">
+                      <PDFViewerDynamic width="100%" height="100%">
+                        <ConstanciaPDFDocument ayudantia={ayudantiaParaPDF}/>
+                      </PDFViewerDynamic>
+                    </div>
+                    <div className="flex justify-end gap-2 mt-4 flex-shrink-0">
+                      <button
+                        onClick={() => setAyudantiaParaPDF(null)}
+                        className="px-3 py-2 bg-gray-400 rounded text-black"
                       >
                         Cerrar
                       </button>

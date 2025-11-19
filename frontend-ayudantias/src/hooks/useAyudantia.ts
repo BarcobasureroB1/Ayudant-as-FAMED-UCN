@@ -15,7 +15,7 @@ export interface AyudantiasAnteriores
             apellidos: string;
             nombre_carrera: string;
         },
-        coordinador: {
+        secretaria_docente: {
             rut: string;
             nombres: string;
             apellidos: string;

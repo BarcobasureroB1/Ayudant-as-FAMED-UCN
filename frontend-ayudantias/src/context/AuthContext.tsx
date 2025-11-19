@@ -1,6 +1,6 @@
 'use client';
 
-import React, { createContext, useContext, useEffect, useMemo, useState } from 'react';
+import React, { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react';
 import Cookies from 'js-cookie';
 
 interface TipoAutenticacion {
@@ -40,7 +40,7 @@ export const ProveedorAuth = ({children}: {children: React.ReactNode }) => {
     },[]);
 
     //actualiza el token en el estado y en la cookie
-    const setToken = (nuevoToken: string | null) => {
+    const setToken = useCallback((nuevoToken: string | null) => {
         setTokenState(nuevoToken);
         if (nuevoToken)
         {
@@ -50,10 +50,10 @@ export const ProveedorAuth = ({children}: {children: React.ReactNode }) => {
         {
             Cookies.remove(TOKEN_COOKIE_KEY);
         }
-    };
+    }, []);
 
     //actualiza el tipo de usuario en el estado y en la cookie
-    const setUsertipo = (nuevoTipoUser: string | null) => {
+    const setUsertipo = useCallback((nuevoTipoUser: string | null) => {
         setUsertipoState(nuevoTipoUser);
         if (nuevoTipoUser)
         {
@@ -63,12 +63,12 @@ export const ProveedorAuth = ({children}: {children: React.ReactNode }) => {
             setUsertipoState(null);
             Cookies.remove(TIPO_USUARIO_KEY);
         }
-    };
+    }, []);
 
     //para evitar que rerendericen los componentes 
     const valorContexto = useMemo(() => ({
         token, setToken, tipoUser, setUsertipo, loading
-    }), [token, tipoUser, loading])
+    }), [token, tipoUser, loading, setToken, setUsertipo])
 
     return(
         <contextoAutenticacion.Provider value={valorContexto}>

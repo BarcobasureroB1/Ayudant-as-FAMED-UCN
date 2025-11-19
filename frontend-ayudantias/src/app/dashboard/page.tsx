@@ -6,11 +6,13 @@ import AdminPage from "../adminDashboard/page";
 import { useRouter } from "next/navigation";
 import { useEffect } from "react";
 import SecretariaDeptoPage from "../secretaria-depto/page";
+import { useAuth } from "@/context/AuthContext";
 
 export default function DashboardPage() {
     const router = useRouter();
     const { data: user, isLoading, isError} = useUserProfile();
-    
+    const {setToken, setUsertipo} = useAuth();
+
     //para obtener el url de la ruta actual
     const rutaActual = typeof globalThis !== 'undefined' && globalThis.location? globalThis.window.location.pathname : '';
 
@@ -18,9 +20,11 @@ export default function DashboardPage() {
         if (isError)
         {
             //quitar la cookie logout
+            setToken(null);
+            setUsertipo(null);
             router.push("/login");
         }
-    }, [isError, router])
+    }, [isError, router, setToken, setUsertipo])
     
     // para redireccionar segun tipo de usuario
     useEffect(() => {
@@ -62,10 +66,10 @@ export default function DashboardPage() {
         return <div>Cargando perfil...</div>;
     }
 
-    if(isError)
+    /*if(isError)
     {
         return <div>Error al cargar los datos </div>
-    }
+    }*/
 
     return (
         <div className="min-h-screen flex items-center justify-center">
