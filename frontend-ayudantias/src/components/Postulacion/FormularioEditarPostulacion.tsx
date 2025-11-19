@@ -26,11 +26,21 @@ export default function FormularioEditarPostulacion({
 }: FormularioEditarPostulacionProps) {
   const [formPostulacion, setFormPostulacion] = useState<EditarPostulacion>(postulacion);
 
+  const [incluirCorreo, setIncluirCorreo] = useState(
+    !!postulacion.correo_profe && postulacion.correo_profe.trim() !== ""
+  );
+
   const editarPostulacionMutation = useEditarPostulacion();
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    editarPostulacionMutation.mutate(formPostulacion, {
+
+    const datosAEnviar = {
+      ...formPostulacion,
+      correo_profe: incluirCorreo ? formPostulacion.correo_profe : null
+    };
+
+    editarPostulacionMutation.mutate(datosAEnviar, {
       onSuccess: () => {
         alert("✅ Postulación actualizada correctamente");
         onClose();
@@ -121,7 +131,51 @@ export default function FormularioEditarPostulacion({
             />
           </div>
 
-          <div>
+          <div className="bg-gray-50 p-4 rounded-lg border border-gray-200">
+            <div className="flex items-center gap-3 mb-3">
+              <input
+                type="checkbox"
+                id="check_correo"
+                checked={incluirCorreo}
+                onChange={(e) => {
+                  setIncluirCorreo(e.target.checked);
+                  if (!e.target.checked)
+                  {
+                    setFormPostulacion(prev => ({ ...prev, correo_profe: ""}));
+                  }
+                }}
+                className="w-5 h-5 text-blue-600 rounded focus:ring-blue-500 cursor-pointer"
+              />
+              <label htmlFor="check_correo" className="text-sm font-medium text-gray-800 cursor-pointer select-none">
+                ¿Incluir correo de recomendación del profesor?
+              </label>
+            </div>
+
+            {incluirCorreo && (
+              <div className="animate-fadeIn mt-2">
+                <label className="block text-xs font-semibold text-gray-600 mb-1">
+                  Correo del profesor
+                </label>
+                <input
+                  name="correo_profe"
+                  type="email"
+                  value={formPostulacion.correo_profe || ""}
+                  onChange={(e) => 
+                    setFormPostulacion({
+                      ...formPostulacion,
+                      [e.target.name]: e.target.value,
+                    })
+                  }
+                  className="w-full px-4 py-3 border border-gray-300 text-black rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
+                  placeholder="correo_profesor@ucn.cl"
+                  required={incluirCorreo}
+                />
+              </div>
+            )}
+          </div>
+          
+          
+          {/*<div>
             <label className="block text-sm font-medium text-gray-700 mb-2">
               Correo del profesor
             </label>
@@ -138,7 +192,7 @@ export default function FormularioEditarPostulacion({
               className="w-full px-4 py-3 border border-gray-300 text-black rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
               required
             />
-          </div>
+          </div>*/}
 
           <div className="border-t border-gray-200 pt-6">
             <h4 className="text-lg font-semibold text-gray-900 mb-4">

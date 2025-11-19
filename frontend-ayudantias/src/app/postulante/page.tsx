@@ -71,6 +71,8 @@ export const PostulanteVista = ({user, alumno, curriculum, actividadesExtracurri
     const [mostrarPopupPostulaciones, setMostrarPopupPostulaciones] = useState<boolean>(false);
     const [postulacionSeleccionada, setPostulacionSeleccionada] = useState<any>(null);
 
+    const [incluirCorreoProfe, setIncluirCorreoProfe] = useState<boolean>(false);
+
     const [mostrarPopupEditarPostulacion, setMostrarPopupEditarPostulacion] = useState(false);
 
     const [vista, setVista] = useState<Vista>('perfil');
@@ -261,7 +263,7 @@ export const PostulanteVista = ({user, alumno, curriculum, actividadesExtracurri
                         </div>
                         <div>
                             <p className="text-sm text-gray-600">Correo del profesor</p>
-                            <p className="font-medium">{postulacionSeleccionada.correo_profe}</p>
+                            <p className="font-medium">{postulacionSeleccionada.correo_profe || "No especificado"}</p>
                         </div>
                         <div>
                             <p className="text-sm text-gray-600">Actividad</p>
@@ -294,7 +296,14 @@ export const PostulanteVista = ({user, alumno, curriculum, actividadesExtracurri
     const handleSubmitPostulacion = (e: SyntheticEvent) => {
         e.preventDefault();
         console.log("enviando postulacion: ", formPostulacion);
-        crearPostulacion.mutate({ ...formPostulacion, rut_alumno: user.rut });
+
+        const datosAEnviar = {
+            ...formPostulacion,
+            rut_alumno: user.rut,
+            correo_profe: incluirCorreoProfe ? formPostulacion.correo_profe : null
+        };
+
+        crearPostulacion.mutate(datosAEnviar);
         
         setFormPostulacion({
             rut_alumno: "",
@@ -307,6 +316,7 @@ export const PostulanteVista = ({user, alumno, curriculum, actividadesExtracurri
             dia: "",
             bloque: "",
         });
+        setIncluirCorreoProfe(false);
     };
 
     const popupCurriculum = mostrarPopup ? (
@@ -578,8 +588,44 @@ export const PostulanteVista = ({user, alumno, curriculum, actividadesExtracurri
                                             />
                                         </div>
 
-                                        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                                            <div>
+                                        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 items-start">
+                                            <div className="bg-gray-50 p-3 rounded-lg border border-gray-200 h-full">
+                                                <div className="flex items-center gap-2 mb-2">
+                                                    <input
+                                                        type="checkbox"
+                                                        id="check_correo"
+                                                        checked={incluirCorreoProfe}
+                                                        onChange={(e) => {
+                                                            setIncluirCorreoProfe(e.target.checked);
+                                                            if (!e.target.checked)
+                                                            {
+                                                                setFormPostulacion({ ...formPostulacion, correo_profe: ""});
+                                                            }
+                                                        }}
+                                                        className="w-4 h-4 text-blue-600 rounded focus:ring-blue-500 cursor-pointer"     
+                                                    />
+                                                    <label htmlFor="check_correo" className="text-xs font-bold text-gray-700 cursor-pointer select-none">
+                                                        Incluir correo de recomendación
+                                                    </label>
+                                                </div>
+
+                                                {incluirCorreoProfe ? (
+                                                    <input
+                                                        name="correo_profe"
+                                                        type="email"
+                                                        value={formPostulacion.correo_profe}
+                                                        onChange={(e) => setFormPostulacion({ ...formPostulacion, [e.target.name]: e.target.value})}
+                                                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors text-black text-sm animate-fadeIn"
+                                                        placeholder="profesor@ucn.cl"
+                                                        required={incluirCorreoProfe}
+                                                    />
+                                                ) : (
+                                                    <p className="text-xs text-gray-400 italic mt-2 pl-1">
+                                                        Opcional. Marque la casilla si tiene recomendación.
+                                                    </p>
+                                                )}
+                                            </div>
+                                            {/*<div>
                                                 <label className="block text-sm font-medium text-gray-700 mb-2">Correo del profesor</label>
                                                 <input 
                                                     name="correo_profe" 
@@ -590,7 +636,7 @@ export const PostulanteVista = ({user, alumno, curriculum, actividadesExtracurri
                                                     placeholder="profesor@universidad.cl"
                                                     required
                                                 />
-                                            </div>
+                                            </div>*/}
                                             <div>
                                                 <label className="block text-sm font-medium text-gray-700 mb-2">Actividad propuesta</label>
                                                 <input 

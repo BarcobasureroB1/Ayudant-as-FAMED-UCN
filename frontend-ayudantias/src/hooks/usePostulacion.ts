@@ -7,7 +7,7 @@ export interface PostulacionData
     rut_alumno: string;
     id_asignatura: string;
     descripcion_carta: string;
-    correo_profe: string;
+    correo_profe: string | null;
     actividad: string;
     metodologia: string;
     dia: string;
@@ -20,7 +20,7 @@ export interface CrearPostulacion
     id_asignatura: string;
     nombre_asignatura: string;
     descripcion_carta: string;
-    correo_profe: string;
+    correo_profe: string | null;
     actividad: string;
     metodologia: string;
     dia: string;
@@ -34,7 +34,7 @@ export interface EditarPostulacion
     id_asignatura: string;
     nombre_asignatura: string;
     descripcion_carta: string;
-    correo_profe: string;
+    correo_profe: string | null;
     actividad: string;
     metodologia: string;
     dia: string;
