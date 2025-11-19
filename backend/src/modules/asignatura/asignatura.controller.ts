@@ -46,4 +46,19 @@ export class AsignaturaController {
   findallwithcoordinador() {
     return this.asignaturaService.findallwithcoordinador();
   }
+
+  @Get('concursoPendiente/false')
+  findAsignaturasPendientes() {
+    return this.asignaturaService.getAsignaturaPendientes();
+
+  }
+
+  @Patch('autorizarConcurso/:id')
+  autorizarConcurso(@Param('id') id: string) {
+    return this.asignaturaService.changeabiertaPostulacion(+id);
+  }
+  @Patch('denegarConcurso/:id')
+  denegarConcurso(@Param('id') id: string){
+    return this.asignaturaService.denegarConcurso(+id);
+  }
 }

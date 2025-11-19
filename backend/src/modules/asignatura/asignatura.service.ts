@@ -264,5 +264,32 @@ export class AsignaturaService {
     
   }
 
+  async getAsignaturaPendientes() {
+    const asignaturas = await this.asignaturaRepository.find({
+      where: {
+        estado: 'pendiente',
+        abierta_postulacion: false,
+      },
+    });
+    return asignaturas;
+  }
+
+  async changeabiertaPostulacion(id: number) {
+    const asignatura = await this.asignaturaRepository.findOneBy({ id });
+    if (!asignatura) {
+      return null;
+    }
+    asignatura.abierta_postulacion = true;
+    return await this.asignaturaRepository.save(asignatura);
+  }
+
+  async denegarConcurso(id: number) {
+    const asignatura = await this.asignaturaRepository.findOneBy({ id });
+    if (!asignatura) {
+      return null
+    }
+    asignatura.estado = 'cerrado';
+    return await this.asignaturaRepository.save(asignatura)
+  }
 
 }

@@ -11,7 +11,7 @@ export class Asignatura {
     id: number;
     @Column()
     nombre: string;
-    @Column({default: "cerrada"})
+    @Column({default: "cerrado"})
     estado: string;
     @Column()
     semestre: number;

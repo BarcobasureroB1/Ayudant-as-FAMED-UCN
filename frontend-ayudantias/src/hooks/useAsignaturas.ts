@@ -21,6 +21,44 @@ export function useTodasAsignaturas(){
     });
 }
 
+// Utilizado por el encargado de ayudantias.
+export function useSolicitudesDeConcurso() {
+  return useQuery({
+    queryKey: ["solicitudes-concurso"],
+    queryFn: async () => {
+      const respuesta = await api.get("asignatura/concursoPendiente/false");
+      return respuesta.data;
+    },
+  });
+}
+
+export function useAutorizarConcurso() {
+    const clienteQuery = useQueryClient();
+    return useMutation({
+        mutationFn: async (id_asignatura: number) => {
+            await api.patch(`/asignatura/autorizarConcurso/${id_asignatura}`);
+        },
+        onSuccess: (_data) => {
+            clienteQuery.invalidateQueries({queryKey:['solicitudes-concurso']});
+        }                        
+    });
+
+}
+
+export function useDenegarConcurso() {
+    const clienteQuery = useQueryClient();
+    return useMutation({
+        mutationFn: async (id_asignatura: number) => {
+            await api.patch(`/asignatura/denegarConcurso/${id_asignatura}`);
+        },
+        onSuccess: (_data) => {
+            clienteQuery.invalidateQueries({queryKey:['solicitudes-concurso']});
+        }                        
+    });
+
+}
+//
+
 //Vista Secretaria Depto
 
 interface AsignaturaData
