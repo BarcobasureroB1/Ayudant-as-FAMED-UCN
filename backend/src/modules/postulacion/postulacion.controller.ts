@@ -3,6 +3,7 @@ import { PostulacionService } from './postulacion.service';
 import { CreatePostulacionDto } from './dto/create-postulacion.dto';
 import { UpdatePostulacionDto } from './dto/update-postulacion.dto';
 import { PuntuarDto } from './dto/puntuar.dto';
+import { DescartarDto } from './dto/descartar.dto';
 
 
 @Controller('postulacion')
