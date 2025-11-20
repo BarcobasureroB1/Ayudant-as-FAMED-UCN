@@ -13,7 +13,7 @@ export class Ayudantia {
     @JoinColumn({ name: 'id_asignatura', referencedColumnName: 'id' })
     asignatura: Asignatura;
     @Column()
-    evaluacion: string;
+    evaluacion: number;
     @ManyToOne(() => Usuario)
     @JoinColumn({ name: 'rut_coordinador_otro', referencedColumnName: 'rut' })
     coordinador: Usuario;

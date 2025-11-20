@@ -1,20 +1,24 @@
-import { IsString } from "class-validator";
+import { IsNumber, IsString } from "class-validator";
 
 export class CreateAyudantiaDto {
     @IsString()
-    rut_alumno:string
-    @IsString()
-    id_asignatura:number
-    @IsString()
-    evaluacion:string
-    @IsString()
-    rut_coordinador_otro:string
-    @IsString()
-    periodo:string
-    @IsString()
-    remunerada:string
-    @IsString()
-    tipo_ayudantia:string
+    rut_alumno: string;
 
+    @IsNumber()
+    id_asignatura: number;
 
+    @IsNumber()
+    evaluacion: number;
+
+    @IsString()
+    rut_coordinador_otro: string;
+
+    @IsString()
+    periodo: string;
+
+    @IsString()
+    remunerada: string;
+
+    @IsString()
+    tipo_ayudantia: string;
 }

@@ -7,6 +7,7 @@ import { Asignatura } from '../asignatura/entities/asignatura.entity';
 import { Usuario } from '../usuario/entities/usuario.entity';
 import { Alumno } from '../alumno/entities/alumno.entity';
 import { Coordinador } from '../coordinador/entities/coordinador.entity';
+import { In } from 'typeorm';
 
 
 @Injectable()
@@ -84,7 +85,7 @@ export class AyudantiaService {
 
     const mapped = raws.map(r => ({
       id: r.id,
-      evaluacion: r.evaluacion,
+      evaluacion: r.evaluacion !== null && r.evaluacion !== undefined ? Number(r.evaluacion) : null,
       periodo: r.periodo,
       remunerada: r.remunerada,
       tipo_ayudantia: r.tipo_ayudantia,
@@ -95,4 +96,64 @@ export class AyudantiaService {
 
     return mapped;
   }
+
+  /**
+   * Devuelve las ayudantías asociadas a las asignaturas que coordina el usuario
+   * identificado por `rut`. Retorna en el formato `AyudanteActivoData`.
+   */
+  async findAyudantiasByCoordinadorRut(rut: string) {
+    // 1) obtener ids de asignaturas donde este usuario es coordinador actual
+    const rows = await this.coordinadorRepository
+      .createQueryBuilder('c')
+      .innerJoin('c.usuario', 'usuario')
+      .innerJoin('c.asignaturas', 'asignatura')
+      .where('usuario.rut = :rut', { rut })
+      .andWhere('c.actual = :actual', { actual: true })
+      .select(['asignatura.id AS asignatura_id'])
+      .getRawMany();
+
+    const asignaturaIds = Array.from(new Set(rows.map((r) => r.asignatura_id).filter(Boolean)));
+    if (asignaturaIds.length === 0) return [];
+
+    // 2) obtener ayudantias cuya asignatura esté en la lista
+    const raws = await this.ayudantiaRepository
+      .createQueryBuilder('ayudantia')
+      .leftJoin('ayudantia.alumno', 'alumno')
+      .leftJoin('ayudantia.asignatura', 'asignatura')
+      .select([
+        'ayudantia.id AS id',
+        'alumno.rut AS alumno_rut',
+        'alumno.nombres AS alumno_nombres',
+        'alumno.apellidos AS alumno_apellidos',
+        'asignatura.nombre AS asignatura_nombre',
+        'ayudantia.periodo AS periodo',
+        'ayudantia.evaluacion AS evaluacion',
+      ])
+      .where('asignatura.id IN (:...ids)', { ids: asignaturaIds })
+      .getRawMany();
+
+    return raws.map((r) => ({
+      id: Number(r.id),
+      rut_alumno: r.alumno_rut,
+      alumno: {
+        nombres: r.alumno_nombres,
+        apellidos: r.alumno_apellidos,
+      },
+      asignatura: r.asignatura_nombre,
+      periodo: r.periodo,
+      evaluacion: r.evaluacion !== null && r.evaluacion !== undefined ? Number(r.evaluacion) : null,
+    }));
+  }
+
+  async evaluarAyudantia(id: number, dto: evaluarAyudantiaDto) {
+    const ayudantia = await this.ayudantiaRepository.findOneBy({ id });
+    if (!ayudantia) {
+      return null;
+    } 
+    ayudantia.evaluacion = dto.evaluacion;
+    return this.ayudantiaRepository.save(ayudantia);
+  }
+
+
+  
 }

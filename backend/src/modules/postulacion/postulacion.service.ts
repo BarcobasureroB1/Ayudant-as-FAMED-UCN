@@ -6,6 +6,10 @@ import { Postulacion } from './entities/postulacion.entity';
 import { Ayudantia } from '../ayudantia/entities/ayudantia.entity';
 import { Usuario } from '../usuario/entities/usuario.entity';
 import { Asignatura } from '../asignatura/entities/asignatura.entity';
+import { Coordinador } from '../coordinador/entities/coordinador.entity';
+import { Alumno } from '../alumno/entities/alumno.entity';
+import { In } from 'typeorm';
+import { DescartarDto } from './dto/descartar.dto';
 
 
 @Injectable()
@@ -18,6 +22,10 @@ export class PostulacionService {
     private readonly asignaturaRepository: Repository<Asignatura>,
     @InjectRepository(Usuario)
     private readonly usuarioRepository: Repository<Usuario>,
+    @InjectRepository(Coordinador)
+    private readonly coordinadorRepository: Repository<Coordinador>,
+    @InjectRepository(Alumno)
+    private readonly alumnoRepository: Repository<Alumno>,
   ) {}
   async create(createPostulacionDto: CreatePostulacionDto) {
     const usuario = await this.usuarioRepository.findOneBy({ rut: createPostulacionDto.rut_alumno });
@@ -116,6 +124,70 @@ export class PostulacionService {
   }
 
   /**
+   * Devuelve las postulaciones asociadas a las asignaturas que coordina
+   * el usuario identificado por `rutCoordinador`. Usa los datos del
+   * `usuario` asignado a la postulacion para rellenar `alumno`.
+   */
+  async findPostulacionesByCoordinadorRut(rutCoordinador: string) {
+    // 1) obtener ids de asignaturas donde este usuario es coordinador actual
+    const rows = await this.coordinadorRepository
+      .createQueryBuilder('c')
+      .innerJoin('c.usuario', 'usuario')
+      .innerJoin('c.asignaturas', 'asignatura')
+      .where('usuario.rut = :rut', { rut: rutCoordinador })
+      .andWhere('c.actual = :actual', { actual: true })
+      .select(['asignatura.id AS asignatura_id'])
+      .getRawMany();
+
+    const asignaturaIds = rows.map((r) => r.asignatura_id).filter(Boolean);
+    if (asignaturaIds.length === 0) return [];
+
+    // 2) obtener postulaciones actuales asociadas a esas asignaturas
+    const postulaciones = await this.postulacionRepository
+      .createQueryBuilder('p')
+      .leftJoin('p.usuario', 'usuario')
+      .leftJoin('p.asignatura', 'asignatura')
+      .select([
+        'p.id AS id',
+        'usuario.rut AS rut_alumno',
+        'usuario.nombres AS alumno_nombres',
+        'usuario.apellidos AS alumno_apellidos',
+        'usuario.correo AS alumno_correo',
+        'asignatura.id AS id_asignatura',
+        'p.descripcion_carta AS descripcion_carta',
+        'p.metodologia AS metodologia',
+        'p.puntuacion_etapa1 AS puntuacion_etapa1',
+        'p.puntuacion_etapa2 AS puntuacion_etapa2',
+        'p.motivo_descarte AS motivo_descarte',
+        'p.fecha_descarte AS fecha_descarte',
+        'p.rechazada_por_jefatura AS rechazada_por_jefatura',
+      ])
+      .where('asignatura.id IN (:...ids)', { ids: asignaturaIds })
+      .andWhere('p.es_actual = :actual', { actual: true })
+      .getRawMany();
+
+    // 3) mapear a la forma solicitada
+    return postulaciones.map((r) => ({
+      id: Number(r.id),
+      rut_alumno: r.rut_alumno,
+      alumno: {
+        rut: r.rut_alumno,
+        nombres: r.alumno_nombres,
+        apellidos: r.alumno_apellidos,
+        correo: r.alumno_correo,
+      },
+      id_asignatura: Number(r.id_asignatura),
+      descripcion_carta: r.descripcion_carta,
+      metodologia: r.metodologia,
+      puntuacion_etapa1: Number(r.puntuacion_etapa1) || 0,
+      puntuacion_etapa2: r.puntuacion_etapa2 !== null && r.puntuacion_etapa2 !== undefined ? Number(r.puntuacion_etapa2) : null,
+      motivo_descarte: r.motivo_descarte || null,
+      fecha_descarte: r.fecha_descarte || null,
+      rechazada_por_jefatura: Boolean(r.rechazada_por_jefatura),
+    }));
+  }
+
+  /**
    * Actualiza una postulacion parcialmente. Los campos opcionales en el DTO
    * se mantienen si no vienen en la petición.
    * editDto: { id: number, rut_alumno?, id_asignatura?, nombre_asignatura?, descripcion_carta?, correo_profe?, actividad?, metodologia?, dia?, bloque? }
@@ -160,6 +232,24 @@ export class PostulacionService {
     return await this.postulacionRepository.save(postulacion);
   }
 
+  async puntuacionetapa2(id: number, puntuacion_etapa2: number) {
+    const postulacion = await this.postulacionRepository.findOneBy({ id });
+    if (!postulacion) {
+      return null;
+    }
+    postulacion.puntuacion_etapa2 = puntuacion_etapa2;
+    return await this.postulacionRepository.save(postulacion);
+  }
+  async rechazarPorJefatura(id: number, dto: DescartarDto) {
+    const postulacion = await this.postulacionRepository.findOneBy({ id });
+    if (!postulacion) {
+      return null;
+    }
+    postulacion.rechazada_por_jefatura = true;
+    postulacion.motivo_descarte = dto.motivo_descarte;
+    postulacion.fecha_descarte = dto.fecha_descarte;
+    return await this.postulacionRepository.save(postulacion);
+  }
 
   
 }
