@@ -74,7 +74,7 @@ export const SecretariaDeptoDashboard = ({ user, asignaturas, asignaturasCoordin
                             Secretaría de Departamento
                         </h1>
                         <p className="text-gray-600 mt-1">
-                            Bienvenido, {user.nombres} {user.apellido}
+                            Bienvenido, {user.nombres} {user.apellidos}
                         </p>
                     </div>
                     <div className="text-right">

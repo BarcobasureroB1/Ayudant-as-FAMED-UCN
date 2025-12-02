@@ -81,12 +81,13 @@ export const AdminDashboard = ({user, usuarios}:UserProps) => {
             path:"/secretaria-depto",
             color: "green" as const
         },
-        /*{
+        {
             title: "Coordinador",
             description: "Acceder a funciones de coordinador (proximamente)",
             icon: "📄",
-            color: "purple" as const
-        }*/
+            path:"/coordinador",
+            color: "yellow" as const
+        }
     ];
 
     const handleNavigation = (path: string) => {
@@ -103,7 +104,7 @@ export const AdminDashboard = ({user, usuarios}:UserProps) => {
                             Panel de Administración
                         </h1>
                         <p className="text-gray-600 mt-1">
-                            Bienvenido, {user.nombres} {user.apellido}
+                            Bienvenido, {user.nombres} {user.apellidos}
                         </p>
                     </div>
                     <div className="text-right">
@@ -173,7 +174,7 @@ export default function AdminPage()
             }
         }, [isError, user, router]);
     
-        if (cargauser) {
+        if (cargauser || cargandoUsuarios) {
             return (
                 <div className="min-h-screen flex items-center justify-center">
                     <div className="text-center">

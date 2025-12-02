@@ -1,72 +1,140 @@
 "use client";
 
-import React, { SyntheticEvent, useEffect, useState } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { useRouter } from 'next/navigation';
 import { useUserProfile, User} from '@/hooks/useUserProfile';
 import { useAuth } from '@/context/AuthContext';
 import Cookies from 'js-cookie';
+import {
+    useEvaluarPostulacion,
+    useDescartarPostulacion,
+    useEvaluarAyudanteFinal,
+    PostulanteCoordinadorData,
+    AyudanteActivoData
+} from '@/hooks/useCoordinadores';
+import { useTodasAsignaturas } from '@/hooks/useAsignaturas';
+import {ModalDescarte} from '@/components/Coordinador/ModalDescarte';
+import {ModalEvaluacionPostulante} from '@/components/Coordinador/ModalEvaluacionPostulante'; 
+import {ModalEvaluacionAyudante} from '@/components/Coordinador/ModalEvaluacionAyudante';
+import { CoordinadorAdmin } from '@/components/Coordinador/CoordinadorAdmin';
+import { CoordinadorUser } from '@/components/Coordinador/CoordinadorUser';
+import { Filter, Search } from 'lucide-react';
 
-
-interface UserProps {
+interface CoordinadorDashboardProps {
     user: User;
+    postulantes: PostulanteCoordinadorData[] | undefined;
+    ayudantes: AyudanteActivoData[] | undefined;
+    loading: boolean;
 }
 
-const FeatureCard = ({ 
-    title, 
-    description, 
-    icon, 
-    status = "soon",
-    color = "blue" 
-}: { 
-    title: string; 
-    description: string; 
-    icon: string; 
-    status?: "soon" | "active";
-    color?: "blue" | "green" | "purple" | "red" | "yellow";
-}) => {
-    const colorClasses = {
-        blue: "bg-blue-50 border-blue-200 text-blue-700",
-        green: "bg-green-50 border-green-200 text-green-700",
-        purple: "bg-purple-50 border-purple-200 text-purple-700",
-        red: "bg-red-50 border-red-200 text-red-700",
-        yellow: "bg-yellow-50 border-yellow-200 text-yellow-700"
-    };
+const InfoCard = ({ title, children }: { title: string; children: React.ReactNode }) => (
+    <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+        <h3 className="text-lg font-semibold text-gray-800 mb-4 pb-2 border-b border-gray-100 text-center">{title}</h3>
+        {children}
+    </div>
+);
 
-    const statusClasses = status === "soon" 
-        ? "opacity-60 cursor-not-allowed" 
-        : "cursor-pointer hover:scale-105 hover:shadow-md";
 
-    return (
-        <div 
-            className={`p-6 rounded-lg border-2 transition-all duration-300 ${colorClasses[color]} ${statusClasses}`}
-        >
-            <div className="flex items-center justify-between mb-3">
-                <div className="flex items-center">
-                    <div className="text-2xl mr-3">
-                        <span>{icon}</span>
-                    </div>
-                    <h3 className="text-lg font-semibold">{title}</h3>
-                </div>
-                {status === "soon" && (
-                    <span className="bg-gray-200 text-gray-700 text-xs px-2 py-1 rounded-full">
-                        Próximamente
-                    </span>
-                )}
-            </div>
-            <p className="text-sm opacity-80">{description}</p>
-        </div>
-    );
-};
-
-export const SecretariaDeptoDashboard = ({ user }: UserProps) => {
+export const CoordinadorDashboard = ({ user,postulantes, ayudantes, loading }: CoordinadorDashboardProps) => {
     const router = useRouter();
-
     const { setToken, setUsertipo } = useAuth();
 
-    type Vista = 'Concurso' | 'Constancia';
-    const [vista, setVista] = useState<Vista>('Concurso');
-    const isConcurso = vista === 'Concurso';
-    const isConstancia = vista === 'Constancia';
+    type Vista = 'Postulantes' | 'Ayudantes';
+    const [vista, setVista] = useState<Vista>('Postulantes');
+    const isPostulantes = vista === 'Postulantes';
+    const isAyudantes = vista === 'Ayudantes';
+
+    const [busqueda, setBusqueda ] = useState("");
+    const [paginaActual, setPaginaActual ] = useState(1);
+    const [itemsPagina, setItemsPagina] = useState(10);
+
+    const [filtroAsignatura, setFiltroAsignatura ] = useState("");
+    const [ordenPuntaje, setOrdenPuntaje ] = useState<"desc" | "asc" | "">("");
+    const [ordenNota, setOrdenNota] = useState<"desc" | "asc" | "">("");
+
+    const [idPostulacionDescartar, setIdPostulacionDescartar] = useState<number | null>(null);
+    const [postulanteAEvaluar, setPostulanteAEvaluar] = useState<PostulanteCoordinadorData | null>(null);
+    const [ayudanteAEvaluar, setAyudanteAEvaluar ] = useState<AyudanteActivoData | null>(null);
+
+    const evaluarPostulacion = useEvaluarPostulacion();
+    const descartarPostulacion = useDescartarPostulacion();
+    const evaluarAyudante = useEvaluarAyudanteFinal();
+
+    const listaPostulantes = useMemo(() => postulantes || [], [postulantes]);
+    const listaAyudantes = useMemo(() => ayudantes || [], [ayudantes]);
+
+    const { data: listaAsignaturas, isLoading: cargaAsignaturas } = useTodasAsignaturas();
+
+    const mapAsig = useMemo(() => {
+        if (!listaAsignaturas)
+        {
+            return {};
+        }
+        const map : Record<number, string> = {};
+        if (Array.isArray(listaAsignaturas))
+        {
+         listaAsignaturas.forEach((asig: any) => {
+            map[asig.id] = asig.nombre;
+         });   
+        }
+        return map;
+    }, [listaAsignaturas]);
+
+    const opcionesDisp = useMemo(() => {
+        if (isPostulantes)
+        {
+            const ids = Array.from(new Set(listaPostulantes.map(p => p.id_asignatura)));
+            return ids.map(id => ({
+                id: id.toString(),
+                nombre: mapAsig[id]
+            })).sort((a,b) => a.nombre.localeCompare(b.nombre));
+        } else {
+            const nombres = Array.from(new Set(listaAyudantes.map(a => a.asignatura)));
+            return nombres.map(nombre => ({
+                id: nombre,
+                nombre: nombre
+            })).sort((a,b) => a.nombre.localeCompare(b.nombre));
+        }
+    }, [isPostulantes, listaPostulantes, listaAyudantes, mapAsig]);
+
+    const dataFiltrada = useMemo(() => {
+        let data: any[] = [];
+
+        if (isPostulantes /*&& postulantes*/)
+        {
+           data = listaPostulantes.filter(p => {
+                const matchTexto = p.alumno.nombres.toLowerCase().includes(busqueda.toLowerCase()) ||
+                                   p.rut_alumno.toLowerCase().includes(busqueda.toLowerCase());
+                const matchAsignatura = filtroAsignatura ? p.id_asignatura.toString() === filtroAsignatura : true;
+                return matchTexto && matchAsignatura && !p.motivo_descarte;
+           });
+
+           if (ordenPuntaje === 'desc')
+            {
+                data.sort((a, b) => b.puntuacion_etapa1 - a.puntuacion_etapa1);
+            } else if (ordenPuntaje === 'asc')
+            {
+                data.sort((a,b) => a.puntuacion_etapa1 - b.puntuacion_etapa1);
+            }
+        }else if (isAyudantes /*&& ayudantes*/)
+        {
+            data = listaAyudantes.filter(a => {
+                const matchTexto = a.alumno.nombres.toLowerCase().includes(busqueda.toLowerCase()) ||
+                                   a.rut_alumno.toLowerCase().includes(busqueda.toLowerCase());
+                const matchAsignatura = filtroAsignatura ? a.asignatura.toString() === filtroAsignatura : true;
+                return matchTexto && matchAsignatura;
+           });
+
+           if (ordenNota === 'desc')
+            {
+                data.sort((a, b) => (b.evaluacion || 0) - (a.evaluacion || 0));
+            } else if (ordenNota === 'asc')
+            {
+                data.sort((a,b) => (a.evaluacion || 0) - (b.evaluacion || 0));
+            }
+        }
+        return data;
+    }, [isPostulantes, isAyudantes, listaPostulantes, listaAyudantes, busqueda, filtroAsignatura, ordenPuntaje, ordenNota])
 
     const handleBackToAdmin = () => {
         router.push('/adminDashboard');
@@ -81,6 +149,70 @@ export const SecretariaDeptoDashboard = ({ user }: UserProps) => {
             router.refresh();
         }
 
+    const handleConfirmarDescarte = async (motivo: string) => {
+        if (idPostulacionDescartar)
+        {
+            await descartarPostulacion.mutateAsync({
+                id_postulacion: idPostulacionDescartar,
+                motivo_descarte: motivo,
+                fecha_descarte: new Date().toISOString().split('T')[0],
+                rechazada_por_jefatura: true
+            });
+            setIdPostulacionDescartar(null);
+        }
+    };
+
+
+    const handleConfirmarEvaluacionPost = async (puntajeTotal: number) => {
+        if (postulanteAEvaluar)
+        {
+            await evaluarPostulacion.mutateAsync({
+                id_postulacion: postulanteAEvaluar.id,
+                puntuacion_etapa2: puntajeTotal
+            });
+            setPostulanteAEvaluar(null);
+        }
+    };
+
+
+    const handleConfirmarEvaluacionAyu = async (nota: number) => {
+        if (ayudanteAEvaluar)
+        {
+            await evaluarAyudante.mutateAsync({
+                id_ayudantia: ayudanteAEvaluar.id,
+                evaluacion: nota
+            });
+            setAyudanteAEvaluar(null);
+        }
+    };
+
+    const totalPaginas = Math.ceil(dataFiltrada.length / (itemsPagina || 1));
+    const indiceInicio = (paginaActual - 1) * (itemsPagina || 1);
+    const indiceFin = indiceInicio + (itemsPagina || 1);
+    const dataPaginada = dataFiltrada.slice(indiceInicio, indiceFin);
+
+    const handlePaginaChange = (nuevaPagina: number) => {
+        if (nuevaPagina >= 1 && nuevaPagina <= totalPaginas) {
+            setPaginaActual(nuevaPagina);
+        }
+    };
+
+    const handleChangeItemsPorPagina = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const valor = Number(e.target.value);
+        if (valor > 0) {
+            setItemsPagina(valor);
+            setPaginaActual(1);
+        }
+    };
+
+    useEffect(() => {
+        setFiltroAsignatura("");
+        setOrdenPuntaje("");
+        setOrdenNota("");
+        setPaginaActual(1);
+        setBusqueda("");
+    }, [vista]);
+
     return (
         <div className="min-h-screen bg-gray-50 p-6">
             <div className="bg-white rounded-lg shadow-sm p-6 mb-6 border border-gray-200">
@@ -93,12 +225,8 @@ export const SecretariaDeptoDashboard = ({ user }: UserProps) => {
                             <span className="mr-2">←</span>
                             Volver al Panel Principal
                         </button>
-                        <h1 className="text-2xl font-bold text-gray-800">
-                            Secretaría de Departamento
-                        </h1>
-                        <p className="text-gray-600 mt-1">
-                            Bienvenido, {user.nombres} {user.apellido}
-                        </p>
+                        <h1 className="text-2xl font-bold text-gray-800">Panel de Coordinación</h1>
+                        <p className="text-gray-600 mt-1">Bienvenido, {user.nombres} {user.apellidos}</p>
                     </div>
                     <div className="text-right">
                         <p className="text-sm text-gray-600">Rol: {user.tipo}</p>
@@ -107,49 +235,310 @@ export const SecretariaDeptoDashboard = ({ user }: UserProps) => {
                     <div className="flex items-center gap-3">
                         <div className="flex bg-gray-100 rounded-lg p-1">
                             <button 
-                                onClick={() => setVista('Concurso')} 
-                                className={`py-2 px-4 rounded-lg transition-all duration-200 ${
-                                isConcurso 
-                                ? 'bg-white text-blue-600 shadow-sm' 
-                                : 'text-gray-600 hover:text-gray-900'
-                                }`}
+                                onClick={() => { setVista('Postulantes'); setPaginaActual(1); setBusqueda(""); }} 
+                                className={`py-2 px-4 rounded-lg transition-all duration-200 ${isPostulantes ? 'bg-white text-blue-600 shadow-sm' : 'text-gray-600 hover:text-gray-900'}`}
                             >
-                                Abrir concurso de postulacion
+                                Postulantes
                             </button>
                             <button 
-                                onClick={() => setVista('Constancia')} 
-                                className={`py-2 px-4 rounded-lg transition-all duration-200 ${
-                                isConstancia 
-                                ? 'bg-white text-blue-600 shadow-sm' 
-                                : 'text-gray-600 hover:text-gray-900'
-                                }`}
+                                onClick={() => { setVista('Ayudantes'); setPaginaActual(1); setBusqueda(""); }} 
+                                className={`py-2 px-4 rounded-lg transition-all duration-200 ${isAyudantes ? 'bg-white text-blue-600 shadow-sm' : 'text-gray-600 hover:text-gray-900'}`}
                             >
-                                Generar constancia
-                            </button>
-                            </div>
-                            <button 
-                            onClick={logout} 
-                            className="bg-gray-800 hover:bg-black text-white font-semibold py-2 px-4 rounded-lg transition duration-200 flex items-center gap-2"
-                            >
-                            <span>Cerrar Sesión</span>
+                                Mis Ayudantes
                             </button>
                         </div>
+                        <button 
+                            onClick={logout} 
+                            className="bg-gray-800 hover:bg-black text-white font-semibold py-2 px-4 rounded-lg transition duration-200 flex items-center gap-2"
+                        >
+                            <span>Cerrar Sesión</span>
+                        </button>
+                    </div>
                 </div>
             </div>
 
-        </div>
+
+            <div className="flex flex-col lg:flex-row gap-6 items-start justify-center max-w-7xl mx-auto w-full">
+                <div className="w-full lg:w-72 flex-shrink-0">
+                    <div className="bg-gray-100 rounded-xl p-5 border border-gray-200 shadow-inner">
+                        <div className="flex items-center gap-2 mb-4 text-gray-700 border-b border-gray-300 pb-2">
+                            <Filter className="w-5 h-5" />
+                            <h3 className="font-bold text-lg">Búsqueda Avanzada</h3>
+                        </div>
+
+                        <div className="space-y-5">
+                            <div>
+                                <label className="block text-sm font-semibold text-gray-700 mb-1">Asignatura</label>
+                                <select 
+                                    className="w-full border border-gray-300 rounded-md p-2 text-sm bg-white focus:ring-2 focus:ring-blue-500 text-gray-900"
+                                    value={filtroAsignatura}
+                                    onChange={(e) => setFiltroAsignatura(e.target.value)}
+                                >
+                                    <option value="">Todas</option>
+                                    {opcionesDisp.map((opcion) => (
+                                        <option key={opcion.id} value={opcion.id}>{opcion.nombre}</option>
+                                    ))}
+                                </select>
+                            </div>
+
+                            {isPostulantes && (
+                                <div>
+                                    <label className="block text-sm font-semibold text-gray-700 mb-2">Orden por Puntaje (Etapa 1)</label>
+                                    <div className="flex flex-col gap-2">
+                                        <label className="flex items-center gap-2 text-sm text-gray-600 cursor-pointer">
+                                            <input 
+                                                type="radio" 
+                                                name="ordenPuntaje" 
+                                                checked={ordenPuntaje === "desc"} 
+                                                onChange={() => setOrdenPuntaje("desc")}
+                                                className="text-blue-600 focus:ring-blue-500"
+                                            />
+                                            Mayor a Menor
+                                        </label>
+                                        <label className="flex items-center gap-2 text-sm text-gray-600 cursor-pointer">
+                                            <input 
+                                                type="radio" 
+                                                name="ordenPuntaje" 
+                                                checked={ordenPuntaje === "asc"} 
+                                                onChange={() => setOrdenPuntaje("asc")}
+                                                className="text-blue-600 focus:ring-blue-500"
+                                            />
+                                            Menor a Mayor
+                                        </label>
+                                        <button 
+                                            onClick={() => setOrdenPuntaje("")}
+                                            className="text-xs text-blue-500 hover:underline text-left mt-1"
+                                        >
+                                            Limpiar orden
+                                        </button>
+                                    </div>
+                                </div>
+                            )}
+
+                            {isAyudantes && (
+                                <div>
+                                    <label className="block text-sm font-semibold text-gray-700 mb-2">Orden por Nota Final</label>
+                                    <div className="flex flex-col gap-2">
+                                        <label className="flex items-center gap-2 text-sm text-gray-600 cursor-pointer">
+                                            <input 
+                                                type="radio" 
+                                                name="ordenNota" 
+                                                checked={ordenNota === "desc"} 
+                                                onChange={() => setOrdenNota("desc")}
+                                                className="text-blue-600 focus:ring-blue-500"
+                                            />
+                                            Mayor a Menor
+                                        </label>
+                                        <label className="flex items-center gap-2 text-sm text-gray-600 cursor-pointer">
+                                            <input 
+                                                type="radio" 
+                                                name="ordenNota" 
+                                                checked={ordenNota === "asc"} 
+                                                onChange={() => setOrdenNota("asc")}
+                                                className="text-blue-600 focus:ring-blue-500"
+                                            />
+                                            Menor a Mayor
+                                        </label>
+                                        <button 
+                                            onClick={() => setOrdenNota("")}
+                                            className="text-xs text-blue-500 hover:underline text-left mt-1"
+                                        >
+                                            Limpiar orden
+                                        </button>
+                                    </div>
+                                </div>
+                            )}
+                        </div>
+                    </div>
+                </div>
+
+                {<div className="w-full max-w-7xl px-4 sm:px-6 lg:px-12">
+                    <InfoCard title={isPostulantes ? "Gestión de Postulantes" : "Gestión de Ayudantes"}>
+                        
+                        <div className="flex flex-col sm:flex-row justify-between items-center mb-6 gap-4 border-b border-gray-100 pb-4">
+                            
+                            <div className="relative w-full sm:w-1/3">
+                                <Search className="absolute left-3 top-2.5 text-gray-400 w-4 h-4" />
+                                <input
+                                    type="text"
+                                    placeholder={isPostulantes ? "Buscar postulante..." : "Buscar ayudante..."}
+                                    value={busqueda}
+                                    onChange={(e) => { setBusqueda(e.target.value); setPaginaActual(1); }}
+                                    className="w-full border border-gray-300 text-black rounded-lg pl-9 pr-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 transition-shadow"
+                                />
+                            </div>
+
+                            <div className="flex items-center gap-4">
+                                <div className="flex items-center gap-2">
+                                    <span className="text-sm text-gray-500 hidden sm:block">Mostrar</span>
+                                    <input
+                                        type="number"
+                                        value={itemsPagina}
+                                        onChange={handleChangeItemsPorPagina}
+                                        className="w-16 border border-gray-300 text-black rounded-md px-2 py-1.5 text-sm text-center focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                        min={1}
+                                    />
+                                    <span className="text-sm text-gray-500 hidden sm:block">filas</span>
+                                </div>
+
+                                <div className="flex items-center gap-2 bg-gray-50 p-1 rounded-lg border border-gray-200">
+                                    <button 
+                                        onClick={() => handlePaginaChange(paginaActual - 1)} 
+                                        disabled={paginaActual === 1} 
+                                        className="p-1.5 rounded hover:bg-white hover:shadow-sm disabled:opacity-30 text-gray-600"
+                                    >
+                                        ←
+                                    </button>
+                                    <span className="text-sm font-medium text-gray-700 w-20 text-center">
+                                        {paginaActual} / {totalPaginas || 1}
+                                    </span>
+                                    <button 
+                                        onClick={() => handlePaginaChange(paginaActual + 1)} 
+                                        disabled={paginaActual === totalPaginas} 
+                                        className="p-1.5 rounded hover:bg-white hover:shadow-sm disabled:opacity-30 text-gray-600"
+                                    >
+                                        →
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+
+                        {loading && (!postulantes && !ayudantes) ? (
+                            <div className="text-center py-20">
+                                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto mb-2"></div>
+                                <p className="text-gray-500 text-sm">Cargando datos...</p>
+                            </div>
+                        ) : (
+                            <div className="overflow-x-auto rounded-lg border border-gray-200">
+                                <table className="min-w-full text-sm text-gray-700 bg-white">
+                                    <thead className="bg-gray-50 text-gray-600 uppercase font-medium text-xs tracking-wider">
+                                        <tr>
+                                            <th className="p-4 text-left">RUT</th>
+                                            <th className="p-4 text-left">{isPostulantes ? 'Nombre Postulante' : 'Nombre Ayudante'}</th>
+                                            <th className="p-4 text-center">Asignatura</th>
+                                            <th className="p-4 text-center">
+                                                {isPostulantes ? 'Puntaje Etapa 1' : 'Nota Final'}
+                                            </th>
+                                            <th className="p-4 text-center">Estado</th>
+                                            <th className="p-4 text-center">Acciones</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody className="divide-y divide-gray-100">
+                                        {dataPaginada.length > 0 ? (
+                                            isPostulantes ? (
+                                                (dataPaginada as PostulanteCoordinadorData[]).map(p => {
+                                                    const esEvaluado = p.puntuacion_etapa2 !== null && p.puntuacion_etapa2 > 0;
+                                                    return (
+                                                        <tr key={p.id} className="hover:bg-gray-50 transition">
+                                                            <td className="p-4 font-medium text-gray-900">{p.rut_alumno}</td>
+                                                            <td className="p-4">{p.alumno.nombres} {p.alumno.apellidos}</td>
+                                                            <td className="p-4 text-center text-gray-700 text-sm">{mapAsig[p.id_asignatura] || p.id_asignatura}</td>
+                                                            <td className="p-4 text-center font-bold text-blue-600">{p.puntuacion_etapa1} pts</td>
+                                                            <td className="p-4 text-center">
+                                                                <span className={`px-2.5 py-0.5 rounded-full text-xs font-medium ${esEvaluado ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800'}`}>
+                                                                    {esEvaluado ? 'Evaluado' : 'Pendiente'}
+                                                                </span>
+                                                            </td>
+                                                            <td className="p-4 text-center flex justify-center gap-2">
+                                                                <button 
+                                                                    onClick={() => setPostulanteAEvaluar(p)} 
+                                                                    className={`px-3 py-1.5 rounded text-white text-xs font-medium shadow-sm transition-colors ${esEvaluado ? "bg-yellow-500 hover:bg-yellow-600" : "bg-blue-600 hover:bg-blue-700"}`}
+                                                                >
+                                                                    {esEvaluado ? 'Editar' : 'Evaluar'}
+                                                                </button>
+                                                                <button 
+                                                                    onClick={() => setIdPostulacionDescartar(p.id)} 
+                                                                    className="bg-white border border-red-200 text-red-600 px-3 py-1.5 rounded hover:bg-red-50 text-xs font-medium"
+                                                                >
+                                                                    Descartar
+                                                                </button>
+                                                            </td>
+                                                        </tr>
+                                                    );
+                                                })
+                                            ) : (
+                                                (dataPaginada as AyudanteActivoData[]).map(a => {
+                                                    const esEvaluado = a.evaluacion !== null && a.evaluacion > 0;
+                                                    const nota = esEvaluado ? (a.evaluacion! / 10).toFixed(1) : '-';
+                                                    return (
+                                                        <tr key={a.id} className="hover:bg-gray-50 transition">
+                                                            <td className="p-4 font-medium text-gray-900">{a.rut_alumno}</td>
+                                                            <td className="p-4">{a.alumno.nombres} {a.alumno.apellidos}</td>
+                                                            <td className="p-4 text-center">{a.asignatura}</td>
+                                                            <td className={`p-4 text-center font-bold ${esEvaluado ? 'text-green-600' : 'text-gray-400'}`}>
+                                                                {esEvaluado ? nota : 'Pendiente'}
+                                                            </td>
+                                                            <td className="p-4 text-center">
+                                                                <span className={`px-2.5 py-0.5 rounded-full text-xs font-medium ${esEvaluado ? 'bg-green-100 text-green-800' : 'bg-green-100 text-green-800'}`}>
+                                                                    {esEvaluado ? 'Calificado' : 'Activo'}
+                                                                </span>
+                                                            </td>
+                                                            <td className="p-4 text-center">
+                                                                <button 
+                                                                    onClick={() => setAyudanteAEvaluar(a)} 
+                                                                    className={`px-3 py-1.5 rounded text-white text-xs font-medium shadow-sm transition-colors ${esEvaluado ? "bg-yellow-500 hover:bg-yellow-600" : "bg-green-600 hover:bg-green-700"}`}
+                                                                >
+                                                                    {esEvaluado ? 'Editar Nota' : 'Evaluar'}
+                                                                </button>
+                                                            </td>
+                                                        </tr>
+                                                    );
+                                                })
+                                            )
+                                        ) : (
+                                            <tr>
+                                                <td colSpan={6} className="text-center py-12 text-gray-500">
+                                                    <div className="flex flex-col items-center justify-center">
+                                                        <Search className="w-8 h-8 text-gray-300 mb-2" />
+                                                        <p>No se encontraron registros con estos filtros.</p>
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                        )}
+                                    </tbody>
+                                </table>
+                            </div>
+                        )}
+                    </InfoCard>
+                </div>}
+                
+            </div>
+
+            {idPostulacionDescartar && (
+                <ModalDescarte 
+                    onClose={() => setIdPostulacionDescartar(null)} 
+                    onConfirm={handleConfirmarDescarte} 
+                />
+            )}
+            
+            {postulanteAEvaluar && (
+                <ModalEvaluacionPostulante 
+                    postulante={postulanteAEvaluar} 
+                    onClose={() => setPostulanteAEvaluar(null)} 
+                    onConfirm={handleConfirmarEvaluacionPost} 
+                />
+            )}
+
+            {ayudanteAEvaluar && (
+                <ModalEvaluacionAyudante 
+                    ayudante={ayudanteAEvaluar} 
+                    onClose={() => setAyudanteAEvaluar(null)} 
+                    onConfirm={handleConfirmarEvaluacionAyu} 
+                />
+            )}
+        </div>        
     );
 };
 
-export default function SecretariaDeptoPage() {
+export default function CoordinadorPage() {
     const { data: user, isLoading: cargauser, isError } = useUserProfile();
     const router = useRouter();
 
     useEffect(() => {
-        if (isError || !user) {
+        if (isError || (!cargauser && !user)) {
             router.push("/login");
         }
-    }, [isError, user, router]);
+    }, [isError, user, router, cargauser]);
 
     if (cargauser) {
         return (
@@ -173,5 +562,13 @@ export default function SecretariaDeptoPage() {
         );
     }
 
-    return <SecretariaDeptoDashboard user={user} />;
+    return (
+        <div className="min-h-screen bg-gray-50">
+            {user.tipo === 'admin' ? (
+                <CoordinadorAdmin adminUser={user} />
+            ) : (
+                <CoordinadorUser user={user} />
+            )}
+        </div>
+    );
 }
