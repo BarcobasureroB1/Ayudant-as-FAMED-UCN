@@ -44,9 +44,10 @@ export default function DashboardPage() {
                     break;
                 case 'coordinador':
                     router.push("/coordinador");
+                    break;
                 case 'encargado_ayudantias':
-                    router.push("/encargado-ayudantia");
-
+                    router.push("/adminDashboard");
+                    break;
             }
         }
     }, [user, isLoading, rutaActual, router])

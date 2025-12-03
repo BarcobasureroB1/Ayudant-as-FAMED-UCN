@@ -36,9 +36,14 @@ export function middleware(request: NextRequest)
     {
         return NextResponse.next();
     }
+    
+    if (userTipo === "encargado_ayudantias")
+    {
+        return NextResponse.next();
+    }
 
     //si no tiene rol admin y quiere ver otras rutas distintas a su rol
-    if (pathname.startsWith("/adminDashboard") && userTipo !== "admin")
+    if (pathname.startsWith("/adminDashboard") && (userTipo !== "admin" && userTipo !== "encargado_ayudantias"))
     {
         //se redirige al dashboard para ir a la vista segun el rol del usuario
         return NextResponse.redirect(new URL("/dashboard", request.url));
@@ -49,6 +54,7 @@ export function middleware(request: NextRequest)
         //se redirige al dashboard para ir a la vista segun el rol del usuario
         return NextResponse.redirect(new URL("/dashboard", request.url));
     }
+    
 
 
     return NextResponse.next();

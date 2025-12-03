@@ -7,6 +7,8 @@ import { useAuth } from '@/context/AuthContext';
 import Cookies from 'js-cookie';
 import CambiarTipoDeUsuario from '@/components/FuncionesAdmin/CambiarTipoDeUsuario';
 import { useUsuarios } from "@/hooks/useUsuarios";
+import AutorizarConcursos from '@/components/FuncionesEncargado/AutorizarConcursos';
+import { useSolicitudesDeConcurso } from '@/hooks/useAsignaturas';
 
 interface UserProps {
     user:User
@@ -54,6 +56,8 @@ export const AdminDashboard = ({user, usuarios}:UserProps) => {
     const {setToken, setUsertipo} = useAuth();
 
     const [mostrarCambiarTipo, setMostrarCambiarTipo] = useState(false);
+    const [mostrarAutorizarConcursos, setMostrarAutorizarConcursos] = useState(false);
+    const { data: asignaturasConcursos } = useSolicitudesDeConcurso();
 
     const router = useRouter();
 
@@ -87,7 +91,7 @@ export const AdminDashboard = ({user, usuarios}:UserProps) => {
             icon: "📄",
             path:"/coordinador",
             color: "yellow" as const
-        }
+        },
     ];
 
     const handleNavigation = (path: string) => {
@@ -122,7 +126,7 @@ export const AdminDashboard = ({user, usuarios}:UserProps) => {
 
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
 
-                {!mostrarCambiarTipo && (
+                {!mostrarCambiarTipo && !mostrarAutorizarConcursos && (
                     <>
                         <DashboardCard
                             title="Cambiar Tipo de Usuario"
@@ -131,6 +135,16 @@ export const AdminDashboard = ({user, usuarios}:UserProps) => {
                             color="purple"
                             onClick={() => setMostrarCambiarTipo(true)}
                         />
+                        
+                        {user.tipo === 'encargado_ayudantias' && (
+                            <DashboardCard
+                            title="Autorizar Concursos"
+                            description="Autorizar concursos de asignaturas"
+                            icon="✅"
+                            color="red"
+                            onClick={() => setMostrarAutorizarConcursos(true)}
+                        />  
+                        )}
 
                         {dashboardItems.map((item, index) => (
                             <DashboardCard
@@ -150,6 +164,15 @@ export const AdminDashboard = ({user, usuarios}:UserProps) => {
                         <CambiarTipoDeUsuario 
                             onClose={() => setMostrarCambiarTipo(false)} 
                             usuarios={usuarios}
+                        />
+                    </div>
+                )}
+
+                {mostrarAutorizarConcursos && (
+                    <div className="col-span-1 md:col-span-2 lg:col-span-3">
+                        <AutorizarConcursos 
+                            onClose={() => setMostrarAutorizarConcursos(false)} 
+                            asignaturasConcursos={asignaturasConcursos}
                         />
                     </div>
                 )}

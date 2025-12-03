@@ -388,13 +388,13 @@ export default function AdministrarUsuarios({
                 </div>
             )}
 
-            {/* POPUP FORM ALUMNO */}
+            {/* POPUP FORM PARA CAMBIAR UN TIPO POR ALUMNO */}
             {showAlumnoPopup && (
                 <div className="fixed inset-0 bg-black/50 flex justify-center items-center text-black overflow-auto p-4">
                     <div className="bg-white p-6 rounded-xl w-[420px]">
                         <h3 className="text-lg font-semibold mb-4">Crear un perfil de alumno para el cambio:</h3>
 
-                        <div className="flex flex-col gap-3">
+                        <div className="flex flex-col gap-3 overflow-auto p-4 max-h-[60vh]">
 
                             <input className="border px-3 py-2 rounded" value={formAlumno.rut_alumno} readOnly />
                             <input className="border px-3 py-2 rounded" value={formAlumno.nombres} readOnly />
@@ -450,9 +450,10 @@ export default function AdministrarUsuarios({
                                 onChange={(e) => setFormAlumno({ ...formAlumno, promedio: e.target.value })}
                             />
 
-                            <p className="text-black">Periodo entre ingreso y actualidad/término</p>
+                            <p className="text-black">Periodo actual (formato YYYYSemestre) (Ej: 202520)</p>
                             <input
                                 className="border px-3 py-2 rounded"
+                                type="number"
                                 placeholder="Periodo"
                                 value={formAlumno.periodo}
                                 onChange={(e) => setFormAlumno({ ...formAlumno, periodo: e.target.value })}

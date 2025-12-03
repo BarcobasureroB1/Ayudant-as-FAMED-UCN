@@ -63,6 +63,7 @@ export const SecretariaDeptoDashboard = ({ user, asignaturas, asignaturasCoordin
             <div className="bg-white rounded-lg shadow-sm p-6 mb-6 border border-gray-200">
                 <div className="flex justify-between items-center">
                     <div>
+                        {user.tipo === 'admin' && (
                         <button 
                             onClick={handleBackToAdmin}
                             className="flex items-center text-blue-600 hover:text-blue-800 mb-2 transition-colors"
@@ -70,6 +71,16 @@ export const SecretariaDeptoDashboard = ({ user, asignaturas, asignaturasCoordin
                             <span className="mr-2">←</span>
                             Volver al Panel Principal
                         </button>
+                        )}
+                        {user.tipo === 'encargado_ayudantias' && (
+                        <button 
+                            onClick={handleBackToAdmin}
+                            className="flex items-center text-blue-600 hover:text-blue-800 mb-2 transition-colors"
+                        >
+                            <span className="mr-2">←</span>
+                            Volver al Panel Principal
+                        </button>
+                        )}
                         <h1 className="text-2xl font-bold text-gray-800">
                             Secretaría de Departamento
                         </h1>
@@ -133,6 +144,12 @@ export const SecretariaDeptoDashboard = ({ user, asignaturas, asignaturasCoordin
                                         asignaturas={asignaturas}
                                     />
                                     )}
+                                    {user.tipo === 'encargado_ayudantias' && (
+                                        <AperturaConcursoAdmin
+                                        rutSecretaria={user.rut} 
+                                        asignaturas={asignaturas}
+                                    />
+                                    )}
                                     {user.tipo ==='secretaria_depto' && (
                                         <AperturaConcursoSecreDepto datosUsuario={user} />
                                     )}
@@ -145,10 +162,21 @@ export const SecretariaDeptoDashboard = ({ user, asignaturas, asignaturasCoordin
                                         alumnos={alumnos}
                                     />
                                     )}
+                                    {user.tipo === 'encargado_ayudantias' && (
+                                        <GenerarConstanciaAdmin 
+                                        alumnos={alumnos}
+                                    />
+                                    )}
                                 </div>
                             ): vista ==='Coordinador' ? (
                                 <div className="space-y-6">
                                     {user.tipo === 'admin' && (
+                                        <GestionCoordinadoresAdmin
+                                        asignaturas={asignaturasCoordinadores}
+                                        coordinadoresTodos={coordinadoresTodos}
+                                    />
+                                    )}
+                                    {user.tipo === 'encargado_ayudantias' && (
                                         <GestionCoordinadoresAdmin
                                         asignaturas={asignaturasCoordinadores}
                                         coordinadoresTodos={coordinadoresTodos}

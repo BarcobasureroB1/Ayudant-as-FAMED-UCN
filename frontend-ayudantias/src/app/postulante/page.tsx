@@ -756,7 +756,7 @@ export const PostulanteVista = ({user, alumno, curriculum, actividadesExtracurri
     }
 
    
-    if (curriculum && user.tipo === 'admin') {
+    if (curriculum && (user.tipo === 'admin' || user.tipo === 'encargado_ayudantias' )) {
         return (
             <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 p-4 md:p-6">
                 <div className="max-w-6xl mx-auto">
