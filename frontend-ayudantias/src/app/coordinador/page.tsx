@@ -39,6 +39,20 @@ export const CoordinadorDashboard = ({ user,postulantes, ayudantes, loading }: C
     const router = useRouter();
     const { setToken, setUsertipo } = useAuth();
 
+    const [postulantesLocales, setPostulantesLocales] = useState<PostulanteCoordinadorData[]>([]);
+    const [ayudantesLocales, setAyudantesLocales] = useState<AyudanteActivoData[]>([]);
+
+    useEffect(() => {
+        if (postulantes)
+        {
+            setPostulantesLocales(postulantes);
+        }
+        if (ayudantes)
+        {
+            setAyudantesLocales(ayudantes);
+        }
+    }, [postulantes, ayudantes]);
+
     type Vista = 'Postulantes' | 'Ayudantes';
     const [vista, setVista] = useState<Vista>('Postulantes');
     const isPostulantes = vista === 'Postulantes';
@@ -49,7 +63,9 @@ export const CoordinadorDashboard = ({ user,postulantes, ayudantes, loading }: C
     const [itemsPagina, setItemsPagina] = useState(10);
 
     const [filtroAsignatura, setFiltroAsignatura ] = useState("");
+    const [filtroEstado, setFiltroEstado] = useState("");
     const [ordenPuntaje, setOrdenPuntaje ] = useState<"desc" | "asc" | "">("");
+    const [ordenPuntaje2, setOrdenPuntaje2 ] = useState<"desc" | "asc" | "">("");
     const [ordenNota, setOrdenNota] = useState<"desc" | "asc" | "">("");
 
     const [idPostulacionDescartar, setIdPostulacionDescartar] = useState<number | null>(null);
@@ -83,30 +99,45 @@ export const CoordinadorDashboard = ({ user,postulantes, ayudantes, loading }: C
     const opcionesDisp = useMemo(() => {
         if (isPostulantes)
         {
-            const ids = Array.from(new Set(listaPostulantes.map(p => p.id_asignatura)));
+            //const ids = Array.from(new Set(listaPostulantes.map(p => p.id_asignatura)));
+            const ids = Array.from(new Set(postulantesLocales.map(p => p.id_asignatura)));
             return ids.map(id => ({
                 id: id.toString(),
-                nombre: mapAsig[id]
+                nombre: mapAsig[id] || `Asignatura ${id}`
             })).sort((a,b) => a.nombre.localeCompare(b.nombre));
         } else {
-            const nombres = Array.from(new Set(listaAyudantes.map(a => a.asignatura)));
+            //const nombres = Array.from(new Set(listaAyudantes.map(a => a.asignatura)));
+            const nombres = Array.from(new Set(ayudantesLocales.map(a => a.asignatura)));
             return nombres.map(nombre => ({
                 id: nombre,
                 nombre: nombre
             })).sort((a,b) => a.nombre.localeCompare(b.nombre));
         }
-    }, [isPostulantes, listaPostulantes, listaAyudantes, mapAsig]);
+    }, [isPostulantes, /*listaPostulantes*/, /*listaAyudantes*/, mapAsig, postulantesLocales, ayudantesLocales]);
 
     const dataFiltrada = useMemo(() => {
         let data: any[] = [];
 
         if (isPostulantes /*&& postulantes*/)
         {
-           data = listaPostulantes.filter(p => {
+        
+           /*data = listaPostulantes.filter(p => {
                 const matchTexto = p.alumno.nombres.toLowerCase().includes(busqueda.toLowerCase()) ||
                                    p.rut_alumno.toLowerCase().includes(busqueda.toLowerCase());
                 const matchAsignatura = filtroAsignatura ? p.id_asignatura.toString() === filtroAsignatura : true;
-                return matchTexto && matchAsignatura && !p.motivo_descarte;
+                return matchTexto && matchAsignatura && !p.motivo_descarte;*/
+            data = postulantesLocales.filter(p => {
+                const matchTexto = p.alumno.nombres.toLowerCase().includes(busqueda.toLowerCase()) ||
+                                   p.rut_alumno.toLowerCase().includes(busqueda.toLowerCase());
+                const matchAsignatura = filtroAsignatura ? p.id_asignatura.toString() === filtroAsignatura : true;
+                let matchEstado = true;
+                if (filtroEstado)
+                {
+                    const esEvaluado = p.puntuacion_etapa2 != null && p.puntuacion_etapa2 > 0;
+                    const estadoActual = esEvaluado ? "Evaluado" : "Pendiente";
+                    matchEstado = estadoActual === filtroEstado;
+                }
+                return matchTexto && matchAsignatura && !p.motivo_descarte && matchEstado;
            });
 
            if (ordenPuntaje === 'desc')
@@ -115,10 +146,23 @@ export const CoordinadorDashboard = ({ user,postulantes, ayudantes, loading }: C
             } else if (ordenPuntaje === 'asc')
             {
                 data.sort((a,b) => a.puntuacion_etapa1 - b.puntuacion_etapa1);
+            } else if (ordenPuntaje2 === 'desc')
+            {
+                data.sort((a,b) => (b.puntuacion_etapa2 || 0) - (a.puntuacion_etapa2 || 0));
+            } else if (ordenPuntaje2 === 'asc')
+            {
+                data.sort((a,b) => (a.puntuacion_etapa2 || 0) - (b.puntuacion_etapa2 || 0));
             }
+
         }else if (isAyudantes /*&& ayudantes*/)
         {
-            data = listaAyudantes.filter(a => {
+            /*data = listaAyudantes.filter(a => {
+                const matchTexto = a.alumno.nombres.toLowerCase().includes(busqueda.toLowerCase()) ||
+                                   a.rut_alumno.toLowerCase().includes(busqueda.toLowerCase());
+                const matchAsignatura = filtroAsignatura ? a.asignatura.toString() === filtroAsignatura : true;
+                return matchTexto && matchAsignatura;
+           });*/
+           data = ayudantesLocales.filter(a => {
                 const matchTexto = a.alumno.nombres.toLowerCase().includes(busqueda.toLowerCase()) ||
                                    a.rut_alumno.toLowerCase().includes(busqueda.toLowerCase());
                 const matchAsignatura = filtroAsignatura ? a.asignatura.toString() === filtroAsignatura : true;
@@ -134,7 +178,7 @@ export const CoordinadorDashboard = ({ user,postulantes, ayudantes, loading }: C
             }
         }
         return data;
-    }, [isPostulantes, isAyudantes, listaPostulantes, listaAyudantes, busqueda, filtroAsignatura, ordenPuntaje, ordenNota])
+    }, [filtroEstado, ayudantesLocales, postulantesLocales,isPostulantes, isAyudantes, /*listaPostulantes*/, /*listaAyudantes*/, busqueda, filtroAsignatura, ordenPuntaje, ordenPuntaje2, ordenNota])
 
     const handleBackToAdmin = () => {
         router.push('/adminDashboard');
@@ -149,7 +193,7 @@ export const CoordinadorDashboard = ({ user,postulantes, ayudantes, loading }: C
             router.refresh();
         }
 
-    const handleConfirmarDescarte = async (motivo: string) => {
+    /*const handleConfirmarDescarte = async (motivo: string) => {
         if (idPostulacionDescartar)
         {
             await descartarPostulacion.mutateAsync({
@@ -160,10 +204,22 @@ export const CoordinadorDashboard = ({ user,postulantes, ayudantes, loading }: C
             });
             setIdPostulacionDescartar(null);
         }
+    };*/
+    const handleConfirmarDescarte = async (motivo: string) => {
+        if (idPostulacionDescartar)
+        {
+            setPostulantesLocales(prev => prev.map(p => 
+                p.id === idPostulacionDescartar
+                ? { ...p, motivo_descarte: motivo, fecha_descarte: new Date().toISOString() }
+                : p
+            ));
+            alert("Postulación decartada");
+            setIdPostulacionDescartar(null);
+        }
     };
 
 
-    const handleConfirmarEvaluacionPost = async (puntajeTotal: number) => {
+    /*const handleConfirmarEvaluacionPost = async (puntajeTotal: number) => {
         if (postulanteAEvaluar)
         {
             await evaluarPostulacion.mutateAsync({
@@ -172,16 +228,44 @@ export const CoordinadorDashboard = ({ user,postulantes, ayudantes, loading }: C
             });
             setPostulanteAEvaluar(null);
         }
+    };*/
+    const handleConfirmarEvaluacionPost = async (puntajeTotal: number) => {
+        if (postulanteAEvaluar)
+        {
+            setPostulantesLocales(prev => prev.map(p => 
+                p.id === postulanteAEvaluar.id
+                ? {...p, puntuacion_etapa2: puntajeTotal}
+                : p
+            ));
+
+            alert(`Postulante evaluado con ${puntajeTotal} puntos`);
+            setPostulanteAEvaluar(null);
+        }
     };
 
 
-    const handleConfirmarEvaluacionAyu = async (nota: number) => {
+    /*const handleConfirmarEvaluacionAyu = async (nota: number) => {
         if (ayudanteAEvaluar)
         {
             await evaluarAyudante.mutateAsync({
                 id_ayudantia: ayudanteAEvaluar.id,
                 evaluacion: nota
             });
+            setAyudanteAEvaluar(null);
+        }
+    };*/
+
+
+    const handleConfirmarEvaluacionAyu = async (nota: number) => {
+        if (ayudanteAEvaluar)
+        {
+            setAyudantesLocales(prev => prev.map(a => 
+                a.id === ayudanteAEvaluar.id
+                ? { ...a, evaluacion: nota }
+                : a
+            ));
+
+            alert(`Nota actualizada a ${(nota/10).toFixed(1)}`);
             setAyudanteAEvaluar(null);
         }
     };
@@ -207,7 +291,9 @@ export const CoordinadorDashboard = ({ user,postulantes, ayudantes, loading }: C
 
     useEffect(() => {
         setFiltroAsignatura("");
+        setFiltroEstado("");
         setOrdenPuntaje("");
+        setOrdenPuntaje2("");
         setOrdenNota("");
         setPaginaActual(1);
         setBusqueda("");
@@ -282,37 +368,76 @@ export const CoordinadorDashboard = ({ user,postulantes, ayudantes, loading }: C
                             </div>
 
                             {isPostulantes && (
-                                <div>
-                                    <label className="block text-sm font-semibold text-gray-700 mb-2">Orden por Puntaje (Etapa 1)</label>
-                                    <div className="flex flex-col gap-2">
-                                        <label className="flex items-center gap-2 text-sm text-gray-600 cursor-pointer">
-                                            <input 
-                                                type="radio" 
-                                                name="ordenPuntaje" 
-                                                checked={ordenPuntaje === "desc"} 
-                                                onChange={() => setOrdenPuntaje("desc")}
-                                                className="text-blue-600 focus:ring-blue-500"
-                                            />
-                                            Mayor a Menor
-                                        </label>
-                                        <label className="flex items-center gap-2 text-sm text-gray-600 cursor-pointer">
-                                            <input 
-                                                type="radio" 
-                                                name="ordenPuntaje" 
-                                                checked={ordenPuntaje === "asc"} 
-                                                onChange={() => setOrdenPuntaje("asc")}
-                                                className="text-blue-600 focus:ring-blue-500"
-                                            />
-                                            Menor a Mayor
-                                        </label>
-                                        <button 
-                                            onClick={() => setOrdenPuntaje("")}
-                                            className="text-xs text-blue-500 hover:underline text-left mt-1"
+                                <>
+                                    <div className="mt-4 border-t border-gray-200 pt-4">
+                                        <label className="block text-sm font-semibold text-gray-700 mb-1">Estado</label>
+                                        <select 
+                                            className="w-full border border-gray-300 rounded-md p-2 text-sm bg-white focus:ring-2 focus:ring-blue-500 text-gray-900"
+                                            value={filtroEstado}
+                                            onChange={(e) => setFiltroEstado(e.target.value)}
                                         >
-                                            Limpiar orden
-                                        </button>
+                                            <option value="">Todos</option>
+                                            <option value="Pendiente">Pendiente</option>
+                                            <option value="Evaluado">Evaluado</option>
+                                        </select>
                                     </div>
-                                </div>
+                                    <div>
+                                        <label className="block text-sm font-semibold text-gray-700 mb-2">Orden por Puntaje (Etapa 1)</label>
+                                        <div className="flex flex-col gap-2">
+                                            <label className="flex items-center gap-2 text-sm text-gray-600 cursor-pointer">
+                                                <input 
+                                                    type="radio" 
+                                                    name="ordenPuntaje" 
+                                                    checked={ordenPuntaje === "desc"} 
+                                                    onChange={() => {setOrdenPuntaje("desc"); setOrdenPuntaje2("");}}
+                                                    className="text-blue-600 focus:ring-blue-500"
+                                                />
+                                                Mayor a Menor
+                                            </label>
+                                            <label className="flex items-center gap-2 text-sm text-gray-600 cursor-pointer">
+                                                <input 
+                                                    type="radio" 
+                                                    name="ordenPuntaje" 
+                                                    checked={ordenPuntaje === "asc"} 
+                                                    onChange={() => {setOrdenPuntaje("asc"); setOrdenPuntaje2("");}}
+                                                    className="text-blue-600 focus:ring-blue-500"
+                                                />
+                                                Menor a Mayor
+                                            </label>
+                                            <button 
+                                                onClick={() => setOrdenPuntaje("")}
+                                                className="text-xs text-blue-500 hover:underline text-left mt-1"
+                                            >
+                                                Limpiar orden
+                                            </button>
+                                        </div>
+                                    </div>
+                                    
+                                    <div className="mt-4 border-t border-gray-200 pt-4">
+                                        <label className="block text-sm font-semibold text-gray-700 mb-2">Orden por Puntaje (Etapa 2)</label>
+                                        <div className="flex flex-col gap-2">
+                                            <label className="flex items-center gap-2 text-sm text-gray-600 cursor-pointer">
+                                                <input 
+                                                    type="radio" 
+                                                    name="ordenPuntaje2" 
+                                                    checked={ordenPuntaje2 === "desc"} 
+                                                    onChange={() => { setOrdenPuntaje2("desc"); setOrdenPuntaje(""); }} 
+                                                    className="text-blue-600 focus:ring-blue-500"
+                                                /> Mayor a Menor
+                                            </label>
+                                            <label className="flex items-center gap-2 text-sm text-gray-600 cursor-pointer">
+                                                <input 
+                                                    type="radio" 
+                                                    name="ordenPuntaje2" 
+                                                    checked={ordenPuntaje2 === "asc"} 
+                                                    onChange={() => { setOrdenPuntaje2("asc"); setOrdenPuntaje(""); }} 
+                                                    className="text-blue-600 focus:ring-blue-500"
+                                                /> Menor a Mayor
+                                            </label>
+                                            <button onClick={() => setOrdenPuntaje2("")} className="text-xs text-blue-500 hover:underline text-left mt-1">Limpiar orden</button>
+                                        </div>
+                                    </div>
+                                </>
                             )}
 
                             {isAyudantes && (
@@ -419,6 +544,9 @@ export const CoordinadorDashboard = ({ user,postulantes, ayudantes, loading }: C
                                             <th className="p-4 text-center">
                                                 {isPostulantes ? 'Puntaje Etapa 1' : 'Nota Final'}
                                             </th>
+                                            {isPostulantes && (
+                                                <th className="p-4 text-center">Puntaje Etapa 2</th>
+                                            )}
                                             <th className="p-4 text-center">Estado</th>
                                             <th className="p-4 text-center">Acciones</th>
                                         </tr>
@@ -430,10 +558,13 @@ export const CoordinadorDashboard = ({ user,postulantes, ayudantes, loading }: C
                                                     const esEvaluado = p.puntuacion_etapa2 !== null && p.puntuacion_etapa2 > 0;
                                                     return (
                                                         <tr key={p.id} className="hover:bg-gray-50 transition">
-                                                            <td className="p-4 font-medium text-gray-900">{p.rut_alumno}</td>
-                                                            <td className="p-4">{p.alumno.nombres} {p.alumno.apellidos}</td>
+                                                            <td className="p-4 font-medium text-gray-900 whitespace-nowrap">{p.rut_alumno}</td>
+                                                            <td className="p-4 whitespace-nowrap">{p.alumno.nombres} {p.alumno.apellidos}</td>
                                                             <td className="p-4 text-center text-gray-700 text-sm">{mapAsig[p.id_asignatura] || p.id_asignatura}</td>
                                                             <td className="p-4 text-center font-bold text-blue-600">{p.puntuacion_etapa1} pts</td>
+                                                            <td className="p-4 text-center font-bold text-blue-600">
+                                                                    {p.puntuacion_etapa2 ? `${p.puntuacion_etapa2} pts` : '-'}
+                                                            </td>
                                                             <td className="p-4 text-center">
                                                                 <span className={`px-2.5 py-0.5 rounded-full text-xs font-medium ${esEvaluado ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800'}`}>
                                                                     {esEvaluado ? 'Evaluado' : 'Pendiente'}
@@ -462,7 +593,7 @@ export const CoordinadorDashboard = ({ user,postulantes, ayudantes, loading }: C
                                                     const nota = esEvaluado ? (a.evaluacion! / 10).toFixed(1) : '-';
                                                     return (
                                                         <tr key={a.id} className="hover:bg-gray-50 transition">
-                                                            <td className="p-4 font-medium text-gray-900">{a.rut_alumno}</td>
+                                                            <td className="p-4 font-medium text-gray-900 whitespace-nowrap">{a.rut_alumno}</td>
                                                             <td className="p-4">{a.alumno.nombres} {a.alumno.apellidos}</td>
                                                             <td className="p-4 text-center">{a.asignatura}</td>
                                                             <td className={`p-4 text-center font-bold ${esEvaluado ? 'text-green-600' : 'text-gray-400'}`}>
@@ -564,7 +695,7 @@ export default function CoordinadorPage() {
 
     return (
         <div className="min-h-screen bg-gray-50">
-            {user.tipo === 'admin' ? (
+            {user.tipo === 'admin' || user.tipo === 'encargado_ayudantias' ? (
                 <CoordinadorAdmin adminUser={user} />
             ) : (
                 <CoordinadorUser user={user} />

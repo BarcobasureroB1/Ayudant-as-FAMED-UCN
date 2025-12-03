@@ -39,11 +39,11 @@ export const ModalSeleccionarCoordinadorAdmin = ({abierto, onClose, onSelect, co
                     <p className="text-sm text-gray-500">Elige un coordinador para visualizar y gestionar sus postulantes.</p>
                     
                     <div className="mt-4 relative">
-                        <Search className="absolute left-3 top-2.5 text-gray-400 w-4 h-4" />
+                        <Search className="absolute left-3 top-2.5 text-gray-800 w-4 h-4" />
                         <input 
                             type="text"
                             placeholder="Buscar por nombre o RUT..."
-                            className="w-full pl-9 pr-4 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 outline-none"
+                            className="w-full pl-9 pr-4 py-2 border border-gray-300 rounded-lg text-black focus:ring-2 focus:ring-blue-500 outline-none"
                             value={busqueda}
                             onChange={(e) => setBusqueda(e.target.value)}
                             autoFocus

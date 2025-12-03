@@ -171,7 +171,7 @@ export function useEvaluarPostulacion() {
       });
     },
     onSuccess: () => {
-      clienteQuery.invalidateQueries({queryKey: ["postulanteCoordinador"]});
+      clienteQuery.invalidateQueries({queryKey: ["postulantesCoordinador"]});
     },
   });
 }
