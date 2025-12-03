@@ -8,6 +8,7 @@ import { useEffect } from "react";
 import SecretariaDeptoPage from "../secretaria-depto/page";
 import { useAuth } from "@/context/AuthContext";
 import CoordinadorPage from "../coordinador/page";
+import DirectorDepartamentoPage from "../directorDepartamento/page";
 
 export default function DashboardPage() {
     const router = useRouter();
@@ -48,6 +49,9 @@ export default function DashboardPage() {
                 case 'encargado_ayudantias':
                     router.push("/adminDashboard");
                     break;
+                case 'director_depto':
+                    router.push("/directorDepartamento");
+                    break;
             }
         }
     }, [user, isLoading, rutaActual, router])
@@ -73,9 +77,9 @@ export default function DashboardPage() {
         return <CoordinadorPage/>;
     }
 
-    if(rutaActual.startsWith("/encargado-ayudantia"))
+    if (rutaActual.startsWith("/directorDepartamento"))
     {
-        //return <EncargadoAyudantiaPage/>;
+        return <DirectorDepartamentoPage/>;
     }
 
     if (isLoading)

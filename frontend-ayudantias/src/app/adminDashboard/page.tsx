@@ -25,14 +25,15 @@ const DashboardCard = ({
         description: string; 
         icon: string; 
         onClick: () => void;
-        color?: "blue" | "green" | "purple" | "red" | "yellow";
+        color?: "blue" | "green" | "purple" | "red" | "yellow" | "orange";
     }) => {
         const colorClasses = {
             blue: "bg-blue-50 border-blue-200 hover:bg-blue-100 text-blue-700",
             green: "bg-green-50 border-green-200 hover:bg-green-100 text-green-700",
             purple: "bg-purple-50 border-purple-200 hover:bg-purple-100 text-purple-700",
             red: "bg-red-50 border-red-200 hover:bg-red-100 text-red-700",
-            yellow: "bg-yellow-50 border-yellow-200 hover:bg-yellow-100 text-yellow-700"
+            yellow: "bg-yellow-50 border-yellow-200 hover:bg-yellow-100 text-yellow-700",
+            orange: "bg-orange-50 border-orange-200 hover:bg-orange-100 text-orange-700"
         };
 
         return (
@@ -80,7 +81,7 @@ export const AdminDashboard = ({user, usuarios}:UserProps) => {
         },
         {
             title: "Secretaría de Depto",
-            description: "Acceder a funciones de secretaría de depto (proximamente)",
+            description: "Acceder a funciones de secretaría de depto",
             icon: "📊",
             path:"/secretaria-depto",
             color: "green" as const
@@ -92,6 +93,13 @@ export const AdminDashboard = ({user, usuarios}:UserProps) => {
             path:"/coordinador",
             color: "yellow" as const
         },
+        {
+            title: "Director de Departamento",
+            description: "Acceder a funciones de director de departamento (proximamente)",
+            icon: "🏛️",
+            path:"/directorDepartamento",
+            color: "orange" as const
+        }
     ];
 
     const handleNavigation = (path: string) => {
@@ -172,6 +180,7 @@ export const AdminDashboard = ({user, usuarios}:UserProps) => {
                     <div className="col-span-1 md:col-span-2 lg:col-span-3">
                         <AutorizarConcursos 
                             onClose={() => setMostrarAutorizarConcursos(false)} 
+                            mostrar={true}
                             asignaturasConcursos={asignaturasConcursos}
                         />
                     </div>
