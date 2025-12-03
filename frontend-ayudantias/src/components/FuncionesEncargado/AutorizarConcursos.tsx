@@ -15,9 +15,11 @@ interface Asignatura {
 export default function AdministrarAsignaturas({
   onClose,
   asignaturasConcursos,
+  mostrar,
 }: {
   onClose: () => void;
   asignaturasConcursos: Asignatura[];
+  mostrar: boolean;
 }) {
   const autorizarConcurso = useAutorizarConcurso();
   const denegarConcurso = useDenegarConcurso();
@@ -94,12 +96,14 @@ export default function AdministrarAsignaturas({
         <h2 className="text-xl font-semibold text-gray-800">
           Administración de Asignaturas
         </h2>
+        {mostrar && (
         <button
           onClick={onClose}
           className="px-3 py-1.5 bg-red-500 text-white rounded-md hover:bg-red-600"
         >
           Cerrar
         </button>
+        )}
       </div>
 
       {/* BUSQUEDA + CONTROLES */}

@@ -1,6 +1,6 @@
 import { NextResponse, NextRequest } from "next/server";
 
-const rutasProtegidas = ["/postulante", "/adminDashboard", "/secretaria-depto", "/coordinador"];
+const rutasProtegidas = ["/postulante", "/adminDashboard", "/secretaria-depto", "/coordinador", "/directorDepartamento"];
 
 
 export function middleware(request: NextRequest)
@@ -54,7 +54,6 @@ export function middleware(request: NextRequest)
         //se redirige al dashboard para ir a la vista segun el rol del usuario
         return NextResponse.redirect(new URL("/dashboard", request.url));
     }
-    
 
 
     return NextResponse.next();
@@ -62,5 +61,5 @@ export function middleware(request: NextRequest)
 
 //rutas a las que afecta el middleware
 export const config = {
-    matcher: ["/adminDashboard", "/login", "/postulante", "/secretaria-depto", "/coordinador"],
+    matcher: ["/adminDashboard", "/login", "/postulante", "/secretaria-depto", "/coordinador", "/directorDepartamento"],
 };
