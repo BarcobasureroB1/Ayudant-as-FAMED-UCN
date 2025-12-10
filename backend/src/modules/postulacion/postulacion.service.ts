@@ -43,7 +43,7 @@ export class PostulacionService {
       usuario,
       asignatura,
     });
-    console.log('Postulacion to be saved:', postulacion);
+   
     return this.postulacionRepository.save(postulacion);
   }
   async cancel(id: number) {
@@ -152,7 +152,7 @@ export class PostulacionService {
         'usuario.rut AS rut_alumno',
         'usuario.nombres AS alumno_nombres',
         'usuario.apellidos AS alumno_apellidos',
-        'usuario.correo AS alumno_correo',
+        
         'asignatura.id AS id_asignatura',
         'p.descripcion_carta AS descripcion_carta',
         'p.metodologia AS metodologia',
