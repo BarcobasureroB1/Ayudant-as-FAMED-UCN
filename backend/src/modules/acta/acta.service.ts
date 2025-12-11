@@ -67,8 +67,11 @@ export class ActaService {
     
   }
 
-  findAll() {
-    return `This action returns all acta`;
+  async findAll() {
+    return this.actaRepository.find({
+      relations: ['firmas', 'participantes'],
+      order: { id: 'DESC' },
+    });
   }
 
   findOne(id: number) {

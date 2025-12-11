@@ -53,11 +53,11 @@ export class AuthService {
     const alumnoExists = await this.alumnoService.findByRut(registerDto.rut);
     if (!alumnoExists) {
       newUser.tipo = registerDto.tipo;
-      console.log('alumno no encontrado asignando tipo dto:', newUser.tipo);
+      throw new Error('El usuario no tiene data de alumno registrado');
     }
     else {
-      newUser.tipo = 'alumno';
-      console.log('alumno encontrado asignado tipo alumno:', newUser.tipo);
+      newUser.tipo = registerDto.tipo;
+      console.log('alumno encontrado asignado tipo:', newUser.tipo);
     }
     newUser.password = hashedPassword;
     newUser.c_ayudantias = 0;
