@@ -17,7 +17,7 @@ export default function AdministrarEstudiantes() {
         const t = busqueda.toLowerCase();
 
         return (alumnos || []).filter((u: any) =>
-            `${u.rut_alumno} ${u.nombres} ${u.apellidos}`
+            `${u.rut} ${u.nombres} ${u.apellidos}`
                 .toLowerCase()
                 .includes(t)
         );
@@ -137,10 +137,10 @@ export default function AdministrarEstudiantes() {
                     <tbody>
                         {alumnosPaginados.map((est: any, index: number) => (
                             <tr
-                                key={`${est.rut_alumno || "sin-rut"}-${index}`}
+                                key={`${est.rut || "sin-rut"}-${index}`}
                                 className="border-b hover:bg-gray-50 transition"
                             >
-                                <td className="py-3 px-4">{est.rut_alumno}</td>
+                                <td className="py-3 px-4">{est.rut}</td>
                                 <td className="py-3 px-4">
                                     {est.nombres} {est.apellidos}
                                 </td>
@@ -148,14 +148,14 @@ export default function AdministrarEstudiantes() {
                                 <td className="py-3 px-4 text-center">
                                     {!est.deshabilitado ? (
                                         <button
-                                            onClick={() => deshabilitar.mutate(est.rut_alumno)}
+                                            onClick={() => deshabilitar.mutate(est.rut)}
                                             className="bg-red-600 hover:bg-red-700 text-white py-2 px-4 rounded-lg transition"
                                         >
                                             Deshabilitar
                                         </button>
                                     ) : (
                                         <button
-                                            onClick={() => habilitar.mutate(est.rut_alumno)}
+                                            onClick={() => habilitar.mutate(est.rut)}
                                             className="bg-green-600 hover:bg-green-700 text-white py-2 px-4 rounded-lg transition"
                                         >
                                             Habilitar

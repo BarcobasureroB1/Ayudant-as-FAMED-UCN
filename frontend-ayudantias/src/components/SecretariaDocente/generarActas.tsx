@@ -2,8 +2,7 @@
 
 import { useState } from "react";
 import { useDepartamentos } from "@/hooks/useDepartamento";
-import { useCrearAyudantia } from "@/hooks/useActas";
-import { useUserProfile } from "@/hooks/useUserProfile";
+import { useCrearActa } from "@/hooks/useActas";
 
 interface Participante {
     nombre: string;
@@ -28,7 +27,7 @@ interface FormActa {
 
 export default function GenerarActa({ rutSecretario }: { rutSecretario: string }) {
     const { data: departamentos, isLoading } = useDepartamentos();
-    const crearActa = useCrearAyudantia();
+    const crearActa = useCrearActa();
 
     const [form, setForm] = useState<FormActa>({
         departamento: "",
@@ -102,7 +101,6 @@ export default function GenerarActa({ rutSecretario }: { rutSecretario: string }
         <div className="p-6 bg-white rounded-xl shadow-md border border-gray-200 w-full text-black">
             <h2 className="text-2xl font-semibold mb-6">Generar Acta</h2>
 
-            {/* Departamento */}
             <div className="mb-4">
                 <label className="block mb-1 font-medium">Departamento</label>
                 <select
@@ -123,7 +121,6 @@ export default function GenerarActa({ rutSecretario }: { rutSecretario: string }
                 </select>
             </div>
 
-            {/* Fecha */}
             <div className="mb-4">
                 <label className="block mb-1 font-medium">Fecha de la reunión</label>
                 <input
@@ -134,7 +131,6 @@ export default function GenerarActa({ rutSecretario }: { rutSecretario: string }
                 />
             </div>
 
-            {/* Horas */}
             <div className="grid grid-cols-2 gap-4 mb-4">
                 <div>
                     <label className="block mb-1 font-medium">Hora inicio</label>
@@ -157,7 +153,6 @@ export default function GenerarActa({ rutSecretario }: { rutSecretario: string }
                 </div>
             </div>
 
-            {/* Lugar */}
             <div className="mb-4">
                 <label className="block mb-1 font-medium">Lugar de reunión</label>
                 <input
@@ -168,7 +163,6 @@ export default function GenerarActa({ rutSecretario }: { rutSecretario: string }
                 />
             </div>
 
-            {/* Participantes */}
             <div className="mb-4">
                 <label className="block font-medium mb-2">Participantes</label>
 
@@ -206,7 +200,6 @@ export default function GenerarActa({ rutSecretario }: { rutSecretario: string }
                 </button>
             </div>
 
-            {/* Firmas */}
             <div className="mb-4">
                 <label className="block font-medium mb-2">Firmas</label>
 
@@ -237,7 +230,6 @@ export default function GenerarActa({ rutSecretario }: { rutSecretario: string }
                 </button>
             </div>
 
-            {/* Submit */}
             <button
                 onClick={enviar}
                 className="mt-6 bg-green-600 hover:bg-green-700 text-white py-3 px-6 rounded-lg"

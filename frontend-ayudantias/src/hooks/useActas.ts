@@ -19,15 +19,15 @@ export interface CrearAyudantíaData {
     }[];  
 }
 
-export function useCrearAyudantia() {
+export function useCrearActa() {
     const clienteQuery = useQueryClient();
     return useMutation({
         mutationFn: async (ayudantia: CrearAyudantíaData) => {
-            const respuesta = await api.post('ayudantia', ayudantia);
+            const respuesta = await api.post('acta', ayudantia);
             return respuesta.data;
         },
         onSuccess: (_data) => {
-            clienteQuery.invalidateQueries({ queryKey: ['ayudantias'] });
+            clienteQuery.invalidateQueries({ queryKey: ['actas'] });
         },
     });
 }
