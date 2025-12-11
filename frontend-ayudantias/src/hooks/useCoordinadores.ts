@@ -135,7 +135,7 @@ export function usePostulantesCoordinador(rut_coordinador?: string) {
         return [];
       }
 
-      const respuesta = await api.get(`postulaciones/coordinador/${rut_coordinador}`);
+      const respuesta = await api.get(`postulacion/coordinador/${rut_coordinador}`);
 
       const data = respuesta.data as PostulanteCoordinadorData[];
       return data.sort((a, b) => b.puntuacion_etapa1 - a.puntuacion_etapa1); //mayor valor puntaje desde backend para la etapa 1 primero
@@ -154,7 +154,7 @@ export function useAyudantesActivos(rut_coordinador?:string) {
         return [];
       }
 
-      const respuesta = await api.get(`ayudantias/coordinador/${rut_coordinador}`);
+      const respuesta = await api.get(`ayudantia/coordinador/${rut_coordinador}`);
       return respuesta.data;
     },
     enabled: !!rut_coordinador,
@@ -166,7 +166,7 @@ export function useEvaluarPostulacion() {
   const clienteQuery = useQueryClient();
   return useMutation({
     mutationFn: async ({id_postulacion, puntuacion_etapa2}: EvaluarPostulacion) => {
-      await api.patch(`evaluar-postulacion/${id_postulacion}`, {
+      await api.patch(`postulacion/puntuacionetapa2/${id_postulacion}`, {
         puntuacion_etapa2
       });
     },
@@ -182,7 +182,7 @@ export function useDescartarPostulacion() {
   const clienteQuery = useQueryClient();
   return useMutation({
     mutationFn: async ({id_postulacion, motivo_descarte, fecha_descarte, rechazada_por_jefatura}: DescartarPostulacion) => {
-      await api.patch(`descartar-postulacion/${id_postulacion}`, {
+      await api.patch(`postulacion/descartar-postulacion/${id_postulacion}`, {
         motivo_descarte,
         fecha_descarte,
         rechazada_por_jefatura
@@ -199,7 +199,7 @@ export function useEvaluarAyudanteFinal() {
   const clienteQuery = useQueryClient();
   return useMutation({
     mutationFn: async ({id_ayudantia, evaluacion}: EvaluarAyudante) => {
-      await api.patch(`ayudantias/${id_ayudantia}`, {
+      await api.patch(`ayudantia/${id_ayudantia}`, {
         evaluacion
       });
     },

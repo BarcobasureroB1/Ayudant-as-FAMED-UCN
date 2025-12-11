@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-//import { PostulanteCoordinadorData, AyudanteActivoData } from '@/hooks/useCoordinadores';
+import { PostulanteCoordinadorData, AyudanteActivoData } from '@/hooks/useCoordinadores';
 
 interface DescarteProps {
     onClose: () => void;
