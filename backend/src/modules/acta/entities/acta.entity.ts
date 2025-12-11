@@ -6,7 +6,7 @@ export class Acta {
     id: number;
     @Column()
     departamento: string;
-    @Column()
+    @Column(type => Date)
     fecha: Date;
     @Column()
     hora_inicio: string;
