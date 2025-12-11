@@ -16,6 +16,7 @@ import { useTodasAsignaturas } from '@/hooks/useAsignaturas';
 import {ModalDescarte} from '@/components/Coordinador/ModalDescarte';
 import {ModalEvaluacionPostulante} from '@/components/Coordinador/ModalEvaluacionPostulante'; 
 import {ModalEvaluacionAyudante} from '@/components/Coordinador/ModalEvaluacionAyudante';
+import { ModalVerCurriculum } from '@/components/Coordinador/ModalVerCurriculum';
 import { CoordinadorAdmin } from '@/components/Coordinador/CoordinadorAdmin';
 import { CoordinadorUser } from '@/components/Coordinador/CoordinadorUser';
 import { Filter, Search } from 'lucide-react';
@@ -39,10 +40,11 @@ export const CoordinadorDashboard = ({ user,postulantes, ayudantes, loading }: C
     const router = useRouter();
     const { setToken, setUsertipo } = useAuth();
 
-    const [postulantesLocales, setPostulantesLocales] = useState<PostulanteCoordinadorData[]>([]);
-    const [ayudantesLocales, setAyudantesLocales] = useState<AyudanteActivoData[]>([]);
+    //const [postulantesLocales, setPostulantesLocales] = useState<PostulanteCoordinadorData[]>([]);
+    //const [ayudantesLocales, setAyudantesLocales] = useState<AyudanteActivoData[]>([]);
+    const [rutVerCurriculum, setRutVerCurriculum] = useState<string | null>(null);
 
-    useEffect(() => {
+    /*useEffect(() => {
         if (postulantes)
         {
             setPostulantesLocales(postulantes);
@@ -51,7 +53,7 @@ export const CoordinadorDashboard = ({ user,postulantes, ayudantes, loading }: C
         {
             setAyudantesLocales(ayudantes);
         }
-    }, [postulantes, ayudantes]);
+    }, [postulantes, ayudantes]);*/
 
     type Vista = 'Postulantes' | 'Ayudantes';
     const [vista, setVista] = useState<Vista>('Postulantes');
@@ -99,21 +101,21 @@ export const CoordinadorDashboard = ({ user,postulantes, ayudantes, loading }: C
     const opcionesDisp = useMemo(() => {
         if (isPostulantes)
         {
-            //const ids = Array.from(new Set(listaPostulantes.map(p => p.id_asignatura)));
-            const ids = Array.from(new Set(postulantesLocales.map(p => p.id_asignatura)));
+            const ids = Array.from(new Set(listaPostulantes.map(p => p.id_asignatura)));
+            //const ids = Array.from(new Set(postulantesLocales.map(p => p.id_asignatura)));
             return ids.map(id => ({
                 id: id.toString(),
                 nombre: mapAsig[id] || `Asignatura ${id}`
             })).sort((a,b) => a.nombre.localeCompare(b.nombre));
         } else {
-            //const nombres = Array.from(new Set(listaAyudantes.map(a => a.asignatura)));
-            const nombres = Array.from(new Set(ayudantesLocales.map(a => a.asignatura)));
+            const nombres = Array.from(new Set(listaAyudantes.map(a => a.asignatura)));
+            //const nombres = Array.from(new Set(ayudantesLocales.map(a => a.asignatura)));
             return nombres.map(nombre => ({
                 id: nombre,
                 nombre: nombre
             })).sort((a,b) => a.nombre.localeCompare(b.nombre));
         }
-    }, [isPostulantes, /*listaPostulantes*/, /*listaAyudantes*/, mapAsig, postulantesLocales, ayudantesLocales]);
+    }, [isPostulantes, listaPostulantes, listaAyudantes, mapAsig, /*postulantesLocales*/, /*ayudantesLocales*/]);
 
     const dataFiltrada = useMemo(() => {
         let data: any[] = [];
@@ -126,7 +128,7 @@ export const CoordinadorDashboard = ({ user,postulantes, ayudantes, loading }: C
                                    p.rut_alumno.toLowerCase().includes(busqueda.toLowerCase());
                 const matchAsignatura = filtroAsignatura ? p.id_asignatura.toString() === filtroAsignatura : true;
                 return matchTexto && matchAsignatura && !p.motivo_descarte;*/
-            data = postulantesLocales.filter(p => {
+            data = listaPostulantes.filter(p => {
                 const matchTexto = p.alumno.nombres.toLowerCase().includes(busqueda.toLowerCase()) ||
                                    p.rut_alumno.toLowerCase().includes(busqueda.toLowerCase());
                 const matchAsignatura = filtroAsignatura ? p.id_asignatura.toString() === filtroAsignatura : true;
@@ -156,18 +158,18 @@ export const CoordinadorDashboard = ({ user,postulantes, ayudantes, loading }: C
 
         }else if (isAyudantes /*&& ayudantes*/)
         {
-            /*data = listaAyudantes.filter(a => {
-                const matchTexto = a.alumno.nombres.toLowerCase().includes(busqueda.toLowerCase()) ||
-                                   a.rut_alumno.toLowerCase().includes(busqueda.toLowerCase());
-                const matchAsignatura = filtroAsignatura ? a.asignatura.toString() === filtroAsignatura : true;
-                return matchTexto && matchAsignatura;
-           });*/
-           data = ayudantesLocales.filter(a => {
+            data = listaAyudantes.filter(a => {
                 const matchTexto = a.alumno.nombres.toLowerCase().includes(busqueda.toLowerCase()) ||
                                    a.rut_alumno.toLowerCase().includes(busqueda.toLowerCase());
                 const matchAsignatura = filtroAsignatura ? a.asignatura.toString() === filtroAsignatura : true;
                 return matchTexto && matchAsignatura;
            });
+           /*data = ayudantesLocales.filter(a => {
+                const matchTexto = a.alumno.nombres.toLowerCase().includes(busqueda.toLowerCase()) ||
+                                   a.rut_alumno.toLowerCase().includes(busqueda.toLowerCase());
+                const matchAsignatura = filtroAsignatura ? a.asignatura.toString() === filtroAsignatura : true;
+                return matchTexto && matchAsignatura;
+           });*/
 
            if (ordenNota === 'desc')
             {
@@ -178,7 +180,7 @@ export const CoordinadorDashboard = ({ user,postulantes, ayudantes, loading }: C
             }
         }
         return data;
-    }, [filtroEstado, ayudantesLocales, postulantesLocales,isPostulantes, isAyudantes, /*listaPostulantes*/, /*listaAyudantes*/, busqueda, filtroAsignatura, ordenPuntaje, ordenPuntaje2, ordenNota])
+    }, [filtroEstado,isPostulantes, isAyudantes, listaPostulantes, listaAyudantes, busqueda, filtroAsignatura, ordenPuntaje, ordenPuntaje2, ordenNota])
 
     const handleBackToAdmin = () => {
         router.push('/adminDashboard');
@@ -193,7 +195,7 @@ export const CoordinadorDashboard = ({ user,postulantes, ayudantes, loading }: C
             router.refresh();
         }
 
-    /*const handleConfirmarDescarte = async (motivo: string) => {
+    const handleConfirmarDescarte = async (motivo: string) => {
         if (idPostulacionDescartar)
         {
             await descartarPostulacion.mutateAsync({
@@ -204,8 +206,8 @@ export const CoordinadorDashboard = ({ user,postulantes, ayudantes, loading }: C
             });
             setIdPostulacionDescartar(null);
         }
-    };*/
-    const handleConfirmarDescarte = async (motivo: string) => {
+    };
+    /*const handleConfirmarDescarte = async (motivo: string) => {
         if (idPostulacionDescartar)
         {
             setPostulantesLocales(prev => prev.map(p => 
@@ -216,10 +218,10 @@ export const CoordinadorDashboard = ({ user,postulantes, ayudantes, loading }: C
             alert("Postulación decartada");
             setIdPostulacionDescartar(null);
         }
-    };
+    };*/
 
 
-    /*const handleConfirmarEvaluacionPost = async (puntajeTotal: number) => {
+    const handleConfirmarEvaluacionPost = async (puntajeTotal: number) => {
         if (postulanteAEvaluar)
         {
             await evaluarPostulacion.mutateAsync({
@@ -228,8 +230,8 @@ export const CoordinadorDashboard = ({ user,postulantes, ayudantes, loading }: C
             });
             setPostulanteAEvaluar(null);
         }
-    };*/
-    const handleConfirmarEvaluacionPost = async (puntajeTotal: number) => {
+    };
+    /*const handleConfirmarEvaluacionPost = async (puntajeTotal: number) => {
         if (postulanteAEvaluar)
         {
             setPostulantesLocales(prev => prev.map(p => 
@@ -241,10 +243,10 @@ export const CoordinadorDashboard = ({ user,postulantes, ayudantes, loading }: C
             alert(`Postulante evaluado con ${puntajeTotal} puntos`);
             setPostulanteAEvaluar(null);
         }
-    };
+    };*/
 
 
-    /*const handleConfirmarEvaluacionAyu = async (nota: number) => {
+    const handleConfirmarEvaluacionAyu = async (nota: number) => {
         if (ayudanteAEvaluar)
         {
             await evaluarAyudante.mutateAsync({
@@ -253,10 +255,10 @@ export const CoordinadorDashboard = ({ user,postulantes, ayudantes, loading }: C
             });
             setAyudanteAEvaluar(null);
         }
-    };*/
+    };
 
 
-    const handleConfirmarEvaluacionAyu = async (nota: number) => {
+    /*const handleConfirmarEvaluacionAyu = async (nota: number) => {
         if (ayudanteAEvaluar)
         {
             setAyudantesLocales(prev => prev.map(a => 
@@ -268,7 +270,7 @@ export const CoordinadorDashboard = ({ user,postulantes, ayudantes, loading }: C
             alert(`Nota actualizada a ${(nota/10).toFixed(1)}`);
             setAyudanteAEvaluar(null);
         }
-    };
+    };*/
 
     const totalPaginas = Math.ceil(dataFiltrada.length / (itemsPagina || 1));
     const indiceInicio = (paginaActual - 1) * (itemsPagina || 1);
@@ -577,6 +579,15 @@ export const CoordinadorDashboard = ({ user,postulantes, ayudantes, loading }: C
                                                                 >
                                                                     {esEvaluado ? 'Editar' : 'Evaluar'}
                                                                 </button>
+
+                                                                <button 
+                                                                    onClick={() => setRutVerCurriculum(p.rut_alumno)} 
+                                                                    className="bg-indigo-50 text-indigo-700 border border-indigo-200 px-3 py-1.5 rounded hover:bg-indigo-100 text-xs font-medium transition-colors flex items-center gap-1 shadow-sm"
+                                                                    title="Ver Curriculum Vitae"
+                                                                >
+                                                                    <span>📄</span> CV
+                                                                </button>
+
                                                                 <button 
                                                                     onClick={() => setIdPostulacionDescartar(p.id)} 
                                                                     className="bg-white border border-red-200 text-red-600 px-3 py-1.5 rounded hover:bg-red-50 text-xs font-medium"
@@ -657,6 +668,15 @@ export const CoordinadorDashboard = ({ user,postulantes, ayudantes, loading }: C
                     onConfirm={handleConfirmarEvaluacionAyu} 
                 />
             )}
+
+            {rutVerCurriculum && (
+                <ModalVerCurriculum 
+                    rut={rutVerCurriculum} 
+                    onClose={() => setRutVerCurriculum(null)} 
+                />
+            )}
+
+
         </div>        
     );
 };
