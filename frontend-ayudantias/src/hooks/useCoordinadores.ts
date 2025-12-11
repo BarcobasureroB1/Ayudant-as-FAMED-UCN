@@ -1,4 +1,4 @@
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { useMutation, useQueries, useQuery, useQueryClient } from "@tanstack/react-query";
 import api from "../api/axios";
 
 export interface CoordinadorAsignatura {
@@ -208,4 +208,55 @@ export function useEvaluarAyudanteFinal() {
     }
 
   });
-};
+}
+
+export function usePostulantesGlobales() {
+  const { data: coordinadores } = useCoordinadoresTodos();
+
+  const queries = useQueries({
+    queries: (coordinadores || []).map((coord: CoordinadorData) => ({
+      queryKey: ["postulantesCoordinador", coord.rut],
+      queryFn: async () => {
+        const respuesta = await api.get(`postulacion/coordinador/${coord.rut}`);
+        const data = respuesta.data as PostulanteCoordinadorData[];
+        return data.map(item => ({
+            ...item,
+            rut_coordinador: coord.rut,
+            nombre_coordinador: `${coord.nombres} ${coord.apellidos}`
+        }));
+      },
+      enabled: !!coord.rut,
+    }))
+  });
+
+  const data = queries.flatMap(q => (q.data as unknown as PostulanteCoordinadorData[]) || []);
+  const isLoading = queries.some(q => q.isLoading);
+  return {data, isLoading};
+}
+
+export function useAyudantesGlobales() {
+  const { data: coordinadores } = useCoordinadoresTodos();
+
+  const queries = useQueries({
+    queries: (coordinadores || []).map((coord: CoordinadorData) => ({
+      queryKey: ["ayudantesActivos", coord.rut],
+      queryFn: async () => {
+        const respuesta = await api.get(`ayudantia/coordinador/${coord.rut}`);
+        const data = respuesta.data as AyudanteActivoData[];
+        return data.map(item => ({
+            ...item,
+            rut_coordinador: coord.rut,
+            nombre_coordinador: `${coord.nombres} ${coord.apellidos}`
+        }));
+      },
+      enabled: !!coord.rut,
+    }))
+  });
+
+  const data = queries.flatMap(q => (q.data as unknown as AyudanteActivoData[]) || []);
+  const isLoading = queries.some(q => q.isLoading);
+  return {data, isLoading};
+}
+
+
+
