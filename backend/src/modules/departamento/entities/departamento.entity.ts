@@ -1,6 +1,7 @@
+import { Acta } from 'src/modules/acta/entities/acta.entity';
 import { Asignatura } from 'src/modules/asignatura/entities/asignatura.entity';
 import { Usuario } from 'src/modules/usuario/entities/usuario.entity';
-import { Column, Entity, JoinTable, ManyToMany, PrimaryGeneratedColumn } from 'typeorm';
+import { Column, Entity, JoinTable, ManyToMany, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
 
 @Entity()
 export class Departamento {
@@ -8,6 +9,9 @@ export class Departamento {
     id: number;
     @Column()
     nombre: string
+
+    @OneToMany(() => Acta, (acta) => acta.id_departamento)
+    actas: Acta[];
 
     @ManyToMany(() => Usuario, (usuario) => usuario.departamentos)
     @JoinTable({

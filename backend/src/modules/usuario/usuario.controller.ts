@@ -44,4 +44,13 @@ export class UsuarioController {
     return this.usuarioService.cambiartipo(rut_usuario, nuevo_tipo);
   }
 
+  @Patch('deshabilitar/:rut')
+  deshabilitarUsuario(@Param('rut') rut: string) {
+    return this.usuarioService.deshabilitarUsuario(rut);
+  }
+  @Patch('habilitar/:rut')
+  habilitarUsuario(@Param('rut') rut: string) {
+    return this.usuarioService.habilitarUsuario(rut);
+  }
+
 }
