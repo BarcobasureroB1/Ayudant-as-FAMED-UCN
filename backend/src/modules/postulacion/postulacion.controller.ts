@@ -38,6 +38,11 @@ export class PostulacionController {
   findByCoordinador(@Param('rut_coordinador') rut_coordinador: string) {
     return this.postulacionService.findPostulacionesByCoordinadorRut(rut_coordinador);
   }
+  @Get('coordinador')
+  findAllByCoordinador() {
+    return this.postulacionService.findPostulacionesByCoordinadores();
+  }
+
   @Patch('puntuacionetapa2/:id')
   puntuacionetapa2(@Param('id') id: string, @Body() puntuacion_etapa2: PuntuarDto) {
     const puntuacion = puntuacion_etapa2.puntuacion_etapa2;

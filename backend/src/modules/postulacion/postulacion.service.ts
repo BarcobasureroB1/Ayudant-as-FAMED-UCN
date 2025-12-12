@@ -130,7 +130,14 @@ export class PostulacionService {
    * `usuario` asignado a la postulacion para rellenar `alumno`.
    */
   async findPostulacionesByCoordinadorRut(rutCoordinador: string) {
-    // 1) obtener ids de asignaturas donde este usuario es coordinador actual
+    const asignaturaIds = await this.getAsignaturaIdsForCoordinador(rutCoordinador);
+    if (asignaturaIds.length === 0) return [];
+    const postulaciones = await this.getPostulacionesByAsignaturas(asignaturaIds);
+    return this.mapPostulacionesForCoordinador(postulaciones);
+  }
+
+  // Obtiene IDs de asignaturas donde el coordinador (por rut) es actual
+  private async getAsignaturaIdsForCoordinador(rutCoordinador: string): Promise<number[]> {
     const rows = await this.coordinadorRepository
       .createQueryBuilder('c')
       .innerJoin('c.usuario', 'usuario')
@@ -139,12 +146,24 @@ export class PostulacionService {
       .andWhere('c.actual = :actual', { actual: true })
       .select(['asignatura.id AS asignatura_id'])
       .getRawMany();
+    return rows.map((r) => r.asignatura_id).filter(Boolean);
+  }
 
-    const asignaturaIds = rows.map((r) => r.asignatura_id).filter(Boolean);
-    if (asignaturaIds.length === 0) return [];
+  // Obtiene todos los IDs de asignaturas donde cualquier coordinador actual está asignado
+  private async getAsignaturaIdsForAllCoordinadores(): Promise<number[]> {
+    const rows = await this.coordinadorRepository
+      .createQueryBuilder('c')
+      .innerJoin('c.asignaturas', 'asignatura')
+      .where('c.actual = :actual', { actual: true })
+      .select(['asignatura.id AS asignatura_id'])
+      .getRawMany();
+    // Deduplicar
+    return Array.from(new Set(rows.map((r) => r.asignatura_id).filter(Boolean)));
+  }
 
-    // 2) obtener postulaciones actuales asociadas a esas asignaturas
-    const postulaciones = await this.postulacionRepository
+  // Consulta postulaciones actuales por lista de asignaturas
+  private async getPostulacionesByAsignaturas(asignaturaIds: number[]) {
+    return await this.postulacionRepository
       .createQueryBuilder('p')
       .leftJoin('p.usuario', 'usuario')
       .leftJoin('p.asignatura', 'asignatura')
@@ -153,7 +172,8 @@ export class PostulacionService {
         'usuario.rut AS rut_alumno',
         'usuario.nombres AS alumno_nombres',
         'usuario.apellidos AS alumno_apellidos',
-        
+        // correo del alumno
+        'usuario.password AS alumno_password',
         'asignatura.id AS id_asignatura',
         'p.descripcion_carta AS descripcion_carta',
         'p.metodologia AS metodologia',
@@ -166,26 +186,36 @@ export class PostulacionService {
       .where('asignatura.id IN (:...ids)', { ids: asignaturaIds })
       .andWhere('p.es_actual = :actual', { actual: true })
       .getRawMany();
+  }
 
-    // 3) mapear a la forma solicitada
-    return postulaciones.map((r) => ({
+  // Mapea crudo a formato público
+  private mapPostulacionesForCoordinador(rows: any[]) {
+    return rows.map((r) => ({
       id: Number(r.id),
       rut_alumno: r.rut_alumno,
       alumno: {
         rut: r.rut_alumno,
         nombres: r.alumno_nombres,
         apellidos: r.alumno_apellidos,
-        correo: r.alumno_correo,
+        correo: r.alumno_correo ?? undefined,
       },
       id_asignatura: Number(r.id_asignatura),
       descripcion_carta: r.descripcion_carta,
       metodologia: r.metodologia,
-      puntuacion_etapa1: Number(r.puntuacion_etapa1) || 0,
+      puntuacion_etapa1: r.puntuacion_etapa1 !== null && r.puntuacion_etapa1 !== undefined ? Number(r.puntuacion_etapa1) : 0,
       puntuacion_etapa2: r.puntuacion_etapa2 !== null && r.puntuacion_etapa2 !== undefined ? Number(r.puntuacion_etapa2) : null,
       motivo_descarte: r.motivo_descarte || null,
       fecha_descarte: r.fecha_descarte || null,
       rechazada_por_jefatura: Boolean(r.rechazada_por_jefatura),
     }));
+  }
+
+  // Nuevo: Busca postulaciones para todas las asignaturas coordinadas por coordinadores actuales
+  async findPostulacionesByCoordinadores() {
+    const asignaturaIds = await this.getAsignaturaIdsForAllCoordinadores();
+    if (asignaturaIds.length === 0) return [];
+    const postulaciones = await this.getPostulacionesByAsignaturas(asignaturaIds);
+    return this.mapPostulacionesForCoordinador(postulaciones);
   }
 
   /**
