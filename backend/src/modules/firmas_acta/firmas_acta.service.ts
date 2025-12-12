@@ -1,11 +1,19 @@
 import { Injectable } from '@nestjs/common';
 import { CreateFirmasActaDto } from './dto/create-firmas_acta.dto';
+import { InjectRepository } from '@nestjs/typeorm';
+import { FirmasActa } from './entities/firmas_acta.entity';
+import { Repository } from 'typeorm';
 
 
 @Injectable()
 export class FirmasActaService {
+  constructor(
+    @InjectRepository(FirmasActa)
+    private readonly firmasActaRepository: Repository<FirmasActa>,  
+  ) {}
   create(createFirmasActaDto: CreateFirmasActaDto) {
-    return 'This action adds a new firmasActa';
+    const firmasActa = this.firmasActaRepository.create(createFirmasActaDto);
+    return this.firmasActaRepository.save(firmasActa);
   }
 
   findAll() {

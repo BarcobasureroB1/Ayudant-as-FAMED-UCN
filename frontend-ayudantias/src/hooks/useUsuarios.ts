@@ -29,3 +29,29 @@ export function useCambiarTipoUsuario() {
     });
 
 }
+
+export function useDeshabilitarUsuario(){   
+    const clienteQuery = useQueryClient();
+    return useMutation({
+        mutationFn: async (rut : string) => {
+            await api.patch(`/usuario/deshabilitar/${rut}`)
+        },
+        onSuccess: (_data) => {
+            clienteQuery.invalidateQueries({queryKey:['usuarios']});
+        }                        
+    });
+
+}
+
+export function useHabilitarUsuario(){   
+    const clienteQuery = useQueryClient();
+    return useMutation({
+        mutationFn: async (rut : string) => {
+            await api.patch(`/usuario/habilitar/${rut}`)
+        },
+        onSuccess: (_data) => {
+            clienteQuery.invalidateQueries({queryKey:['usuarios']});
+        }                        
+    });
+
+}

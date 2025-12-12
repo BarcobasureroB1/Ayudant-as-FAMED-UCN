@@ -88,18 +88,26 @@ export const AdminDashboard = ({user, usuarios}:UserProps) => {
         },
         {
             title: "Coordinador",
-            description: "Acceder a funciones de coordinador (proximamente)",
+            description: "Acceder a funciones de coordinador",
             icon: "📄",
             path:"/coordinador",
             color: "yellow" as const
         },
         {
             title: "Director de Departamento",
-            description: "Acceder a funciones de director de departamento (proximamente)",
+            description: "Acceder a funciones de director de departamento",
             icon: "🏛️",
             path:"/directorDepartamento",
             color: "orange" as const
+        },
+        {
+            title: "Secretaría Docente",
+            description: "Acceder a funciones de secretaría docente",
+            icon: "📝",
+            path:"/secretariaDocente",
+            color: "purple" as const
         }
+
     ];
 
     const handleNavigation = (path: string) => {

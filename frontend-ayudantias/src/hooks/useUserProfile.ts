@@ -15,7 +15,6 @@ export function useUserProfile(){
         queryKey:['user'],
         queryFn: async () => {
             const respuesta = await api.get('/auth/profile');
-            console.log("datos usuario: ", respuesta.data);
             return respuesta.data;
         },
     });

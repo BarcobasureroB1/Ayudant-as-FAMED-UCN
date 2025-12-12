@@ -103,6 +103,7 @@ export class PostulacionService {
         'postulacion.puntuacion_etapa2 AS puntuacion_etapa2',
       ])
       .where('postulacion.es_actual = :actual', { actual: true })
+      .andWhere('postulacion.rechazada_por_jefatura = false')
       .getRawMany();
 
     return rows.map((r) => ({
@@ -250,6 +251,7 @@ export class PostulacionService {
     postulacion.fecha_descarte = dto.fecha_descarte;
     return await this.postulacionRepository.save(postulacion);
   }
+  
 
   
 }

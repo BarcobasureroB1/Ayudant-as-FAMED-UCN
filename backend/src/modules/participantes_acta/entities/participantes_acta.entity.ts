@@ -11,6 +11,6 @@ export class ParticipantesActa {
     @Column()
     cargo : string;
     @Column()
-    coreroo : string;
+    correo : string;
     
 }

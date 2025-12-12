@@ -73,4 +73,21 @@ async create(createUsuarioDto: CreateUsuarioDto) {
     return await this.usuarioRepository.save(usuario);
 
   }
+  async deshabilitarUsuario(rut_usuario: string) {
+    const usuario = await this.usuarioRepository.findOneBy({ rut: rut_usuario  });
+    if (!usuario) {
+      throw new Error('Usuario no encontrado');
+    }
+    usuario.deshabilitado = true;
+    return await this.usuarioRepository.save(usuario);
+  }
+
+  async habilitarUsuario(rut_usuario: string) {
+    const usuario = await this.usuarioRepository.findOneBy({ rut: rut_usuario  });
+    if (!usuario) {
+      throw new Error('Usuario no encontrado');
+    }
+    usuario.deshabilitado = false;
+    return await this.usuarioRepository.save(usuario);
+  }
 }
