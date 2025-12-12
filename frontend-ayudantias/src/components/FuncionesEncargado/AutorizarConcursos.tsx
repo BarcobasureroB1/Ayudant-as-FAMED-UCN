@@ -14,7 +14,7 @@ interface Asignatura {
 
 export default function AdministrarAsignaturas({
   onClose,
-  asignaturasConcursos,
+  asignaturasConcursos = [],
   mostrar,
 }: {
   onClose: () => void;
