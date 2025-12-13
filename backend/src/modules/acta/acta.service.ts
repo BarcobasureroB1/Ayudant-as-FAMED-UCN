@@ -33,6 +33,7 @@ export class ActaService {
         hora_inicio: createActaDto.hora_inicio,
         hora_fin: createActaDto.hora_fin,
         id_departamento: departamentobyid,
+        rut_secretaria: createActaDto.rut_secretaria,
         
       });
       const savedActaEntity = await transactionalEntityManager.save(acta);
@@ -78,6 +79,13 @@ export class ActaService {
     return `This action returns a #${id} acta`;
   }
 
+  findbysecretaria(rut_secretaria: string) {
+    return this.actaRepository.find({
+      where: { rut_secretaria },
+      relations: ['firmas', 'participantes'],
+      order: { id: 'DESC' },
+    });
+  }
   update(id: number) {
     return `This action updates a #${id} acta`;
   }

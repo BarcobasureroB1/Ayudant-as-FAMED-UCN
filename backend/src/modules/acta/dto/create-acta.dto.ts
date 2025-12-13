@@ -22,6 +22,9 @@ export class CreateActaDto {
     @IsNotEmpty()
     @IsString()
     lugar: string
+    @IsNotEmpty()
+    @IsString()
+    rut_secretaria: string;
 
     @IsArray() @ValidateNested({ each: true }) @Type(() => CreateParticipantesActaDto)
     participantes: CreateParticipantesActaDto[];
