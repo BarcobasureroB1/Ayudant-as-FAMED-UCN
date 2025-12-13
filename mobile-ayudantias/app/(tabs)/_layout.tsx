@@ -18,6 +18,7 @@ import { usePostulacionesPorAlumno, useCancelarPostulacion } from '@/hooks/usePo
 import { useAsignaturasDisponiblesPostulacion, useTodasAsignaturas } from '@/hooks/useAsignaturas';
 import { PostulanteContexto, PostulanteContextType } from '@/context/PostulanteContext';
 import { useAuth } from '@/context/AuthContext';
+import { useThemeColors } from '@/hooks/useThemeColors';
 
 
 function TabBarIcon(props: { name: React.ComponentProps<typeof Ionicons>['name']; color: string }) {
@@ -35,6 +36,8 @@ export default function TabLayout() {
   const router = useRouter();
   const colorScheme = useColorScheme() ?? 'light';
   const [appReady, setAppReady] = useState(false);
+
+  const colors = useThemeColors();
 
   const {data: user, isLoading: cargauser, isError } = useUserProfile();
 
@@ -129,27 +132,22 @@ export default function TabLayout() {
     cancelarPostulacion,
   };
 
-  const colors = {
-    light: { text: '#000', background: '#fff', active: '#007bff', inactive: 'gray' },
-    dark: { text: '#fff', background: '#000', active: '#007bff', inactive: 'gray' },
-  };
-  const theme = colors[colorScheme];
-
   return (
     <PostulanteContexto.Provider value={contextoValue as PostulanteContextType}>
       <Tabs
         screenOptions={{
-          tabBarActiveTintColor: theme.active,
-          tabBarInactiveTintColor: theme.inactive,
+          tabBarActiveTintColor: colors.primary,
+          tabBarInactiveTintColor: colors.textPlaceholder,
           tabBarStyle: {
-            backgroundColor: theme.background,
+            backgroundColor: colors.card,
+            borderTopColor: colors.inputBorder,
           },
           headerShown: true,
           headerStyle: {
-            backgroundColor: theme.background,
+            backgroundColor: colors.background,
           },
           headerTitleStyle: {
-            color: theme.text,
+            color: colors.text,
           }
         }}>
         <Tabs.Screen

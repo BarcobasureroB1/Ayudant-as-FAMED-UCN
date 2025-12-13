@@ -8,7 +8,8 @@ import {
   TextInput,
   TextInputProps,
   Platform,
-  useColorScheme
+  useColorScheme,
+  Switch
 } from 'react-native';
 import { ThemedText } from '@/components/themed-text';
 import { ThemedView } from '@/components/themed-view';
@@ -77,8 +78,10 @@ export default function PostularScreen() {
   const colorScheme = useColorScheme() ?? 'light';
 
   const { user, asignaturasDisponibles, asignaturasTodas } = usePostulante();
-
   const { mutate: crearPostulacion, isPending } = useCrearPostulacion();
+
+  // Estado para controlar si se incluye el correo (igual que en web)
+  const [incluirCorreoProfe, setIncluirCorreoProfe] = useState(false);
 
   const [form, setForm] = useState({
     rut_alumno: user?.rut || "",
@@ -131,6 +134,14 @@ export default function PostularScreen() {
     }));
   };
 
+  // Manejador del Switch: Limpia el correo si se desactiva
+  const handleSwitchChange = (val: boolean) => {
+    setIncluirCorreoProfe(val);
+    if (!val) {
+        handleChange('correo_profe', "");
+    }
+  };
+
   const limpiarFormulario = () => {
     setForm({
         rut_alumno: user?.rut || "",
@@ -143,15 +154,29 @@ export default function PostularScreen() {
         dia: "",
         bloque: "",
     });
+    setIncluirCorreoProfe(false);
   };
 
   const handleSubmit = () => {
-    if (!form.id_asignatura || !form.descripcion_carta || !form.correo_profe || !form.dia || !form.bloque) {
-      Alert.alert("Campos incompletos", "Por favor, rellena todos los campos requeridos.");
+    // Validación básica: campos obligatorios siempre
+    if (!form.id_asignatura || !form.descripcion_carta || !form.dia || !form.bloque || !form.actividad || !form.metodologia) {
+      Alert.alert("Campos incompletos", "Por favor, rellena todos los campos obligatorios.");
       return;
     }
 
-    crearPostulacion(form, {
+    // Validación condicional: correo profe solo si el switch está activo
+    if (incluirCorreoProfe && !form.correo_profe) {
+        Alert.alert("Campos incompletos", "Has marcado incluir recomendación, por favor ingresa el correo del profesor.");
+        return;
+    }
+
+    // Preparar datos (asegurar que correo sea null o string vacío si no se incluye)
+    const datosAEnviar = {
+        ...form,
+        correo_profe: incluirCorreoProfe ? form.correo_profe : ""
+    };
+
+    crearPostulacion(datosAEnviar, {
       onSuccess: () => {
         Alert.alert("¡Éxito!", "Postulación enviada correctamente.");
         limpiarFormulario();
@@ -175,6 +200,10 @@ export default function PostularScreen() {
     buttonBackText: colorScheme === 'dark' ? '#fff' : '#333',
     buttonBackBackground: colorScheme === 'dark' ? '#2c2c2e' : '#f0f0f0',
     buttonBackBorder: colorScheme === 'dark' ? '#444' : '#ddd',
+    switchTrackTrue: '#81b0ff',
+    switchTrackFalse: '#767577',
+    switchThumbTrue: '#007bff',
+    switchThumbFalse: '#f4f3f4',
   }), [colorScheme]);
 
   const styles = useMemo(() => StyleSheet.create({
@@ -187,11 +216,11 @@ export default function PostularScreen() {
       paddingBottom: 60,
     },
     formContainer: {
-    gap: 16,
+        gap: 16,
     },
     title: {
-    textAlign: 'center',
-    fontSize: 24,
+        textAlign: 'center',
+        fontSize: 24,
     },
     subtitle: {
       textAlign: 'center',
@@ -238,11 +267,24 @@ export default function PostularScreen() {
       textAlignVertical: 'top',
     },
     row: {
-    flexDirection: 'row',
-    gap: 12,
+        flexDirection: 'row',
+        gap: 12,
     },
     col: {
       flex: 1,
+    },
+    switchContainer: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        justifyContent: 'space-between',
+        paddingVertical: 8,
+        marginBottom: 8,
+    },
+    switchLabel: {
+        fontSize: 14,
+        fontWeight: '600',
+        color: themeColors.textLabel,
+        flex: 1, 
     },
     button: {
       flexDirection: 'row',
@@ -274,8 +316,8 @@ export default function PostularScreen() {
       fontWeight: '600',
     },
     buttonSubmit: {
-    flex: 2,
-    backgroundColor: '#28a745',
+        flex: 2,
+        backgroundColor: '#28a745',
     },
     pickerIcon: {
       top: Platform.OS === 'ios' ? 0 : 16,
@@ -359,7 +401,6 @@ export default function PostularScreen() {
             </View>
           )}
           
-
           <FormInput
             label="Carta de Interés"
             styles={styles}
@@ -371,15 +412,29 @@ export default function PostularScreen() {
           />
 
           <ThemedText type="subtitle" style={styles.sectionTitle}>Plan de Trabajo</ThemedText>
+        
+          {/* Switch para incluir recomendación */}
+          <View style={styles.switchContainer}>
+            <ThemedText style={styles.switchLabel}>Incluir correo de recomendación</ThemedText>
+            <Switch
+                trackColor={{ false: themeColors.switchTrackFalse, true: themeColors.switchTrackTrue }}
+                thumbColor={incluirCorreoProfe ? themeColors.switchThumbTrue : themeColors.switchThumbFalse}
+                onValueChange={handleSwitchChange}
+                value={incluirCorreoProfe}
+            />
+          </View>
 
-          <FormInput
-            label="Correo del Profesor (para recomendación)"
-            styles={styles}
-            value={form.correo_profe}
-            onChangeText={(t) => handleChange('correo_profe', t)}
-            placeholder="profesor@universidad.cl"
-            keyboardType="email-address"
-          />
+          {/* Renderizado condicional del input de correo */}
+          {incluirCorreoProfe && (
+            <FormInput
+                label="Correo del Profesor"
+                styles={styles}
+                value={form.correo_profe}
+                onChangeText={(t) => handleChange('correo_profe', t)}
+                placeholder="profesor@ucn.cl"
+                keyboardType="email-address"
+            />
+          )}
 
           <FormInput
             label="Actividad Propuesta"
@@ -448,4 +503,3 @@ export default function PostularScreen() {
     </ThemedView>
   )
 }
-

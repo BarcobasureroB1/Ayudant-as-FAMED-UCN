@@ -1,9 +1,10 @@
-import React, { useState } from 'react';
+import React, { useMemo, useState } from 'react';
 import { View, Text, TextInput, StyleSheet, Alert, TouchableOpacity, ActivityIndicator, TouchableWithoutFeedback, Keyboard, KeyboardAvoidingView, Platform, ScrollView } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRegister } from '../../hooks/useRegister';
 import { Link, useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
+import { useThemeColors } from '@/hooks/useThemeColors';
 
 export default function RegisterPage() {
     const [rut, setRut] = useState('');
@@ -12,11 +13,13 @@ export default function RegisterPage() {
     const [password, setPassword] = useState('');
     const [mostrarPassword, setMostrarPassword] = useState(false);
     const router = useRouter();
+    const colors = useThemeColors();
+    const styles = useMemo(() => getStyles(colors), [colors]);
 
     const registerMutation = useRegister(
         () => {
             Alert.alert('Registro Correcto', 'Ahora puedes iniciar sesión', [
-                {text: 'OK', onPress: () => router.push('/(auth)/login')},
+                {text: 'OK', onPress: () => router.replace('/(auth)/login')},
             ]);
         },
         (error) => {
@@ -58,7 +61,7 @@ export default function RegisterPage() {
                         <TextInput
                             style={styles.input}
                             placeholder="Ingrese su rut sin puntos ni guiones"
-                            placeholderTextColor="#9CA3AF"
+                            placeholderTextColor={colors.textPlaceholder}
                             value={rut}
                             onChangeText={filtrarRut}
                             autoCapitalize="none"
@@ -72,8 +75,8 @@ export default function RegisterPage() {
                         <Text style={styles.label}>Nombres</Text>
                         <TextInput
                             style={styles.input}
-                            placeholder="Jorge Gonzales"
-                            placeholderTextColor="#9CA3AF"
+                            placeholder="Jorge Andres"
+                            placeholderTextColor={colors.textPlaceholder}
                             value={nombres}
                             onChangeText={setNombres}
                             textContentType="givenName"
@@ -85,7 +88,7 @@ export default function RegisterPage() {
                         <TextInput
                             style={styles.input}
                             placeholder="Perez Tapia"
-                            placeholderTextColor="#9CA3AF"
+                            placeholderTextColor={colors.textPlaceholder}
                             value={apellidos}
                             onChangeText={setApellidos}
                             textContentType="familyName"
@@ -99,7 +102,7 @@ export default function RegisterPage() {
                             <TextInput
                                 style={styles.inputInContainer}
                                 placeholder="Ingrese una contraseña de acceso"
-                                placeholderTextColor="#9CA3AF"
+                                placeholderTextColor={colors.textPlaceholder}
                                 value={password}
                                 onChangeText={setPassword}
                                 secureTextEntry={!mostrarPassword}
@@ -117,7 +120,7 @@ export default function RegisterPage() {
                         disabled={registerMutation.isPending}
                     >
                         {registerMutation.isPending ? (
-                            <ActivityIndicator color="#FFF"/>
+                            <ActivityIndicator color={colors.primaryText}/>
                         ): (
                             <Text style={styles.buttonText}>Registrarse</Text>
                         )}
@@ -139,7 +142,7 @@ export default function RegisterPage() {
 }
 
 
-const styles = StyleSheet.create({
+/*const styles = StyleSheet.create({
     container: {
         flex: 1,
         backgroundColor: '#F3F4F6', 
@@ -230,6 +233,102 @@ const styles = StyleSheet.create({
     },
     switchButtonText: {
         color: '#007AFF', 
+        textAlign: 'center',
+        fontSize: 14,
+        fontWeight: '500',
+    },
+});*/
+
+const getStyles = (colors: ReturnType<typeof useThemeColors>) => StyleSheet.create({
+    container: {
+        flex: 1,
+        backgroundColor: colors.background,
+    },
+    flexContainer: {
+        flex:1,
+    },
+    content: {
+        flex: 1,
+        justifyContent: 'center', 
+        padding: 16, 
+    },
+    card: {
+        backgroundColor: colors.card, 
+        borderRadius: 12, 
+        padding: 24,
+        shadowColor: "#000", 
+        shadowOffset: {
+            width: 0,
+            height: 2,
+        },
+        shadowOpacity: 0.1,
+        shadowRadius: 3.84,
+        elevation: 5,
+    },
+    title: {
+        fontSize: 22, // Ajustado para coincidir con login
+        fontWeight: 'bold',
+        color: colors.text, 
+        textAlign: 'center',
+        marginBottom: 24,
+    },
+    fieldContainer: {
+        marginBottom: 16,
+    },
+    label: {
+        fontSize: 14,
+        fontWeight: '500',
+        color: colors.textLabel,
+        marginBottom: 8,
+    },
+    input: {
+        backgroundColor: colors.inputBackground,
+        borderWidth: 1,
+        borderColor: colors.inputBorder,
+        borderRadius: 8,
+        padding: 12,
+        fontSize: 16,
+        color: colors.text,
+    },
+    inputContainer: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        backgroundColor: colors.inputBackground,
+        borderWidth: 1,
+        borderColor: colors.inputBorder,
+        borderRadius: 8,
+    },
+    inputInContainer: {
+        flex: 1,
+        paddingVertical: 12,
+        paddingHorizontal: 12,
+        fontSize: 16,
+        color: colors.text,
+    },
+    eyeIcon: {
+        padding: 12,
+    },
+    button: {
+        backgroundColor: colors.primary, 
+        borderRadius: 8,
+        padding: 14,
+        alignItems: 'center', 
+        marginTop: 8,
+    },
+    buttonDisabled: {
+        backgroundColor: '#9E9E9E', 
+    },
+    buttonText: {
+        color: colors.primaryText,
+        fontSize: 16,
+        fontWeight: 'bold',
+    },
+    switchButton: {
+        marginTop: 16,
+        padding: 8,
+    },
+    switchButtonText: {
+        color: colors.primary, 
         textAlign: 'center',
         fontSize: 14,
         fontWeight: '500',
