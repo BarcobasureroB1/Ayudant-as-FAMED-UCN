@@ -96,3 +96,35 @@ Nest is an MIT-licensed open source project. It can grow thanks to the sponsors 
 ## License
 
 Nest is [MIT licensed](https://github.com/nestjs/nest/blob/master/LICENSE).
+
+## SMTP Email
+
+Configure SMTP to send emails from the backend using `nodemailer`:
+
+- Required env vars: `SMTP_HOST`, `SMTP_PORT`, `SMTP_USER`, `SMTP_PASS`
+- Optional env vars: `SMTP_SECURE` (`true`/`false`), `SMTP_FROM`
+
+Example `.env`:
+
+```env
+SMTP_HOST=smtp.gmail.com
+SMTP_PORT=465
+SMTP_USER=tu_usuario@dominio.com
+SMTP_PASS=tu_password_o_app_password
+SMTP_SECURE=true
+SMTP_FROM="Ayudantías UCN <no-reply@ucn.cl>"
+```
+
+Usage in any service or controller:
+
+```ts
+import { EmailService } from './modules/email/email.service';
+
+constructor(private readonly emailService: EmailService) {}
+
+await this.emailService.send({
+  to: 'destinatario@dominio.com',
+  subject: 'Bienvenido',
+  text: 'Tu cuenta fue creada exitosamente',
+});
+```

@@ -7,17 +7,21 @@ import { LlamadoPostulacion } from './entities/llamado_postulacion.entity';
 import { Repository, In } from 'typeorm';
 import { Asignatura } from '../asignatura/entities/asignatura.entity';
 import { Usuario } from '../usuario/entities/usuario.entity';
+import { Postulacion } from '../postulacion/entities/postulacion.entity';
 
 @Injectable()
 export class LlamadoPostulacionService {
 
-  constructor(@InjectRepository(LlamadoPostulacion)
-  private readonly llamadoPostulacionRepository: Repository<LlamadoPostulacion>,
-  @InjectRepository(Usuario)
-  private readonly usuarioRepository: Repository<Usuario>,
-  @InjectRepository(Asignatura)
-  private readonly asignaturaRepository: Repository<Asignatura>,
-) {}
+  constructor(
+    @InjectRepository(LlamadoPostulacion)
+    private readonly llamadoPostulacionRepository: Repository<LlamadoPostulacion>,
+    @InjectRepository(Usuario)
+    private readonly usuarioRepository: Repository<Usuario>,
+    @InjectRepository(Asignatura)
+    private readonly asignaturaRepository: Repository<Asignatura>,
+    @InjectRepository(Postulacion)
+    private readonly postulacionRepository: Repository<Postulacion>,
+  ) {}
   async create(createLlamadoPostulacionDto: CreateLlamadoPostulacionDto) {
 
     const rutSecretaria = String(createLlamadoPostulacionDto.rut_secretaria);
@@ -124,12 +128,31 @@ export class LlamadoPostulacionService {
   }
 
   async cambiarEstado(id: number) {
-    const entity = await this.llamadoPostulacionRepository.findOneBy({ id });
+    // Obtener el llamado con su asignatura
+    const entity = await this.llamadoPostulacionRepository.findOne({
+      where: { id },
+      relations: ['asignatura'],
+    });
     if (!entity) {
       throw new Error('Llamado no encontrado');
     }
+
+    // Cambiar estado del llamado
     entity.estado = 'cerrado';
-    return await this.llamadoPostulacionRepository.save(entity);
+    await this.llamadoPostulacionRepository.save(entity);
+
+    // Marcar todas las postulaciones de esta asignatura como no actuales
+    // Asumiendo que la FK en Postulacion se llama 'asignaturaId' (nombre por defecto de TypeORM)
+    if (entity.asignatura?.id) {
+      await this.postulacionRepository
+        .createQueryBuilder()
+        .update(Postulacion)
+        .set({ es_actual: false })
+        .where('asignaturaId = :idAsignatura', { idAsignatura: entity.asignatura.id })
+        .execute();
+    }
+
+    return entity;
   }
 
  
