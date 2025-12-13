@@ -9,15 +9,18 @@ import { useUserProfile } from "@/hooks/useUserProfile";
 
 import AdministrarEstudiantes from "@/components/SecretariaDocente/AdministrarEstudiantes";
 import GenerarActa from "@/components/SecretariaDocente/generarActas";
+import { useVerActasDeSecretario } from "@/hooks/useActas";
+import VerActas from "@/components/SecretariaDocente/revisarActas";
 
 export default function SecretariaDocentePage() {
     const router = useRouter();
     const { setToken, setUsertipo } = useAuth();
 
-    type Vista = "estudiantes" | "acta" | "aperturas";
+    type Vista = "estudiantes" | "acta" | "actas";
     const [vista, setVista] = useState<Vista>("estudiantes");
 
     const { data: user, isLoading, isError } = useUserProfile();
+    const { data: actas } = useVerActasDeSecretario(user?.rut);
 
     useEffect(() => {
         if (isError || !user) {
@@ -88,6 +91,16 @@ export default function SecretariaDocentePage() {
                             Generar acta
                         </button>
 
+                        <button
+                            onClick={() => setVista("actas")}
+                            className={`py-2 px-4 rounded-lg transition-all duration-200 ${
+                                vista === "actas"
+                                    ? "bg-white text-blue-600 shadow-sm"
+                                    : "text-gray-600 hover:text-gray-900"
+                            }`}
+                        >
+                            Ver actas
+                        </button>
                     </div>
 
                     <button
@@ -107,6 +120,9 @@ export default function SecretariaDocentePage() {
 
                     {vista === "acta" && (
                         <GenerarActa rutSecretario={user.rut} />
+                    )}
+                    {vista === "actas" && (
+                        <VerActas actas={actas} />
                     )}
                 </div>
             </div>
