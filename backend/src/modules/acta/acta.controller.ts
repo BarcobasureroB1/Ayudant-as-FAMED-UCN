@@ -17,9 +17,9 @@ export class ActaController {
     return this.actaService.findAll();
   }
 
-  @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.actaService.findOne(+id);
+  @Get(':rut_secretaria')
+  findOne(@Param('rut_secretaria') rut_secretaria: string) {
+    return this.actaService.findbysecretaria(rut_secretaria);
   }
 
 

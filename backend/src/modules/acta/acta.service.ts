@@ -79,6 +79,13 @@ export class ActaService {
     return `This action returns a #${id} acta`;
   }
 
+  findbysecretaria(rut_secretaria: string) {
+    return this.actaRepository.find({
+      where: { rut_secretaria },
+      relations: ['firmas', 'participantes'],
+      order: { id: 'DESC' },
+    });
+  }
   update(id: number) {
     return `This action updates a #${id} acta`;
   }
