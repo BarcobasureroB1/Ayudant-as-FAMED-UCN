@@ -141,15 +141,12 @@ export class LlamadoPostulacionService {
     entity.estado = 'cerrado';
     await this.llamadoPostulacionRepository.save(entity);
 
-    // Marcar todas las postulaciones de esta asignatura como no actuales
-    // Asumiendo que la FK en Postulacion se llama 'asignaturaId' (nombre por defecto de TypeORM)
+    // Actualizar las postulaciones (no la asignatura) vinculadas a esta asignatura: es_actual = false
     if (entity.asignatura?.id) {
-      await this.postulacionRepository
-        .createQueryBuilder()
-        .update(Postulacion)
-        .set({ es_actual: false })
-        .where('asignaturaId = :idAsignatura', { idAsignatura: entity.asignatura.id })
-        .execute();
+      await this.postulacionRepository.update(
+        { asignatura: { id: entity.asignatura.id }, es_actual: true },
+        { es_actual: false },
+      );
     }
 
     return entity;
