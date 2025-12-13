@@ -33,6 +33,7 @@ export class ActaService {
         hora_inicio: createActaDto.hora_inicio,
         hora_fin: createActaDto.hora_fin,
         id_departamento: departamentobyid,
+        rut_secretaria: createActaDto.rut_secretaria,
         
       });
       const savedActaEntity = await transactionalEntityManager.save(acta);

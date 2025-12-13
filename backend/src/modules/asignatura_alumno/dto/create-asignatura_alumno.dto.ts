@@ -8,4 +8,6 @@ export class CreateAsignaturaAlumnoDto {
     nombre_asignatura: string;
     @IsNumber()
     nota: number;
+    @IsNumber()
+    oportunidad: number;
 }

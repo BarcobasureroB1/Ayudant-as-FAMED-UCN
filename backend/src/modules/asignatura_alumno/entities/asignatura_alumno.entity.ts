@@ -15,6 +15,8 @@ export class AsignaturaAlumno {
   @JoinColumn({ name: 'id_alumno' })
   alumno: Alumno;
 
+  @Column({default: 1, type: 'int'})
+  oportunidad: number;
   @Column('double precision')
   nota: number;
 }

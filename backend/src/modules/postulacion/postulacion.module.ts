@@ -8,8 +8,9 @@ import { Usuario } from '../usuario/entities/usuario.entity';
 import { Asignatura } from '../asignatura/entities/asignatura.entity';
 import { Coordinador } from '../coordinador/entities/coordinador.entity';
 import { Alumno } from '../alumno/entities/alumno.entity';
+import { AsignaturaAlumno } from '../asignatura_alumno/entities/asignatura_alumno.entity';
 @Module({
-  imports: [TypeOrmModule.forFeature([Postulacion, Asignatura, Usuario,Coordinador, Ayudantia,Alumno])],
+  imports: [TypeOrmModule.forFeature([Postulacion, Asignatura, Usuario, Coordinador, Ayudantia, Alumno, AsignaturaAlumno])],
   controllers: [PostulacionController],
   providers: [PostulacionService],
 })

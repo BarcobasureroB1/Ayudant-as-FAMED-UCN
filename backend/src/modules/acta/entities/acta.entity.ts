@@ -16,8 +16,11 @@ export class Acta {
     hora_fin: string;
     @Column()
     lugar: string;
+    @Column()
+    rut_secretaria: string;
     @ManyToOne(() => Departamento, (departamento) => departamento.id)
     id_departamento: Departamento;
+
     
     @OneToMany(() => FirmasActa, (firma) => firma.acta)
     firmas: FirmasActa[];
