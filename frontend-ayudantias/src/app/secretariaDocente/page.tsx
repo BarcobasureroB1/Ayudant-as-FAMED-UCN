@@ -55,7 +55,7 @@ export default function SecretariaDocentePage() {
                 <div className="flex justify-between items-center">
                     <div>
                         <h1 className="text-2xl font-bold text-gray-800">
-                            Dirección de Departamento
+                            Secretaría Docente
                         </h1>
                         <p className="text-gray-600 mt-1">
                             Bienvenido, {user.nombres} {user.apellidos}
@@ -63,7 +63,6 @@ export default function SecretariaDocentePage() {
                     </div>
 
                     <div className="text-right">
-                        <p className="text-sm text-gray-600">Rol: {user.tipo}</p>
                         <p className="text-sm text-gray-600">RUT: {user.rut}</p>
                     </div>
 
