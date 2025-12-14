@@ -231,7 +231,9 @@ export class PostulacionService {
       .innerJoin('c.asignaturas', 'asignatura')
       .where('usuario.rut = :rut', { rut: rutCoordinador })
       .andWhere('c.actual = :actual', { actual: true })
-      .select(['asignatura.id AS asignatura_id'])
+      .select(['asignatura.id AS asignatura_id',
+        'asignatura.nombre AS nombre_asignatura'
+      ])
       .getRawMany();
     return rows.map((r) => r.asignatura_id).filter(Boolean);
   }
@@ -288,6 +290,7 @@ export class PostulacionService {
       },
       id_asignatura: Number(r.id_asignatura),
       descripcion_carta: r.descripcion_carta,
+      nombre_asignatura: r.nombre_asignatura,
       metodologia: r.metodologia,
       puntuacion_etapa1: r.puntuacion_etapa1 !== null && r.puntuacion_etapa1 !== undefined ? Number(r.puntuacion_etapa1) : 0,
       puntuacion_etapa2: r.puntuacion_etapa2 !== null && r.puntuacion_etapa2 !== undefined ? Number(r.puntuacion_etapa2) : null,

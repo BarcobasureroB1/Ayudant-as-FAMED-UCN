@@ -145,6 +145,12 @@ export class AyudantiaService {
       evaluacion: r.evaluacion !== null && r.evaluacion !== undefined ? Number(r.evaluacion) : null,
     }));
   }
+  async findAll() {
+    return this.ayudantiaRepository.find({
+      relations: ['alumno', 'asignatura', 'coordinador'],
+      order: { id: 'DESC' },
+    });
+  }
 
   async evaluarAyudantia(id: number, dto: evaluarAyudantiaDto) {
     const ayudantia = await this.ayudantiaRepository.findOneBy({ id });
