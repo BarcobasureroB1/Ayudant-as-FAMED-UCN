@@ -59,3 +59,28 @@ export function useCrearAyudantia() {
         },
     });
 }
+
+export interface AyudantiaGlobalData {
+    id: number;
+    alumno: {
+        rut: string;
+        nombres: string;
+        apellidos: string;
+    };
+    asignatura: {
+        id: number;
+        nombre: string;
+    };
+}
+
+export function useTodasAyudantias() {
+    return useQuery<AyudantiaGlobalData[], Error>({
+        queryKey: ['ayudantiasGlobales'],
+        queryFn: async () => {
+            const respuesta = await api.get('/ayudantia');
+            return respuesta.data;
+        },
+
+        staleTime: 1000 * 60,
+    })
+}
