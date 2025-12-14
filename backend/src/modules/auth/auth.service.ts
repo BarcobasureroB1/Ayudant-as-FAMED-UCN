@@ -5,6 +5,7 @@ import * as bcryptjs from 'bcryptjs';
 import { RegisterDto } from './dto/RegisterDto';
 import { Usuario } from '../usuario/entities/usuario.entity';
 import { AlumnoService } from '../alumno/alumno.service';
+import { EmailService } from '../email/email.service';
 
 @Injectable()
 export class AuthService {
@@ -12,6 +13,7 @@ export class AuthService {
     private readonly usuarioService: UsuarioService,
     private readonly jwtService: JwtService,
     private readonly alumnoService: AlumnoService,
+    private readonly emailService: EmailService,
   ) {}
 
  async login(loginDto: any) {
@@ -76,5 +78,59 @@ export class AuthService {
     if (cleaned.length === 0) return false;
     const parsed = parseInt(cleaned, 10);
     return !Number.isNaN(parsed);
+  }
+
+  async enviarRecuperacionContrasena(rut: string) {
+    const usuario = await this.usuarioService.findforLogin(rut);
+    if (!usuario) {
+      throw new Error('Usuario no encontrado');
+    }
+
+    // Generar token de recuperación válido por 1 hora
+    const resetToken = this.jwtService.sign(
+      { rut: usuario.rut },
+      { expiresIn: '1h' }
+    );
+
+    // Buscar correo del alumno si existe
+    const alumno = await this.alumnoService.findByRut(rut);
+    const correo = alumno?.correo;
+
+    if (!correo) {
+      throw new Error('No se encontró correo para este usuario');
+    }
+
+    const enlaceRecuperacion = `${process.env.FRONTEND_URL || 'http://localhost:3000'}/reset-password?token=${resetToken}`;
+
+    const html = `
+      <p>Estimado/a ${usuario.nombres} ${usuario.apellidos},</p>
+      <p>Hemos recibido una solicitud para recuperar tu contraseña. Haz clic en el siguiente enlace para restablecerla:</p>
+      <p><a href="${enlaceRecuperacion}" style="background-color: #007bff; color: white; padding: 10px 20px; text-decoration: none; border-radius: 5px; display: inline-block;">Recuperar Contraseña</a></p>
+      <p>Este enlace será válido por 1 hora.</p>
+      <p>Si no solicitaste esto, ignora este correo.</p>
+      <p>Saludos,<br>Sistema de Ayudantías FAMED-UCN</p>
+    `;
+
+    await this.emailService.send({
+      to: correo,
+      subject: 'Recuperación de Contraseña - Sistema de Ayudantías FAMED-UCN',
+      html,
+    });
+
+    return { message: 'Se ha enviado un correo de recuperación a tu cuenta' };
+  }
+
+  async restablecerContrasena(rut: string, nuevaContrasena: string) {
+    const usuario = await this.usuarioService.findforLogin(rut);
+
+    if (!usuario) {
+      throw new Error('Usuario no encontrado');
+    }
+
+    const hashedPassword = await bcryptjs.hash(nuevaContrasena, 10);
+    usuario.password = hashedPassword;
+    await this.usuarioService.guardar(usuario);
+
+    return { message: 'Contraseña restablecida exitosamente' };
   }
 }

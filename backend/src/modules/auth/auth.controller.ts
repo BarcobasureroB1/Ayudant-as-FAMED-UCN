@@ -2,6 +2,7 @@ import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards, Request }
 import { AuthService } from './auth.service';
 import { LoginDto } from './dto/LoginDto';
 import { AuthGuard } from './guards/aurh.guard';
+import { ResetTokenGuard } from './guards/reset-token.guard';
 import { RegisterDto } from './dto/RegisterDto';
 
 
@@ -27,5 +28,16 @@ export class AuthController {
     registerDto:RegisterDto) {
         
         return this.authService.Register(registerDto); 
+    }
+
+    @Post('recuperar-contrasena')
+    recuperarContrasena(@Body() body: { rut: string }) {
+      return this.authService.enviarRecuperacionContrasena(body.rut);
+    }
+
+    @Post('restablecer-contrasena')
+    @UseGuards(ResetTokenGuard)
+    restablecerContrasena(@Body() body: { token: string; nuevaContrasena: string }, @Request() req) {
+      return this.authService.restablecerContrasena(req.resetUser.rut, body.nuevaContrasena);
     }
 }

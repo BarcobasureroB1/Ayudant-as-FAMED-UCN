@@ -9,6 +9,7 @@ import { Alumno } from '../alumno/entities/alumno.entity';
 import { Coordinador } from '../coordinador/entities/coordinador.entity';
 import { In } from 'typeorm';
 import { evaluarAyudantiaDto } from './dto/evaluar.dto';
+import { EmailService } from '../email/email.service';
 
 
 @Injectable()
@@ -22,6 +23,9 @@ export class AyudantiaService {
     private readonly usuarioRepository: Repository<Usuario>,
     @InjectRepository(Coordinador)
     private readonly coordinadorRepository: Repository<Coordinador>,
+    @InjectRepository(Alumno)
+    private readonly alumnoRepository: Repository<Alumno>,
+    private readonly emailService: EmailService,
   ) {}
 
   async create(dto:CreateAyudantiaDto){
@@ -49,7 +53,29 @@ export class AyudantiaService {
     });
 
     // Persistir la entidad en la base de datos y devolver la entidad guardada.
-    return await this.ayudantiaRepository.save(entity);
+    const ayudantiaGuardada = await this.ayudantiaRepository.save(entity);
+
+    // Enviar correo al postulante informando que ha sido seleccionado
+    const alumnoData = await this.alumnoRepository.findOneBy({ rut_alumno: dto.rut_alumno });
+    if (alumnoData && alumnoData.correo) {
+      const asunto = `¡Felicitaciones! Has sido seleccionado/a para la ayudantía de ${asignatura.nombre}`;
+      const html = `
+        <p>Estimado/a ${alumno.nombres} ${alumno.apellidos},</p>
+        <p>¡Felicitaciones! Te complacemos informar que has sido seleccionado/a para desempeñarte como ayudante en la asignatura de <strong>${asignatura.nombre}</strong>.</p>
+        <p><strong>Período:</strong> ${dto.periodo}</p>
+        <p><strong>Tipo de ayudantía:</strong> ${dto.tipo_ayudantia}</p>
+        <p><strong>Remunerada:</strong> ${dto.remunerada ? 'Sí' : 'No'}</p>
+        <p>Te recomendamos que te pongas en contacto con la coordinación para conocer los detalles de tu trabajo.</p>
+        <p>Saludos,<br>Sistema de Ayudantías FAMED-UCN</p>
+      `;
+      await this.emailService.send({
+        to: alumnoData.correo,
+        subject: asunto,
+        html,
+      });
+    }
+
+    return ayudantiaGuardada;
   }
 
   async findByUsuario(rut: string) {
