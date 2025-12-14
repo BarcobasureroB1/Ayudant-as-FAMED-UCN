@@ -23,7 +23,7 @@ export class AuthService {
    if (!passwordIsValid) {
      throw new Error('Contraseña incorrecta');
    }
-   const payload = { rut: usuario.rut, nombres: usuario.nombres, apellidos: usuario.apellidos, tipo : usuario.tipo };
+   const payload = { rut: usuario.rut, nombres: usuario.nombres, apellidos: usuario.apellidos, tipo : usuario.tipo, deshabilitado: usuario.deshabilitado };
    const access_token = this.jwtService.sign(payload);
    return {
      access_token,
