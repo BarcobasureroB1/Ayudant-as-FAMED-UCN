@@ -17,15 +17,17 @@ import {ModalDescarte} from '@/components/Coordinador/ModalDescarte';
 import {ModalEvaluacionPostulante} from '@/components/Coordinador/ModalEvaluacionPostulante'; 
 import {ModalEvaluacionAyudante} from '@/components/Coordinador/ModalEvaluacionAyudante';
 import { ModalVerCurriculum } from '@/components/Coordinador/ModalVerCurriculum';
+import { ModalDetallePostulacion } from '@/components/SecretariaDocente/ModalDetallePostulacion';
 import { CoordinadorAdmin } from '@/components/Coordinador/CoordinadorAdmin';
 import { CoordinadorUser } from '@/components/Coordinador/CoordinadorUser';
-import { Filter, Search } from 'lucide-react';
+import { Filter, Search, Eye } from 'lucide-react';
 
 interface CoordinadorDashboardProps {
     user: User;
     postulantes: PostulanteCoordinadorData[] | undefined;
     ayudantes: AyudanteActivoData[] | undefined;
     loading: boolean;
+    adminBar?: React.ReactNode;
 }
 
 const InfoCard = ({ title, children }: { title: string; children: React.ReactNode }) => (
@@ -36,24 +38,11 @@ const InfoCard = ({ title, children }: { title: string; children: React.ReactNod
 );
 
 
-export const CoordinadorDashboard = ({ user,postulantes, ayudantes, loading }: CoordinadorDashboardProps) => {
+export const CoordinadorDashboard = ({ user,postulantes, ayudantes, loading, adminBar}: CoordinadorDashboardProps) => {
     const router = useRouter();
     const { setToken, setUsertipo } = useAuth();
 
-    //const [postulantesLocales, setPostulantesLocales] = useState<PostulanteCoordinadorData[]>([]);
-    //const [ayudantesLocales, setAyudantesLocales] = useState<AyudanteActivoData[]>([]);
     const [rutVerCurriculum, setRutVerCurriculum] = useState<string | null>(null);
-
-    /*useEffect(() => {
-        if (postulantes)
-        {
-            setPostulantesLocales(postulantes);
-        }
-        if (ayudantes)
-        {
-            setAyudantesLocales(ayudantes);
-        }
-    }, [postulantes, ayudantes]);*/
 
     type Vista = 'Postulantes' | 'Ayudantes';
     const [vista, setVista] = useState<Vista>('Postulantes');
@@ -71,6 +60,7 @@ export const CoordinadorDashboard = ({ user,postulantes, ayudantes, loading }: C
     const [ordenNota, setOrdenNota] = useState<"desc" | "asc" | "">("");
 
     const [idPostulacionDescartar, setIdPostulacionDescartar] = useState<number | null>(null);
+    const [postulanteVerDetalle, setPostulanteVerDetalle] = useState<PostulanteCoordinadorData | null>(null);
     const [postulanteAEvaluar, setPostulanteAEvaluar] = useState<PostulanteCoordinadorData | null>(null);
     const [ayudanteAEvaluar, setAyudanteAEvaluar ] = useState<AyudanteActivoData | null>(null);
 
@@ -81,7 +71,7 @@ export const CoordinadorDashboard = ({ user,postulantes, ayudantes, loading }: C
     const listaPostulantes = useMemo(() => postulantes || [], [postulantes]);
     const listaAyudantes = useMemo(() => ayudantes || [], [ayudantes]);
 
-    const { data: listaAsignaturas, isLoading: cargaAsignaturas } = useTodasAsignaturas();
+    const { data: listaAsignaturas } = useTodasAsignaturas();
 
     const mapAsig = useMemo(() => {
         if (!listaAsignaturas)
@@ -102,32 +92,27 @@ export const CoordinadorDashboard = ({ user,postulantes, ayudantes, loading }: C
         if (isPostulantes)
         {
             const ids = Array.from(new Set(listaPostulantes.map(p => p.id_asignatura)));
-            //const ids = Array.from(new Set(postulantesLocales.map(p => p.id_asignatura)));
+            
             return ids.map(id => ({
                 id: id.toString(),
                 nombre: mapAsig[id] || `Asignatura ${id}`
             })).sort((a,b) => a.nombre.localeCompare(b.nombre));
         } else {
             const nombres = Array.from(new Set(listaAyudantes.map(a => a.asignatura)));
-            //const nombres = Array.from(new Set(ayudantesLocales.map(a => a.asignatura)));
+            
             return nombres.map(nombre => ({
                 id: nombre,
                 nombre: nombre
             })).sort((a,b) => a.nombre.localeCompare(b.nombre));
         }
-    }, [isPostulantes, listaPostulantes, listaAyudantes, mapAsig, /*postulantesLocales*/, /*ayudantesLocales*/]);
+    }, [isPostulantes, listaPostulantes, listaAyudantes, mapAsig]);
 
     const dataFiltrada = useMemo(() => {
         let data: any[] = [];
 
-        if (isPostulantes /*&& postulantes*/)
+        if (isPostulantes)
         {
         
-           /*data = listaPostulantes.filter(p => {
-                const matchTexto = p.alumno.nombres.toLowerCase().includes(busqueda.toLowerCase()) ||
-                                   p.rut_alumno.toLowerCase().includes(busqueda.toLowerCase());
-                const matchAsignatura = filtroAsignatura ? p.id_asignatura.toString() === filtroAsignatura : true;
-                return matchTexto && matchAsignatura && !p.motivo_descarte;*/
             data = listaPostulantes.filter(p => {
                 const matchTexto = p.alumno.nombres.toLowerCase().includes(busqueda.toLowerCase()) ||
                                    p.rut_alumno.toLowerCase().includes(busqueda.toLowerCase());
@@ -156,7 +141,7 @@ export const CoordinadorDashboard = ({ user,postulantes, ayudantes, loading }: C
                 data.sort((a,b) => (a.puntuacion_etapa2 || 0) - (b.puntuacion_etapa2 || 0));
             }
 
-        }else if (isAyudantes /*&& ayudantes*/)
+        }else if (isAyudantes)
         {
             data = listaAyudantes.filter(a => {
                 const matchTexto = a.alumno.nombres.toLowerCase().includes(busqueda.toLowerCase()) ||
@@ -164,12 +149,7 @@ export const CoordinadorDashboard = ({ user,postulantes, ayudantes, loading }: C
                 const matchAsignatura = filtroAsignatura ? a.asignatura.toString() === filtroAsignatura : true;
                 return matchTexto && matchAsignatura;
            });
-           /*data = ayudantesLocales.filter(a => {
-                const matchTexto = a.alumno.nombres.toLowerCase().includes(busqueda.toLowerCase()) ||
-                                   a.rut_alumno.toLowerCase().includes(busqueda.toLowerCase());
-                const matchAsignatura = filtroAsignatura ? a.asignatura.toString() === filtroAsignatura : true;
-                return matchTexto && matchAsignatura;
-           });*/
+           
 
            if (ordenNota === 'desc')
             {
@@ -207,20 +187,7 @@ export const CoordinadorDashboard = ({ user,postulantes, ayudantes, loading }: C
             setIdPostulacionDescartar(null);
         }
     };
-    /*const handleConfirmarDescarte = async (motivo: string) => {
-        if (idPostulacionDescartar)
-        {
-            setPostulantesLocales(prev => prev.map(p => 
-                p.id === idPostulacionDescartar
-                ? { ...p, motivo_descarte: motivo, fecha_descarte: new Date().toISOString() }
-                : p
-            ));
-            alert("Postulación decartada");
-            setIdPostulacionDescartar(null);
-        }
-    };*/
-
-
+    
     const handleConfirmarEvaluacionPost = async (puntajeTotal: number) => {
         if (postulanteAEvaluar)
         {
@@ -231,20 +198,7 @@ export const CoordinadorDashboard = ({ user,postulantes, ayudantes, loading }: C
             setPostulanteAEvaluar(null);
         }
     };
-    /*const handleConfirmarEvaluacionPost = async (puntajeTotal: number) => {
-        if (postulanteAEvaluar)
-        {
-            setPostulantesLocales(prev => prev.map(p => 
-                p.id === postulanteAEvaluar.id
-                ? {...p, puntuacion_etapa2: puntajeTotal}
-                : p
-            ));
-
-            alert(`Postulante evaluado con ${puntajeTotal} puntos`);
-            setPostulanteAEvaluar(null);
-        }
-    };*/
-
+    
 
     const handleConfirmarEvaluacionAyu = async (nota: number) => {
         if (ayudanteAEvaluar)
@@ -257,20 +211,6 @@ export const CoordinadorDashboard = ({ user,postulantes, ayudantes, loading }: C
         }
     };
 
-
-    /*const handleConfirmarEvaluacionAyu = async (nota: number) => {
-        if (ayudanteAEvaluar)
-        {
-            setAyudantesLocales(prev => prev.map(a => 
-                a.id === ayudanteAEvaluar.id
-                ? { ...a, evaluacion: nota }
-                : a
-            ));
-
-            alert(`Nota actualizada a ${(nota/10).toFixed(1)}`);
-            setAyudanteAEvaluar(null);
-        }
-    };*/
 
     const totalPaginas = Math.ceil(dataFiltrada.length / (itemsPagina || 1));
     const indiceInicio = (paginaActual - 1) * (itemsPagina || 1);
@@ -306,13 +246,15 @@ export const CoordinadorDashboard = ({ user,postulantes, ayudantes, loading }: C
             <div className="bg-white rounded-lg shadow-sm p-6 mb-6 border border-gray-200">
                 <div className="flex justify-between items-center">
                     <div>
-                        <button 
-                            onClick={handleBackToAdmin}
-                            className="flex items-center text-blue-600 hover:text-blue-800 mb-2 transition-colors"
-                        >
-                            <span className="mr-2">←</span>
-                            Volver al Panel Principal
-                        </button>
+                        {(user.tipo === 'admin' || user.tipo === 'encargado_ayudantias') && (
+                            <button 
+                                onClick={handleBackToAdmin}
+                                className="flex items-center text-blue-600 hover:text-blue-800 mb-2 transition-colors"
+                            >
+                                <span className="mr-2">←</span>
+                                Volver al Panel Principal
+                            </button>
+                        )}
                         <h1 className="text-2xl font-bold text-gray-800">Panel de Coordinación</h1>
                         <p className="text-gray-600 mt-1">Bienvenido, {user.nombres} {user.apellidos}</p>
                     </div>
@@ -345,6 +287,11 @@ export const CoordinadorDashboard = ({ user,postulantes, ayudantes, loading }: C
                 </div>
             </div>
 
+            {adminBar && (
+                <div className="mb-6 max-w-7xl mx-auto w-full">
+                    {adminBar}
+                </div>
+            )}
 
             <div className="flex flex-col lg:flex-row gap-6 items-start justify-center max-w-7xl mx-auto w-full">
                 <div className="w-full lg:w-72 flex-shrink-0">
@@ -574,6 +521,14 @@ export const CoordinadorDashboard = ({ user,postulantes, ayudantes, loading }: C
                                                             </td>
                                                             <td className="p-4 text-center flex justify-center gap-2">
                                                                 <button 
+                                                                    onClick={() => setPostulanteVerDetalle(p)}
+                                                                    className="bg-gray-100 text-gray-600 border border-gray-200 px-3 py-1.5 rounded hover:bg-gray-200 text-xs font-medium transition-colors flex items-center gap-1 shadow-sm"
+                                                                    title="Ver Detalle Postulación"
+                                                                >
+                                                                    <Eye size={14} />
+                                                                </button>
+
+                                                                <button 
                                                                     onClick={() => setPostulanteAEvaluar(p)} 
                                                                     className={`px-3 py-1.5 rounded text-white text-xs font-medium shadow-sm transition-colors ${esEvaluado ? "bg-yellow-500 hover:bg-yellow-600" : "bg-blue-600 hover:bg-blue-700"}`}
                                                                 >
@@ -675,7 +630,13 @@ export const CoordinadorDashboard = ({ user,postulantes, ayudantes, loading }: C
                     onClose={() => setRutVerCurriculum(null)} 
                 />
             )}
-
+            
+            {postulanteVerDetalle && (
+                <ModalDetallePostulacion 
+                    postulante={postulanteVerDetalle} 
+                    onClose={() => setPostulanteVerDetalle(null)} 
+                />
+            )}
 
         </div>        
     );

@@ -1,10 +1,10 @@
 "use client";
-import React, { useState, useMemo } from 'react';
+import React, { useState} from 'react';
 import {
     useCoordinadoresTodos,
     CoordinadorData,
     usePostulantesCoordinador,
-    useAyudantesActivos, PostulanteCoordinadorData, AyudanteActivoData
+    useAyudantesActivos
 } from '@/hooks/useCoordinadores';
 import { CoordinadorDashboard } from '@/app/coordinador/page';
 import { User } from '@/hooks/useUserProfile';
@@ -13,25 +13,12 @@ import { Users, RefreshCw } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 
 
-
-
-
 export const CoordinadorAdmin = ({adminUser}:{adminUser:User}) => {
     const {data: coordinadores, isLoading: cargaCoordinadores} = useCoordinadoresTodos();
     const [rutSeleccionado, setRutSeleccionado] = useState<string>("");
     const [modalAbierto, setModalAbierto] = useState(true);
     const router = useRouter();
     
-    /*const [busquedaCoordinador, setBusquedaCoordinador] = useState("");
-
-    const coordinadoresFiltrados = useMemo(() => {
-        if (!coordinadores) return [];
-        return (coordinadores as CoordinadorData[]).filter(c => 
-            `${c.nombres} ${c.apellidos}`.toLowerCase().includes(busquedaCoordinador.toLowerCase()) ||
-            c.rut.includes(busquedaCoordinador)
-        );
-    }, [coordinadores, busquedaCoordinador]);*/
-
     const { data: postulantes, isLoading: cargaPostulantes } = usePostulantesCoordinador(rutSeleccionado || undefined);
     const { data: ayudantes, isLoading: cargaAyudantes } = useAyudantesActivos(rutSeleccionado || undefined);
 
@@ -51,6 +38,35 @@ export const CoordinadorAdmin = ({adminUser}:{adminUser:User}) => {
         }
     }
 
+    const adminBarra = (
+        rutSeleccionado && coordinadorActual ? (
+            <div className="bg-blue-100 border border-blue-100 rounded-lg p-3 flex items-center justify-between">
+                <div className="flex items-center gap-3">
+                    <div className="bg-blue-100 p-2 rounded-full text-blue-600">
+                        <Users className="w-5 h-5" />
+                    </div>
+                    <div>
+                        <p className="text-xs text-blue-600 font-bold uppercase">Modo Supervisión: Coordinador</p>
+                        <p className="text-sm font-bold text-gray-800">
+                            {coordinadorActual.nombres} {coordinadorActual.apellidos}
+                            <span className="text-gray-500 font-normal ml-1">
+                                (Rut: {coordinadorActual.rut})
+                            </span>
+                        </p>
+                    </div>
+                </div>
+                
+                <button 
+                    onClick={() => setModalAbierto(true)}
+                    className="flex items-center gap-2 bg-white text-blue-600 px-3 py-1.5 rounded-md text-xs font-medium border border-blue-200 hover:bg-blue-50 transition"
+                >
+                    <RefreshCw className="w-4 h-4" />
+                    Cambiar
+                </button>
+            </div>
+        ) : null
+    );
+
     return (
         <>
             <ModalSeleccionarCoordinadorAdmin 
@@ -62,7 +78,7 @@ export const CoordinadorAdmin = ({adminUser}:{adminUser:User}) => {
             />
 
             <div className="space-y-6">
-                {rutSeleccionado && coordinadorActual && (
+                {/*rutSeleccionado && coordinadorActual && (
                     <div className="bg-blue-600 text-white p-4 rounded-xl shadow-md flex flex-col sm:flex-row justify-between items-center gap-4 animate-in slide-in-from-top-4">
                         <div className="flex items-center gap-3">
                             <div className="bg-white/20 p-2 rounded-lg">
@@ -84,7 +100,7 @@ export const CoordinadorAdmin = ({adminUser}:{adminUser:User}) => {
                             Cambiar Coordinador
                         </button>
                     </div>
-                )}
+                )*/}
 
                 {rutSeleccionado ? (
                     <div className="animate-in fade-in duration-500">
@@ -93,6 +109,7 @@ export const CoordinadorAdmin = ({adminUser}:{adminUser:User}) => {
                             postulantes={postulantes} 
                             ayudantes={ayudantes} 
                             loading={cargaPostulantes || cargaAyudantes} 
+                            adminBar={adminBarra}
                         />
                     </div>
                 ) : (

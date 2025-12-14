@@ -7,6 +7,13 @@ interface PatchData
     nuevo_tipo: string;
 }
 
+export interface UsuarioData {
+    rut: string;
+    nombres: string;
+    apellidos: string;
+    tipo: string;
+}
+
 export function useUsuarios(){
     return useQuery({
         queryKey:['usuarios'],
@@ -55,3 +62,17 @@ export function useHabilitarUsuario(){
     });
 
 }
+
+export function useSecretariaDocente()
+{
+    return useQuery<UsuarioData[]>({
+        queryKey: ['usuarios', 'secretaria'],
+        queryFn: async () => {
+            const { data } = await api.get('/usuario/secretaria-docente/endpoint/a');
+            return data;
+        }
+    })
+
+}
+
+

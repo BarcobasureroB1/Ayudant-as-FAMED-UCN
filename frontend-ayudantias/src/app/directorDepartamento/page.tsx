@@ -57,15 +57,6 @@ export const DirectorDeptoDashboard = ({ user }: UserProps) => {
                                 Volver al Panel Principal
                             </button>
                         )}
-                        {/*user.tipo === 'encargado_ayudantias' && (
-                        <button 
-                            onClick={handleBackToAdmin}
-                            className="flex items-center text-blue-600 hover:text-blue-800 mb-2 transition-colors"
-                        >
-                            <span className="mr-2">←</span>
-                            Volver al Panel Principal
-                        </button>
-                        )*/}
                         <h1 className="text-2xl font-bold text-gray-800">
                             Dirección de Departamento
                         </h1>

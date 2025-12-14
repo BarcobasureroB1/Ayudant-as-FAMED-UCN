@@ -765,23 +765,14 @@ export const PostulanteVista = ({user, alumno, curriculum, actividadesExtracurri
                     <div className="bg-white rounded-2xl shadow-lg p-6 mb-6">
                         <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
                             <div>
-                                {user.tipo === 'admin' && (
-                                <button 
-                                    onClick={handleBackToAdmin}
-                                    className="flex items-center text-blue-600 hover:text-blue-800 mb-2 transition-colors"
-                                >
-                                    <span className="mr-2">←</span>
-                                    Volver al Panel Principal
-                                </button>
-                                )}
-                                {user.tipo === 'encargado_ayudantias' && (
-                                <button 
-                                    onClick={handleBackToAdmin}
-                                    className="flex items-center text-blue-600 hover:text-blue-800 mb-2 transition-colors"
-                                >
-                                    <span className="mr-2">←</span>
-                                    Volver al Panel Principal
-                                </button>
+                                {(user.tipo === 'admin' || user.tipo === 'encargado_ayudantias') && (
+                                    <button 
+                                        onClick={handleBackToAdmin}
+                                        className="flex items-center text-blue-600 hover:text-blue-800 mb-2 transition-colors"
+                                    >
+                                        <span className="mr-2">←</span>
+                                        Volver al Panel Principal
+                                    </button>
                                 )}
                                 <h1 className="text-2xl md:text-3xl font-bold text-gray-900">
                                     Portal del Postulante

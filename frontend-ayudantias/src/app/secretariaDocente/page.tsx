@@ -10,11 +10,14 @@ import { useUserProfile } from "@/hooks/useUserProfile";
 import AdministrarEstudiantes from "@/components/SecretariaDocente/AdministrarEstudiantes";
 import GenerarActa from "@/components/SecretariaDocente/generarActas";
 
+import GenerarAyudantia from "@/components/SecretariaDocente/GenerarAyudantia";
+
+
 export default function SecretariaDocentePage() {
     const router = useRouter();
     const { setToken, setUsertipo } = useAuth();
 
-    type Vista = "estudiantes" | "acta" | "aperturas";
+    type Vista = "estudiantes" | "acta" | "ayudantias";
     const [vista, setVista] = useState<Vista>("estudiantes");
 
     const { data: user, isLoading, isError } = useUserProfile();
@@ -34,6 +37,10 @@ export default function SecretariaDocentePage() {
         router.refresh();
     };
 
+    const handleBackToAdmin = () => {
+        router.push('/adminDashboard');
+    };
+
     if (isLoading || !user) {
         return (
             <div className="min-h-screen flex items-center justify-center">
@@ -51,8 +58,17 @@ export default function SecretariaDocentePage() {
             <div className="bg-white rounded-lg shadow-sm p-6 mb-6 border border-gray-200">
                 <div className="flex justify-between items-center">
                     <div>
+                        {(user.tipo === 'admin' || user.tipo === 'encargado_ayudantias') && (
+                            <button 
+                                onClick={handleBackToAdmin}
+                                className="flex items-center text-blue-600 hover:text-blue-800 mb-2 transition-colors"
+                            >
+                                <span className="mr-2">←</span>
+                                Volver al Panel Principal
+                            </button>
+                        )}
                         <h1 className="text-2xl font-bold text-gray-800">
-                            Dirección de Departamento
+                            Secretaría Docente
                         </h1>
                         <p className="text-gray-600 mt-1">
                             Bienvenido, {user.nombres} {user.apellidos}
@@ -64,11 +80,11 @@ export default function SecretariaDocentePage() {
                         <p className="text-sm text-gray-600">RUT: {user.rut}</p>
                     </div>
 
-                    <div className="flex bg-gray-100 rounded-lg p-1 space-x-1">
+                    <div className="flex bg-gray-100 rounded-lg p-1 space-x-1 overflow-x-auto max-w-full">
 
                         <button
                             onClick={() => setVista("estudiantes")}
-                            className={`py-2 px-4 rounded-lg transition-all duration-200 ${
+                            className={`py-2 px-4 rounded-lg transition-all duration-200 whitespace-nowrap ${
                                 vista === "estudiantes"
                                     ? "bg-white text-blue-600 shadow-sm"
                                     : "text-gray-600 hover:text-gray-900"
@@ -79,13 +95,24 @@ export default function SecretariaDocentePage() {
 
                         <button
                             onClick={() => setVista("acta")}
-                            className={`py-2 px-4 rounded-lg transition-all duration-200 ${
+                            className={`py-2 px-4 rounded-lg transition-all duration-200 whitespace-nowrap ${
                                 vista === "acta"
                                     ? "bg-white text-blue-600 shadow-sm"
                                     : "text-gray-600 hover:text-gray-900"
                             }`}
                         >
                             Generar acta
+                        </button>
+
+                        <button
+                            onClick={() => setVista("ayudantias")}
+                            className={`py-2 px-4 rounded-lg transition-all duration-200 whitespace-nowrap ${
+                                vista === "ayudantias"
+                                    ? "bg-white text-blue-600 shadow-sm"
+                                    : "text-gray-600 hover:text-gray-900"
+                            }`}
+                        >
+                            Formalizar Ayudantía
                         </button>
 
                     </div>
@@ -107,6 +134,10 @@ export default function SecretariaDocentePage() {
 
                     {vista === "acta" && (
                         <GenerarActa rutSecretario={user.rut} />
+                    )}
+
+                    {vista === "ayudantias" && (
+                        <GenerarAyudantia user={user} onBack={() => setVista("estudiantes")} />
                     )}
                 </div>
             </div>

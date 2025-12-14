@@ -45,8 +45,10 @@ export interface PostulanteCoordinadorData {
   rut_alumno: string;
   alumno: AlumnoData;
   id_asignatura: number;
+  nombre_asignatura: string;
   descripcion_carta: string;
   metodologia: string;
+  actividad: string;
   puntuacion_etapa1: number;
   puntuacion_etapa2: number | null;
   motivo_descarte: string | null;

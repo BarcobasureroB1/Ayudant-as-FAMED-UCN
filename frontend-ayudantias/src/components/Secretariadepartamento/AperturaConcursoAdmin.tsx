@@ -1106,13 +1106,7 @@ export default function AperturaConcursoAdmin({ asignaturas = [], rutSecretaria 
                             </div>
                           )}
                         </div>
-
-                        {/*<label className="text-sm flex items-center gap-2  text-black ">
-                          <input type="checkbox" checked={horarioFijo} onChange={(e) => setHorarioFijo(e.target.checked)} />
-                          Horario fijo
-                        </label>*/}
-
-                        
+              
                       </div>
 
                       <div>
