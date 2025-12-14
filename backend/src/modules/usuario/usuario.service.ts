@@ -91,6 +91,6 @@ async create(createUsuarioDto: CreateUsuarioDto) {
     return await this.usuarioRepository.save(usuario);
   }
   async getsecretario_docente() {
-    return await this.usuarioRepository.findOneBy({ tipo: 'secretaria_docente' });
+    return await this.usuarioRepository.findBy({ tipo: 'secretaria_docente' });
   }
 }
