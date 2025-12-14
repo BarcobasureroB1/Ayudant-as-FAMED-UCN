@@ -9,6 +9,8 @@ import { useUserProfile } from "@/hooks/useUserProfile";
 
 import AdministrarEstudiantes from "@/components/SecretariaDocente/AdministrarEstudiantes";
 import GenerarActa from "@/components/SecretariaDocente/generarActas";
+import { useVerActasDeSecretario } from "@/hooks/useActas";
+import VerActas from "@/components/SecretariaDocente/revisarActas";
 
 import GenerarAyudantia from "@/components/SecretariaDocente/GenerarAyudantia";
 
@@ -17,16 +19,25 @@ export default function SecretariaDocentePage() {
     const router = useRouter();
     const { setToken, setUsertipo } = useAuth();
 
-    type Vista = "estudiantes" | "acta" | "ayudantias";
+    type Vista = "estudiantes" | "acta" | "actas" | "ayudantias";
     const [vista, setVista] = useState<Vista>("estudiantes");
 
     const { data: user, isLoading, isError } = useUserProfile();
+    const { data: actas } = useVerActasDeSecretario(user?.rut);
 
     useEffect(() => {
         if (isError || !user) {
             router.push("/login");
         }
     }, [isError, user, router]);
+
+    const handleBackToAdmin = () => {
+        router.push('/adminDashboard');
+    };
+
+    const handleBackToDobleTipo = () => {
+        router.push('/DobleTipo');
+    };
 
     const logout = () => {
         setToken(null);
@@ -35,10 +46,6 @@ export default function SecretariaDocentePage() {
         Cookies.remove("tipoUser");
         router.push("/login");
         router.refresh();
-    };
-
-    const handleBackToAdmin = () => {
-        router.push('/adminDashboard');
     };
 
     if (isLoading || !user) {
@@ -58,14 +65,23 @@ export default function SecretariaDocentePage() {
             <div className="bg-white rounded-lg shadow-sm p-6 mb-6 border border-gray-200">
                 <div className="flex justify-between items-center">
                     <div>
-                        {(user.tipo === 'admin' || user.tipo === 'encargado_ayudantias') && (
-                            <button 
-                                onClick={handleBackToAdmin}
-                                className="flex items-center text-blue-600 hover:text-blue-800 mb-2 transition-colors"
-                            >
-                                <span className="mr-2">←</span>
-                                Volver al Panel Principal
-                            </button>
+                        {user.tipo === 'admin' || user.tipo === 'encargado_ayudantias' && (
+                        <button 
+                            onClick={handleBackToAdmin}
+                            className="flex items-center text-blue-600 hover:text-blue-800 mb-2 transition-colors"
+                        >
+                            <span className="mr-2">←</span>
+                            Volver al Panel Principal
+                        </button>
+                        )}
+                        {user.tipo === 'coordinador_secretariaDocente' && (
+                        <button 
+                            onClick={handleBackToDobleTipo}
+                            className="flex items-center text-blue-600 hover:text-blue-800 mb-2 transition-colors"
+                        >
+                            <span className="mr-2">←</span>
+                            Volver al Panel Principal
+                        </button>
                         )}
                         <h1 className="text-2xl font-bold text-gray-800">
                             Secretaría Docente
@@ -76,7 +92,6 @@ export default function SecretariaDocentePage() {
                     </div>
 
                     <div className="text-right">
-                        <p className="text-sm text-gray-600">Rol: {user.tipo}</p>
                         <p className="text-sm text-gray-600">RUT: {user.rut}</p>
                     </div>
 
@@ -102,6 +117,17 @@ export default function SecretariaDocentePage() {
                             }`}
                         >
                             Generar acta
+                        </button>
+
+                        <button
+                            onClick={() => setVista("actas")}
+                            className={`py-2 px-4 rounded-lg transition-all duration-200 ${
+                                vista === "actas"
+                                ? "bg-white text-blue-600 shadow-sm"
+                                    : "text-gray-600 hover:text-gray-900"
+                            }`}
+                        >
+                            Ver actas
                         </button>
 
                         <button
@@ -136,6 +162,10 @@ export default function SecretariaDocentePage() {
                         <GenerarActa rutSecretario={user.rut} />
                     )}
 
+                    {vista === "actas" && (
+                        <VerActas actas={actas} />
+                    )}
+                    
                     {vista === "ayudantias" && (
                         <GenerarAyudantia user={user} onBack={() => setVista("estudiantes")} />
                     )}

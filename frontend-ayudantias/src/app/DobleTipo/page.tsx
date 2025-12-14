@@ -1,14 +1,11 @@
 "use client";
 
-import React, {useEffect, useState} from 'react';
+import React, {useEffect} from 'react';
 import { useRouter } from 'next/navigation';
 import { useUserProfile,User } from '@/hooks/useUserProfile';
 import { useAuth } from '@/context/AuthContext';
 import Cookies from 'js-cookie';
-import CambiarTipoDeUsuario from '@/components/FuncionesAdmin/CambiarTipoDeUsuario';
 import { useUsuarios } from "@/hooks/useUsuarios";
-import AutorizarConcursos from '@/components/FuncionesEncargado/AutorizarConcursos';
-import { useSolicitudesDeConcurso } from '@/hooks/useAsignaturas';
 
 interface UserProps {
     user:User
@@ -56,10 +53,6 @@ export const AdminDashboard = ({user, usuarios}:UserProps) => {
 
     const {setToken, setUsertipo} = useAuth();
 
-    const [mostrarCambiarTipo, setMostrarCambiarTipo] = useState(false);
-    const [mostrarAutorizarConcursos, setMostrarAutorizarConcursos] = useState(false);
-    const { data: asignaturasConcursos } = useSolicitudesDeConcurso();
-
     const router = useRouter();
 
     const logout = () => {
@@ -71,35 +64,27 @@ export const AdminDashboard = ({user, usuarios}:UserProps) => {
         router.refresh();
     }
 
-    const dashboardItems = [
-        {
-            title: "Gestión de Postulantes",
-            description: "Ver y gestionar postulaciónes",
-            icon: "👥",
-            path: "/postulante",
-            color: "blue" as const
-        },
-        {
-            title: "Secretaría de Depto",
-            description: "Acceder a funciones de secretaría de depto",
-            icon: "📊",
-            path:"/secretaria-depto",
-            color: "green" as const
-        },
+    const dashboardCoordinador = [
         {
             title: "Coordinador",
             description: "Acceder a funciones de coordinador",
             icon: "📄",
             path:"/coordinador",
             color: "yellow" as const
-        },
+        }
+    ];
+
+    const dashboardDirectordepto = [
         {
             title: "Director de Departamento",
             description: "Acceder a funciones de director de departamento",
             icon: "🏛️",
             path:"/directorDepartamento",
             color: "orange" as const
-        },
+        }
+    ];
+
+    const dashboardSecretariaDoc = [
         {
             title: "Secretaría Docente",
             description: "Acceder a funciones de secretaría docente",
@@ -107,7 +92,6 @@ export const AdminDashboard = ({user, usuarios}:UserProps) => {
             path:"/secretariaDocente",
             color: "purple" as const
         }
-
     ];
 
     const handleNavigation = (path: string) => {
@@ -121,7 +105,7 @@ export const AdminDashboard = ({user, usuarios}:UserProps) => {
                 <div className="flex justify-between items-center">
                     <div>
                         <h1 className="text-2xl font-bold text-gray-800">
-                            Panel de Administración
+                            Panel de opciones
                         </h1>
                         <p className="text-gray-600 mt-1">
                             Bienvenido, {user.nombres} {user.apellidos}
@@ -140,28 +124,9 @@ export const AdminDashboard = ({user, usuarios}:UserProps) => {
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-
-                {!mostrarCambiarTipo && !mostrarAutorizarConcursos && (
+                {user.tipo === 'coordinador_secretariaDocente' && (
                     <>
-                        <DashboardCard
-                            title="Cambiar Tipo de Usuario"
-                            description="Modificar roles de usuarios"
-                            icon="🛠️"
-                            color="purple"
-                            onClick={() => setMostrarCambiarTipo(true)}
-                        />
-                        
-                        {user.tipo === 'encargado_ayudantias' && (
-                            <DashboardCard
-                            title="Autorizar Concursos"
-                            description="Autorizar concursos de asignaturas"
-                            icon="✅"
-                            color="red"
-                            onClick={() => setMostrarAutorizarConcursos(true)}
-                        />  
-                        )}
-
-                        {dashboardItems.map((item, index) => (
+                        {dashboardCoordinador.map((item, index) => (
                             <DashboardCard
                                 key={index}
                                 title={item.title}
@@ -170,27 +135,43 @@ export const AdminDashboard = ({user, usuarios}:UserProps) => {
                                 color={item.color}
                                 onClick={() => handleNavigation(item.path)}
                             />
-                        ))}
+                        ))} 
+                        {dashboardSecretariaDoc.map((item, index) => (
+                            <DashboardCard
+                                key={index}
+                                title={item.title}
+                                description={item.description}
+                                icon={item.icon}
+                                color={item.color}
+                                onClick={() => handleNavigation(item.path)}
+                            />
+                        ))} 
                     </>
                 )}
 
-                {mostrarCambiarTipo && (
-                    <div className="col-span-1 md:col-span-2 lg:col-span-3">
-                        <CambiarTipoDeUsuario 
-                            onClose={() => setMostrarCambiarTipo(false)} 
-                            usuarios={usuarios}
-                        />
-                    </div>
-                )}
-
-                {mostrarAutorizarConcursos && (
-                    <div className="col-span-1 md:col-span-2 lg:col-span-3">
-                        <AutorizarConcursos 
-                            onClose={() => setMostrarAutorizarConcursos(false)} 
-                            mostrar={true}
-                            asignaturasConcursos={asignaturasConcursos}
-                        />
-                    </div>
+                {user.tipo === 'coordinador_directorDepto' && (
+                    <>
+                        {dashboardCoordinador.map((item, index) => (
+                            <DashboardCard
+                                key={index}
+                                title={item.title}
+                                description={item.description}
+                                icon={item.icon}
+                                color={item.color}
+                                onClick={() => handleNavigation(item.path)}
+                            />
+                        ))} 
+                        {dashboardDirectordepto.map((item, index) => (
+                            <DashboardCard
+                                key={index}
+                                title={item.title}
+                                description={item.description}
+                                icon={item.icon}
+                                color={item.color}
+                                onClick={() => handleNavigation(item.path)}
+                            />
+                        ))} 
+                    </>
                 )}
             </div>
 

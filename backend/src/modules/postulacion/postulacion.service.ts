@@ -10,6 +10,7 @@ import { Coordinador } from '../coordinador/entities/coordinador.entity';
 import { Alumno } from '../alumno/entities/alumno.entity';
 import { DescartarDto } from './dto/descartar.dto';
 import { AsignaturaAlumno } from '../asignatura_alumno/entities/asignatura_alumno.entity';
+import { EmailService } from '../email/email.service';
 
 
 @Injectable()
@@ -30,6 +31,7 @@ export class PostulacionService {
     private readonly ayudantiaRepository: Repository<Ayudantia>,
     @InjectRepository(AsignaturaAlumno)
     private readonly asignaturaAlumnoRepository: Repository<AsignaturaAlumno>,
+    private readonly emailService: EmailService,
   ) {}
   async create(createPostulacionDto: CreatePostulacionDto) {
     const usuario = await this.usuarioRepository.findOneBy({ rut: createPostulacionDto.rut_alumno });
@@ -362,14 +364,42 @@ export class PostulacionService {
     return await this.postulacionRepository.save(postulacion);
   }
   async rechazarPorJefatura(id: number, dto: DescartarDto) {
-    const postulacion = await this.postulacionRepository.findOneBy({ id });
+    const postulacion = await this.postulacionRepository.findOne({
+      where: { id },
+      relations: ['usuario', 'asignatura'],
+    });
     if (!postulacion) {
       return null;
     }
     postulacion.rechazada_por_jefatura = true;
     postulacion.motivo_descarte = dto.motivo_descarte;
     postulacion.fecha_descarte = dto.fecha_descarte;
-    return await this.postulacionRepository.save(postulacion);
+    await this.postulacionRepository.save(postulacion);
+
+    // Enviar correo al postulante
+    const usuario = postulacion.usuario;
+    const asignatura = postulacion.asignatura;
+    if (usuario && asignatura) {
+      // Buscar el alumno asociado al usuario por rut
+      const alumno = await this.alumnoRepository.findOneBy({ rut_alumno: usuario.rut });
+      if (alumno && alumno.correo) {
+        const asunto = `Notificación: Tu postulación ha sido rechazada - ${asignatura.nombre}`;
+        const html = `
+          <p>Estimado/a ${usuario.nombres} ${usuario.apellidos},</p>
+          <p>Lamentamos informarte que tu postulación para la ayudantía de <strong>${asignatura.nombre}</strong> ha sido rechazada por jefatura.</p>
+          <p><strong>Motivo:</strong> ${dto.motivo_descarte}</p>
+          <p>Si tienes dudas sobre esta decisión, puedes contactar a la coordinación correspondiente.</p>
+          <p>Saludos,<br>Sistema de Ayudantías FAMED-UCN</p>
+        `;
+        await this.emailService.send({
+          to: alumno.correo,
+          subject: asunto,
+          html,
+        });
+      }
+    }
+
+    return postulacion;
   }
   
 

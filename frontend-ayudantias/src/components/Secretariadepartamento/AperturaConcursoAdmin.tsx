@@ -426,27 +426,6 @@ export default function AperturaConcursoAdmin({ asignaturas = [], rutSecretaria 
 
   const [aficheExists, setAficheExists] = useState<Record<number, boolean | undefined>>({});
 
-  //const { data: listaCoordinadores, isLoading: cargaCoord} = useCoordinadoresTodos();
-
-  //const [coordinadoresSeleccionados, setCoordinadoresSeleccionados] = useState<string[]>([]);
-
-  //const [busquedaCoordinador, setBusquedaCoordinador] = useState("");
-
-  /*const coordinadoresFiltrados = useMemo(() => {
-    if (!listaCoordinadores)
-    {
-      return [];
-    }
-    const busquedaMin = busquedaCoordinador.toLowerCase();
-    return (listaCoordinadores as CoordinadorData[]).filter(
-      (coord: CoordinadorData) => {
-        const nombreCompleto = 
-          `${coord.nombres} ${coord.apellidos}`.toLowerCase();
-        return nombreCompleto.includes(busquedaMin);
-      }
-    );
-  }, [listaCoordinadores, busquedaCoordinador]);*/
-
   const asignaturasFiltradas = useMemo(
     () => asignaturas.filter((a) => a.nombre.toLowerCase().includes(busqueda.toLowerCase())),
     [asignaturas, busqueda]
@@ -509,8 +488,6 @@ export default function AperturaConcursoAdmin({ asignaturas = [], rutSecretaria 
     setDiaActual(opcionesDias[0].value);
     setBloqueActual(opcionesBloques[0].value);
     setCantAyudantes("");
-    //setCoordinadoresSeleccionados([]);
-    //setBusquedaCoordinador("");
     setMostrarModalCrear(true);
 
     try{
@@ -563,27 +540,9 @@ export default function AperturaConcursoAdmin({ asignaturas = [], rutSecretaria 
     setHorarios(prev => prev.filter((_, i) => i !== index));
   }
 
-  /*const handleToggleCoordinador = (rut: string) => {
-    setCoordinadoresSeleccionados((prev) => {
-      if (prev.includes(rut))
-      {
-        return prev.filter((r) => r !== rut);  
-      } else {
-        return [...prev, rut];
-      }
-    });
-  };*/
-
   const handleSubmitCrear = (e?: React.FormEvent) => {
     e?.preventDefault();
     if (!asignaturaParaCrear) return;
-
-    /*if (coordinadoresSeleccionados.length === 0)
-    {
-      setMensajePopup("Debes seleccionar al menos un coordinador");
-      setMostrarPopup(true);
-      return;
-    }*/
 
     if(!asignaturaParaCrear.coordinadores || asignaturaParaCrear.coordinadores.length === 0)
     {
@@ -1106,6 +1065,7 @@ export default function AperturaConcursoAdmin({ asignaturas = [], rutSecretaria 
                             </div>
                           )}
                         </div>
+                        
               
                       </div>
 

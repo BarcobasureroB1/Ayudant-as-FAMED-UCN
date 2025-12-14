@@ -84,11 +84,6 @@ export default function AdministrarUsuarios({
     usuariosFiltrados.length / (itemsPorPagina || 1)
     );
 
-    // -------------------------
-    // PAGINACION
-    // -------------------------
-    const totalPaginas = Math.ceil(usuariosFiltrados.length / itemsPorPagina);
-
     const usuariosPaginados = useMemo(() => {
         const inicio = (paginaActual - 1) * itemsPorPagina;
         return usuariosFiltrados.slice(inicio, inicio + itemsPorPagina);
@@ -184,7 +179,6 @@ export default function AdministrarUsuarios({
             const rut = pending.rut;
             const tipoReal = usuarios.find((u) => u.rut === rut)!.tipo;
 
-            // restaurar selector
             setSelectedTipos((prev) => ({ ...prev, [rut]: tipoReal }));
         }
 
@@ -199,7 +193,7 @@ export default function AdministrarUsuarios({
     const crearAlumnoSubmit = async () => {
         if (!pending) return;
 
-        // validación
+
         const campos = [
             "correo",
             "fecha_admision",
@@ -231,7 +225,6 @@ export default function AdministrarUsuarios({
             periodo: formAlumno.periodo,
         });
 
-        // cambiar tipo finalmente
         cambiarTipo.mutate({
             rut_usuario: pending.rut,
             nuevo_tipo: "alumno",
@@ -242,9 +235,6 @@ export default function AdministrarUsuarios({
         setPending(null);
     };
 
-    // -------------------------
-    // RENDER
-    // -------------------------
     return (
         <div className="bg-white rounded-xl shadow-lg p-6 border border-gray-200 relative">
 
@@ -258,7 +248,6 @@ export default function AdministrarUsuarios({
                 </button>
             </div>
 
-            {/* BUSQUEDA */}
             <div className="flex flex-col sm:flex-row justify-between items-center mb-4">
                 <input
                   type="text"
@@ -286,7 +275,7 @@ export default function AdministrarUsuarios({
                     }}
                     className="w-20 border border-gray-300 text-black rounded-md px-2 py-1 text-sm text-center"
                   />
-                  <span className="text-sm text-gray-700">asignaturas</span>
+                  <span className="text-sm text-gray-700">usuarios</span>
                 </div>
 
                 {totalPaginasFiltradas > 1 && (
@@ -322,7 +311,6 @@ export default function AdministrarUsuarios({
                 )}
             </div>
 
-            {/* TABLA */}
             <div className="overflow-y-auto max-h-[60vh]">
                 <table className="w-full text-left">
                     <thead>

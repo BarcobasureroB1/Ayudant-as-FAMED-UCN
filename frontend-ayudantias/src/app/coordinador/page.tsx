@@ -92,14 +92,12 @@ export const CoordinadorDashboard = ({ user,postulantes, ayudantes, loading, adm
         if (isPostulantes)
         {
             const ids = Array.from(new Set(listaPostulantes.map(p => p.id_asignatura)));
-            
             return ids.map(id => ({
                 id: id.toString(),
                 nombre: mapAsig[id] || `Asignatura ${id}`
             })).sort((a,b) => a.nombre.localeCompare(b.nombre));
         } else {
             const nombres = Array.from(new Set(listaAyudantes.map(a => a.asignatura)));
-            
             return nombres.map(nombre => ({
                 id: nombre,
                 nombre: nombre
@@ -149,7 +147,6 @@ export const CoordinadorDashboard = ({ user,postulantes, ayudantes, loading, adm
                 const matchAsignatura = filtroAsignatura ? a.asignatura.toString() === filtroAsignatura : true;
                 return matchTexto && matchAsignatura;
            });
-           
 
            if (ordenNota === 'desc')
             {
@@ -164,6 +161,10 @@ export const CoordinadorDashboard = ({ user,postulantes, ayudantes, loading, adm
 
     const handleBackToAdmin = () => {
         router.push('/adminDashboard');
+    };
+
+    const handleBackToDobleTipo = () => {
+        router.push('/DobleTipo');
     };
 
     const logout = () => {
@@ -187,7 +188,6 @@ export const CoordinadorDashboard = ({ user,postulantes, ayudantes, loading, adm
             setIdPostulacionDescartar(null);
         }
     };
-    
     const handleConfirmarEvaluacionPost = async (puntajeTotal: number) => {
         if (postulanteAEvaluar)
         {
@@ -198,7 +198,6 @@ export const CoordinadorDashboard = ({ user,postulantes, ayudantes, loading, adm
             setPostulanteAEvaluar(null);
         }
     };
-    
 
     const handleConfirmarEvaluacionAyu = async (nota: number) => {
         if (ayudanteAEvaluar)
@@ -210,7 +209,6 @@ export const CoordinadorDashboard = ({ user,postulantes, ayudantes, loading, adm
             setAyudanteAEvaluar(null);
         }
     };
-
 
     const totalPaginas = Math.ceil(dataFiltrada.length / (itemsPagina || 1));
     const indiceInicio = (paginaActual - 1) * (itemsPagina || 1);
@@ -246,20 +244,28 @@ export const CoordinadorDashboard = ({ user,postulantes, ayudantes, loading, adm
             <div className="bg-white rounded-lg shadow-sm p-6 mb-6 border border-gray-200">
                 <div className="flex justify-between items-center">
                     <div>
-                        {(user.tipo === 'admin' || user.tipo === 'encargado_ayudantias') && (
-                            <button 
-                                onClick={handleBackToAdmin}
-                                className="flex items-center text-blue-600 hover:text-blue-800 mb-2 transition-colors"
-                            >
-                                <span className="mr-2">←</span>
-                                Volver al Panel Principal
-                            </button>
+                        {user.tipo === 'admin' || user.tipo === 'encargado_ayudantias' && (
+                        <button 
+                            onClick={handleBackToAdmin}
+                            className="flex items-center text-blue-600 hover:text-blue-800 mb-2 transition-colors"
+                        >
+                            <span className="mr-2">←</span>
+                            Volver al Panel Principal
+                        </button>
+                        )}
+                        {(user.tipo === 'coordinador_secretariaDocente' || user.tipo === 'coordinador_directorDepto') && (
+                        <button 
+                            onClick={handleBackToDobleTipo}
+                            className="flex items-center text-blue-600 hover:text-blue-800 mb-2 transition-colors"
+                        >
+                            <span className="mr-2">←</span>
+                            Volver al Panel Principal
+                        </button>
                         )}
                         <h1 className="text-2xl font-bold text-gray-800">Panel de Coordinación</h1>
                         <p className="text-gray-600 mt-1">Bienvenido, {user.nombres} {user.apellidos}</p>
                     </div>
                     <div className="text-right">
-                        <p className="text-sm text-gray-600">Rol: {user.tipo}</p>
                         <p className="text-sm text-gray-600">RUT: {user.rut}</p>
                     </div>
                     <div className="flex items-center gap-3">

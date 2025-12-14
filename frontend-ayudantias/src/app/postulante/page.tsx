@@ -6,8 +6,8 @@ import { useUserProfile, User } from '@/hooks/useUserProfile';
 import { useAlumnoProfile, AlumnoData } from '@/hooks/useAlumnoProfile';
 import { useComprobarCurriculum, useCrearCurriculum, useActividadesExtracurriculares, useActividadescientificas, useCursos_titulos_grados, useAyudantias, CurriculumResponse, useEditarCurriculum} from '@/hooks/useCurriculum';
 import { useAuth } from '@/context/AuthContext';
-import { AyudantiasAnteriores, useAyudantiasPorAlumno } from '@/hooks/useAyudantia';
-import { PostulacionData, usePostulacionesPorAlumno, useCancelarPostulacion, useCrearPostulacion } from '@/hooks/usePostulacion';
+import { useAyudantiasPorAlumno } from '@/hooks/useAyudantia';
+import { usePostulacionesPorAlumno, useCancelarPostulacion, useCrearPostulacion } from '@/hooks/usePostulacion';
 import { useAsignaturasDisponiblesPostulacion, useTodasAsignaturas } from '@/hooks/useAsignaturas';
 import Cookies from 'js-cookie';
 import Select from 'react-select';
@@ -297,7 +297,6 @@ export const PostulanteVista = ({user, alumno, curriculum, actividadesExtracurri
 
     const handleSubmitPostulacion = (e: SyntheticEvent) => {
         e.preventDefault();
-        console.log("enviando postulacion: ", formPostulacion);
 
         const datosAEnviar = {
             ...formPostulacion,
@@ -397,9 +396,24 @@ export const PostulanteVista = ({user, alumno, curriculum, actividadesExtracurri
             label: a.nombre,
         })) || [];
 
+    if (user.deshabilitado === true) {
+        
+        return (
+            <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 p-4 md:p-6 text-black flex items-center justify-center">
+                <div className="absolute top-4 right-4 flex items-center gap-3">
+                    <button 
+                        onClick={logout} 
+                        className="bg-gray-800 hover:bg-black text-white font-semibold py-2 px-4 rounded-lg transition duration-200 flex items-center gap-2"
+                    >
+                        <span>Cerrar Sesión</span>
+                    </button>
+                </div>
 
-    
-    if (curriculum && user.tipo === 'alumno') {
+                <h1>Tu cuenta ha sido deshabilitada. Por favor, contacta con un administrador para más información.</h1>
+            </div>
+        );
+
+    } else if (curriculum && user.tipo === 'alumno') {
         return (
             <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 p-4 md:p-6">
                 <div className="max-w-6xl mx-auto">
@@ -407,7 +421,7 @@ export const PostulanteVista = ({user, alumno, curriculum, actividadesExtracurri
                         <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
                             <div>
                                 <h1 className="text-2xl md:text-3xl font-bold text-gray-900">
-                                    Portal del Postulante
+                                    Tus Postulaciones
                                 </h1>
                                 <p className="text-gray-600 mt-1">
                                     Gestiona tu perfil y postulaciones
@@ -627,18 +641,6 @@ export const PostulanteVista = ({user, alumno, curriculum, actividadesExtracurri
                                                     </p>
                                                 )}
                                             </div>
-                                            {/*<div>
-                                                <label className="block text-sm font-medium text-gray-700 mb-2">Correo del profesor</label>
-                                                <input 
-                                                    name="correo_profe" 
-                                                    type="email"
-                                                    value={formPostulacion.correo_profe} 
-                                                    onChange={(e) => setFormPostulacion({ ...formPostulacion, [e.target.name]: e.target.value })} 
-                                                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors text-black"
-                                                    placeholder="profesor@universidad.cl"
-                                                    required
-                                                />
-                                            </div>*/}
                                             <div>
                                                 <label className="block text-sm font-medium text-gray-700 mb-2">Actividad propuesta</label>
                                                 <input 
@@ -757,7 +759,6 @@ export const PostulanteVista = ({user, alumno, curriculum, actividadesExtracurri
         );
     }
 
-   
     if (curriculum && (user.tipo === 'admin' || user.tipo === 'encargado_ayudantias' )) {
         return (
             <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 p-4 md:p-6">
@@ -775,7 +776,7 @@ export const PostulanteVista = ({user, alumno, curriculum, actividadesExtracurri
                                     </button>
                                 )}
                                 <h1 className="text-2xl md:text-3xl font-bold text-gray-900">
-                                    Portal del Postulante
+                                    Tus Postulaciones
                                 </h1>
                                 <p className="text-gray-600 mt-1">
                                     Gestiona tu perfil y postulaciones
@@ -998,18 +999,6 @@ export const PostulanteVista = ({user, alumno, curriculum, actividadesExtracurri
                                                     </p>
                                                 )}
                                             </div>
-                                            {/*<div>
-                                                <label className="block text-sm font-medium text-gray-700 mb-2">Correo del profesor</label>
-                                                <input 
-                                                    name="correo_profe" 
-                                                    type="email"
-                                                    value={formPostulacion.correo_profe} 
-                                                    onChange={(e) => setFormPostulacion({ ...formPostulacion, [e.target.name]: e.target.value })} 
-                                                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors text-black"
-                                                    placeholder="profesor@universidad.cl"
-                                                    required
-                                                />
-                                            </div>*/}
                                             <div>
                                                 <label className="block text-sm font-medium text-gray-700 mb-2">Actividad propuesta</label>
                                                 <input 
@@ -1128,7 +1117,6 @@ export const PostulanteVista = ({user, alumno, curriculum, actividadesExtracurri
             </div>
         );
     };
-
     
     const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
         setForm({ ...form, [e.target.name]: e.target.value });
