@@ -285,7 +285,7 @@ export const PostulanteVista = ({user, alumno, curriculum, actividadesExtracurri
                         </div>
                         <div className="md:col-span-2">
                             <p className="text-sm text-gray-600">Carta de interés</p>
-                            <p className="font-medium mt-1 p-3 bg-gray-50 rounded-lg border border-gray-200">
+                            <p className="font-medium mt-1 p-3 bg-gray-50 rounded-lg border border-gray-200 ">
                                 {postulacionSeleccionada.descripcion_carta}
                             </p>
                         </div>
@@ -598,6 +598,7 @@ export const PostulanteVista = ({user, alumno, curriculum, actividadesExtracurri
                                                 name="descripcion_carta" 
                                                 value={formPostulacion.descripcion_carta} 
                                                 onChange={(e) => setFormPostulacion({ ...formPostulacion, [e.target.name]: e.target.value })} 
+                                                maxLength={700}
                                                 className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors h-32 text-black"
                                                 placeholder="Describe por qué estás interesado en esta ayudantía..."
                                                 required
