@@ -7,7 +7,7 @@ import { Asignatura } from '../asignatura/entities/asignatura.entity';
 import { Usuario } from '../usuario/entities/usuario.entity';
 import { Alumno } from '../alumno/entities/alumno.entity';
 import { Coordinador } from '../coordinador/entities/coordinador.entity';
-import { In } from 'typeorm';
+
 import { evaluarAyudantiaDto } from './dto/evaluar.dto';
 import { EmailService } from '../email/email.service';
 

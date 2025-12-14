@@ -9,10 +9,11 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { Usuario } from '../usuario/entities/usuario.entity';
 import { AlumnoModule } from '../alumno/alumno.module';
 import { Alumno } from '../alumno/entities/alumno.entity';
+import { EmailModule } from '../email/email.module';
 
 @Module({
   imports: [TypeOrmModule.forFeature([Usuario,Alumno])
-    ,UsuarioModule,AlumnoModule,
+    ,UsuarioModule,AlumnoModule,EmailModule,
     JwtModule.register({
       global: true,
       secret: jwtConstants.secret,
