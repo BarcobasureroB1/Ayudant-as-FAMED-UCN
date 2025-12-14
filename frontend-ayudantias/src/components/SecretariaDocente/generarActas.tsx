@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { useDepartamentos } from "@/hooks/useDepartamento";
-import { useCrearActa, useVerActasDeSecretario } from "@/hooks/useActas";
+import { useCrearActa } from "@/hooks/useActas";
 
 interface Participante {
     nombre: string;
@@ -95,7 +95,7 @@ export default function GenerarActa({ rutSecretario }: { rutSecretario: string }
             hora_inicio: form.hora_inicio,
             hora_fin: form.hora_fin,
             lugar: form.lugar,
-            rut_secretario: rutSecretario,
+            rut_secretaria: rutSecretario,
             participantes: form.participantes,
             firmas: form.firmas,
         },
@@ -160,6 +160,7 @@ export default function GenerarActa({ rutSecretario }: { rutSecretario: string }
                     <select
                         className="border rounded-lg p-2 w-full"
                         value={form.departamento}
+                        required
                         onChange={(e) => actualizarCampo("departamento", e.target.value)}
                     >
                         <option value="">Seleccione...</option>
@@ -181,6 +182,7 @@ export default function GenerarActa({ rutSecretario }: { rutSecretario: string }
                         type="date"
                         className="border rounded-lg p-2 w-full"
                         value={form.fecha}
+                        required
                         onChange={(e) => actualizarCampo("fecha", e.target.value)}
                     />
                 </div>
@@ -192,6 +194,7 @@ export default function GenerarActa({ rutSecretario }: { rutSecretario: string }
                             type="time"
                             className="border rounded-lg p-2 w-full"
                             value={form.hora_inicio}
+                            required
                             onChange={(e) => actualizarCampo("hora_inicio", e.target.value)}
                         />
                     </div>
@@ -202,6 +205,7 @@ export default function GenerarActa({ rutSecretario }: { rutSecretario: string }
                             type="time"
                             className="border rounded-lg p-2 w-full"
                             value={form.hora_fin}
+                            required
                             onChange={(e) => actualizarCampo("hora_fin", e.target.value)}
                         />
                     </div>
@@ -213,6 +217,7 @@ export default function GenerarActa({ rutSecretario }: { rutSecretario: string }
                         type="text"
                         className="border rounded-lg p-2 w-full"
                         value={form.lugar}
+                        required
                         onChange={(e) => actualizarCampo("lugar", e.target.value)}
                     />
                 </div>
@@ -227,6 +232,7 @@ export default function GenerarActa({ rutSecretario }: { rutSecretario: string }
                                 placeholder="Nombre"
                                 className="border p-2 rounded"
                                 value={p.nombre}
+                                required
                                 onChange={(e) =>
                                     actualizarParticipante(i, "nombre", e.target.value)
                                 }
@@ -236,6 +242,7 @@ export default function GenerarActa({ rutSecretario }: { rutSecretario: string }
                                 placeholder="Cargo"
                                 className="border p-2 rounded"
                                 value={p.cargo}
+                                required
                                 onChange={(e) =>
                                     actualizarParticipante(i, "cargo", e.target.value)
                                 }
@@ -245,6 +252,7 @@ export default function GenerarActa({ rutSecretario }: { rutSecretario: string }
                                 placeholder="Correo"
                                 className="border p-2 rounded"
                                 value={p.correo}
+                                required
                                 onChange={(e) =>
                                     actualizarParticipante(i, "correo", e.target.value)
                                 }
@@ -270,6 +278,7 @@ export default function GenerarActa({ rutSecretario }: { rutSecretario: string }
                                 placeholder="Nombre"
                                 className="border p-2 rounded"
                                 value={f.nombre}
+                                required
                                 onChange={(e) =>
                                     actualizarFirma(i, "nombre", e.target.value)
                                 }
@@ -279,6 +288,7 @@ export default function GenerarActa({ rutSecretario }: { rutSecretario: string }
                                 placeholder="Cargo"
                                 className="border p-2 rounded"
                                 value={f.cargo}
+                                required
                                 onChange={(e) =>
                                     actualizarFirma(i, "cargo", e.target.value)
                                 }

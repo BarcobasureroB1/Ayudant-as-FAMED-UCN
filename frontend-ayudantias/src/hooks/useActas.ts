@@ -7,7 +7,7 @@ export interface CrearAyudantíaData {
     hora_inicio: string;
     hora_fin: string;
     lugar: string;
-    rut_secretario: string;
+    rut_secretaria: string;
     participantes: {
         nombre: string;
         cargo: string;

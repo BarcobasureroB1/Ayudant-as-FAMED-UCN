@@ -395,8 +395,25 @@ export const PostulanteVista = ({user, alumno, curriculum, actividadesExtracurri
             value: String(a.id),
             label: a.nombre,
         })) || [];
-    
-    if (curriculum && user.tipo === 'alumno') {
+
+    if (user.deshabilitado === true) {
+        
+        return (
+            <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 p-4 md:p-6 text-black flex items-center justify-center">
+                <div className="absolute top-4 right-4 flex items-center gap-3">
+                    <button 
+                        onClick={logout} 
+                        className="bg-gray-800 hover:bg-black text-white font-semibold py-2 px-4 rounded-lg transition duration-200 flex items-center gap-2"
+                    >
+                        <span>Cerrar Sesión</span>
+                    </button>
+                </div>
+
+                <h1>Tu cuenta ha sido deshabilitada. Por favor, contacta con un administrador para más información.</h1>
+            </div>
+        );
+
+    } else if (curriculum && user.tipo === 'alumno') {
         return (
             <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 p-4 md:p-6">
                 <div className="max-w-6xl mx-auto">
@@ -741,7 +758,7 @@ export const PostulanteVista = ({user, alumno, curriculum, actividadesExtracurri
             </div>
         );
     }
-   
+
     if (curriculum && (user.tipo === 'admin' || user.tipo === 'encargado_ayudantias' )) {
         return (
             <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 p-4 md:p-6">
@@ -1109,16 +1126,6 @@ export const PostulanteVista = ({user, alumno, curriculum, actividadesExtracurri
             </div>
         );
     };
-
-    if (user.deshabilitado === true) {
-        
-        return (
-            <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 p-4 md:p-6">
-                <h2>Tu cuenta ha sido deshabilitada. Por favor, contacta con un administrador para más información.</h2>
-            </div>
-        );
-    }
-
     
     const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
         setForm({ ...form, [e.target.name]: e.target.value });
