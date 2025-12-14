@@ -8,7 +8,7 @@ export class Acta {
     id: number;
     @Column()
     departamento: string;
-    @Column()
+    @Column({ default: () => 'CURRENT_TIMESTAMP' })
     fecha: string;
     @Column()
     hora_inicio: string;
@@ -16,7 +16,7 @@ export class Acta {
     hora_fin: string;
     @Column()
     lugar: string;
-    @Column()
+    @Column({default:'1234567' })
     rut_secretaria: string;
     @ManyToOne(() => Departamento, (departamento) => departamento.id)
     id_departamento: Departamento;
