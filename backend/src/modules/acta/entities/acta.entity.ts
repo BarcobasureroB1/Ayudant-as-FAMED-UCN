@@ -8,7 +8,7 @@ export class Acta {
     id: number;
     @Column()
     departamento: string;
-    @Column()
+    @Column({ default: () => 'CURRENT_TIMESTAMP' })
     fecha: string;
     @Column()
     hora_inicio: string;
