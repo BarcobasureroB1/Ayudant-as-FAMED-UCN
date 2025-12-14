@@ -28,14 +28,7 @@ export class AsignaturaAlumnoService {
       throw new NotFoundException('Asignatura no encontrada');
     }
 
-    const asignaturaAlumno = this.asignaturaAlumnoRepository.create({
-      ...createAsignaturaAlumnoDto,
-      alumno,
-      asignatura,
-    });
-
-    // Evitar crear duplicados: verificar si ya existe una relación para
-    // este alumno y esta asignatura.
+    // Verificar si ya existe una relación para este alumno y esta asignatura
     const existing = await this.asignaturaAlumnoRepository.findOne({
       where: {
         alumno: { rut_alumno: alumno.rut_alumno },
@@ -45,8 +38,18 @@ export class AsignaturaAlumnoService {
     });
 
     if (existing) {
-      throw new ConflictException('La relación alumno-asignatura ya existe');
+      // Si ya existe, actualizar la nota y sumar 1 a la oportunidad
+      existing.nota = createAsignaturaAlumnoDto.nota;
+      existing.oportunidad = (existing.oportunidad ?? 1) + 1;
+      return await this.asignaturaAlumnoRepository.save(existing);
     }
+
+    // Si no existe, crear nueva entrada
+    const asignaturaAlumno = this.asignaturaAlumnoRepository.create({
+      ...createAsignaturaAlumnoDto,
+      alumno,
+      asignatura,
+    });
 
     return await this.asignaturaAlumnoRepository.save(asignaturaAlumno);
   }

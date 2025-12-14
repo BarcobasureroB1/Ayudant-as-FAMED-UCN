@@ -90,4 +90,7 @@ async create(createUsuarioDto: CreateUsuarioDto) {
     usuario.deshabilitado = false;
     return await this.usuarioRepository.save(usuario);
   }
+  async getsecretario_docente() {
+    return await this.usuarioRepository.findOneBy({ tipo: 'secretaria_docente' });
+  }
 }

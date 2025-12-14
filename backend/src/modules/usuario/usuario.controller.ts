@@ -53,4 +53,8 @@ export class UsuarioController {
     return this.usuarioService.habilitarUsuario(rut);
   }
 
+  @Get('secretaria-docente')
+  getSecretarioDocente() {
+    return this.usuarioService.getsecretario_docente();
+  }
 }
