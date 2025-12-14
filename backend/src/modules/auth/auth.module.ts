@@ -8,9 +8,10 @@ import { UsuarioModule } from '../usuario/usuario.module';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { Usuario } from '../usuario/entities/usuario.entity';
 import { AlumnoModule } from '../alumno/alumno.module';
+import { Alumno } from '../alumno/entities/alumno.entity';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([Usuario])
+  imports: [TypeOrmModule.forFeature([Usuario,Alumno])
     ,UsuarioModule,AlumnoModule,
     JwtModule.register({
       global: true,
