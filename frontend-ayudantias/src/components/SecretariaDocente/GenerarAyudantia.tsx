@@ -9,6 +9,8 @@ import {
     usePostulantesGlobales,
     useDescartarPostulacion
 } from '@/hooks/useCoordinadores';
+
+import { useTodasAyudantias } from '@/hooks/useAyudantia';
 import { useTodasAsignaturas } from '@/hooks/useAsignaturas';
 import { useSecretariaDocente } from '@/hooks/useUsuarios';
 
@@ -23,7 +25,7 @@ import { ModalVerCurriculum } from '../Coordinador/ModalVerCurriculum';
 
 import { 
     Search, Users, CheckSquare, Square, Filter, ChevronDown, 
-    Briefcase, RefreshCw, UserCheck, FileText, Eye, XCircle 
+    Briefcase, RefreshCw, UserCheck, FileText, Eye, XCircle, CheckCircle
 } from 'lucide-react';
 
 
@@ -50,18 +52,26 @@ export default function GenerarAyudantia({ user, onBack }: Props) {
 
     const { data: coordinadores } = useCoordinadoresTodos();    
     const { data: postulantes, isLoading: cargaPostulantes } = usePostulantesGlobales();
+    const { data: listaAyudantias } = useTodasAyudantias();
+
     const { data: listaAsignaturas } = useTodasAsignaturas();
     const descartarPostulacion = useDescartarPostulacion();
 
+    // Filtros
     const [busquedaAlumno, setBusquedaAlumno ] = useState("");
     const [busquedaCoordinador, setBusquedaCoordinador] = useState("");
     const [coordinadoresSeleccionados, setCoordinadoresSeleccionados] = useState<string[]>([]);
     const [filtroAsignatura, setFiltroAsignatura ] = useState("");
-
+    const [filtroEstado, setFiltroEstado] = useState("");
     const [ordenTotal, setOrdenTotal] = useState<"desc" | "asc" | "">("");
+
+    // Paginación
+    const [paginaActual, setPaginaActual] = useState(1);
+    const [itemsPagina, setItemsPagina] = useState(10);
+
+    // Modales y Selecciones
     const [postulanteSeleccionado, setPostulanteSeleccionado] = useState<PostulanteCoordinadorData | null>(null);
     const [modalAyudantiaAbierto, setModalAyudantiaAbierto] = useState(false);
-
     const [rutVerCurriculum, setRutVerCurriculum] = useState<string | null>(null);
     const [idPostulacionDescartar, setIdPostulacionDescartar] = useState<number | null>(null);
     const [postulanteVerDetalle, setPostulanteVerDetalle] = useState<any | null>(null);
@@ -110,10 +120,25 @@ export default function GenerarAyudantia({ user, onBack }: Props) {
                 }
             }
 
+            // filtro Estado (Pendiente / Seleccionado)
+            let matchEstado = true;
+            if (filtroEstado && listaAyudantias) {
+                const yaTieneAyudantia = listaAyudantias.some((ayudantia) => 
+                    ayudantia.alumno.rut === item.rut_alumno && 
+                    ayudantia.asignatura.id === item.id_asignatura
+                );
+                
+                if (filtroEstado === "Seleccionado") {
+                    matchEstado = yaTieneAyudantia;
+                } else if (filtroEstado === "Pendiente") {
+                    matchEstado = !yaTieneAyudantia;
+                }
+            }
+
             // solo mostrar los que NO están descartados
             const noDescartado = !item.motivo_descarte;
 
-            return matchTexto && matchAsignatura && matchCoordinador && noDescartado;
+            return matchTexto && matchAsignatura && matchCoordinador && noDescartado && matchEstado;
         });
 
         if (ordenTotal)
@@ -123,9 +148,9 @@ export default function GenerarAyudantia({ user, onBack }: Props) {
                 const totalB = (b.puntuacion_etapa1 || 0) + (b.puntuacion_etapa2 || 0);
 
                 if (ordenTotal === 'desc') {
-                    return totalB - totalA; // Mayor a menor
+                    return totalB - totalA; 
                 } else {
-                    return totalA - totalB; // Menor a mayor
+                    return totalA - totalB; 
                 }
             });
             
@@ -133,7 +158,32 @@ export default function GenerarAyudantia({ user, onBack }: Props) {
 
         return filtrados;
 
-    }, [postulantes, busquedaAlumno, filtroAsignatura, coordinadoresSeleccionados, ordenTotal]);
+    }, [postulantes, busquedaAlumno, filtroAsignatura, coordinadoresSeleccionados, ordenTotal, filtroEstado, listaAyudantias]);
+
+    // Lógica de Paginación
+    const totalPaginas = Math.ceil(postulantesFiltrados.length / (itemsPagina || 1));
+    const indiceInicio = (paginaActual - 1) * (itemsPagina || 1);
+    const indiceFin = indiceInicio + (itemsPagina || 1);
+    const dataPaginada = postulantesFiltrados.slice(indiceInicio, indiceFin);
+
+    const handlePaginaChange = (nuevaPagina: number) => {
+        if (nuevaPagina >= 1 && nuevaPagina <= totalPaginas) {
+            setPaginaActual(nuevaPagina);
+        }
+    };
+
+    const handleChangeItemsPorPagina = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const valor = Number(e.target.value);
+        if (valor > 0) {
+            setItemsPagina(valor);
+            setPaginaActual(1);
+        }
+    };
+    
+    // Resetear pagina al filtrar
+    useEffect(() => {
+        setPaginaActual(1);
+    }, [busquedaAlumno, filtroAsignatura, coordinadoresSeleccionados, ordenTotal, filtroEstado]);
 
 
     const toggleCoordinador = (rut: string) => {
@@ -142,7 +192,6 @@ export default function GenerarAyudantia({ user, onBack }: Props) {
         );
     };
 
-
     const handleSelectSecretaria = (rut: string, nombre: string) => {
         setRutSecretariaSeleccionada(rut);
         setNombreSecretariaSeleccionada(nombre);
@@ -150,13 +199,10 @@ export default function GenerarAyudantia({ user, onBack }: Props) {
 
     };
 
-
-
     const handleFormalizar = (p: PostulanteCoordinadorData) => {
         setPostulanteSeleccionado(p);
         setModalAyudantiaAbierto(true);
     };
-
 
     const handleConfirmarDescarte = async (motivo: string) => {
         if (idPostulacionDescartar)
@@ -190,11 +236,7 @@ export default function GenerarAyudantia({ user, onBack }: Props) {
         } else {
             setModalSecAbierto(false);
         }
-
-
     }
-
-
 
 return (
         <div className="space-y-6 animate-in fade-in pb-10">
@@ -236,6 +278,7 @@ return (
                 />
             )}
 
+            {/* Barra admin */}
             {user.tipo === 'admin' && (
                 <div className="bg-indigo-50 border border-indigo-100 rounded-lg p-3 flex items-center justify-between">
                     <div className="flex items-center gap-3">
@@ -267,9 +310,10 @@ return (
                 </div>
             )}
 
-            <div className="flex flex-col xl:flex-row gap-6 items-start justify-center w-full">
+            <div className="flex flex-col xl:flex-row gap-4 items-start justify-center w-full max-w-full mx-auto px-4">
                 
-                <div className="w-full xl:w-80 flex-shrink-0 space-y-4">
+                {/* Columna izq: Filtros y Coordinadores */}
+                <div className="w-full xl:w-72 flex-shrink-0 space-y-4">
                     
                     <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
                         <div className="p-4 border-b border-gray-100 bg-gray-50/50 flex justify-between items-center">
@@ -371,6 +415,22 @@ return (
                                 </div>
                             </div>
                             
+                            <div>
+                                <label className="block text-xs font-bold text-gray-500 uppercase mb-1.5">Estado</label>
+                                <div className="relative">
+                                    <select 
+                                        className="w-full appearance-none px-3 py-2 bg-gray-50 border border-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:bg-white outline-none transition-all text-gray-800 pr-8"
+                                        value={filtroEstado}
+                                        onChange={(e) => setFiltroEstado(e.target.value)}
+                                    >
+                                        <option value="">Todos los estados</option>
+                                        <option value="Pendiente">Pendiente</option>
+                                        <option value="Seleccionado">Seleccionado</option>
+                                    </select>
+                                    <ChevronDown className="absolute right-3 top-2.5 w-4 h-4 text-gray-400 pointer-events-none" />
+                                </div>
+                            </div>
+
                             <div className="pt-3 border-t border-gray-100">
                                 <label className="block text-xs font-bold text-gray-500 uppercase mb-2">Orden por Puntaje Total</label>
                                 <div className="space-y-2">
@@ -409,11 +469,50 @@ return (
                     
                 </div>
 
+                {/* Columna der: Tabla con Paginación */}
                 <div className="flex-1 w-full min-w-0">
                     <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
-                        <div className="bg-gray-50/50 border-b border-gray-200 px-6 py-4">
-                            <h3 className="text-lg font-bold text-gray-800">Postulantes Disponibles</h3>
-                            <p className="text-xs text-gray-500 mt-1">Seleccione un postulante para formalizar su ayudantía.</p>
+                        
+                        <div className="bg-white border-b border-gray-200 px-6 py-4 flex flex-col sm:flex-row justify-between items-center gap-4">
+                            <div>
+                                <h3 className="text-lg font-bold text-gray-800">Postulantes Disponibles</h3>
+                                <p className="text-xs text-gray-500 mt-0.5">Seleccione un postulante para formalizar su ayudantía.</p>
+                            </div>
+                            
+                            {/* Controles de Paginación */}
+                            <div className="flex items-center gap-4">
+                                <div className="flex items-center gap-2">
+                                    <span className="text-sm text-gray-500 hidden sm:block">Mostrar</span>
+                                    <input
+                                        type="number"
+                                        value={itemsPagina}
+                                        onChange={handleChangeItemsPorPagina}
+                                        className="w-16 border border-gray-300 text-black rounded-md px-2 py-1.5 text-sm text-center focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                        min={1}
+                                    />
+                                    <span className="text-sm text-gray-500 hidden sm:block">filas</span>
+                                </div>
+
+                                <div className="flex items-center gap-2 bg-gray-50 p-1 rounded-lg border border-gray-200">
+                                    <button 
+                                        onClick={() => handlePaginaChange(paginaActual - 1)} 
+                                        disabled={paginaActual === 1} 
+                                        className="p-1.5 rounded hover:bg-white hover:shadow-sm disabled:opacity-30 text-gray-600 transition-all"
+                                    >
+                                        ←
+                                    </button>
+                                    <span className="text-sm font-medium text-gray-700 w-20 text-center select-none">
+                                        {paginaActual} / {totalPaginas || 1}
+                                    </span>
+                                    <button 
+                                        onClick={() => handlePaginaChange(paginaActual + 1)} 
+                                        disabled={paginaActual === totalPaginas} 
+                                        className="p-1.5 rounded hover:bg-white hover:shadow-sm disabled:opacity-30 text-gray-600 transition-all"
+                                    >
+                                        →
+                                    </button>
+                                </div>
+                            </div>
                         </div>
 
                         {cargaPostulantes ? (
@@ -422,50 +521,60 @@ return (
                                 <p className="text-gray-500 font-medium">Cargando postulantes...</p>
                             </div>
                         ) : (
-                            <div className="overflow-x-auto">
-                                <table className="w-full text-left border-collapse">
-                                    <thead>
-                                        <tr className="bg-slate-50 border-b border-gray-200 text-xs font-bold text-slate-500 uppercase tracking-wider">
+                            <div className="overflow-hidden">
+                                <table className="w-full text-left border-collapse table-fixed">
+                                    <thead className="bg-gray-50 text-gray-600 uppercase font-medium text-xs tracking-wider">
+                                        <tr>
                                             <th className="px-2 py-4 w-[10%]">RUT</th>
-                                            
-                                            <th className="px-2 py-4 w-[20%]">Alumno</th>
-                                            
-                                            <th className="px-2 py-4 text-center w-[15%]">Asignatura</th>
-                                            
-                                            <th className="px-2 py-4 text-center w-[10%]">Coordinador</th>
-                                            
+                                            <th className="px-2 py-4 w-[15%]">Alumno</th>
+                                            <th className="px-2 py-4 text-center w-[14%]">Asignatura</th>
+                                            <th className="px-2 py-4 text-center w-[14%]">Coordinador</th>
                                             <th className="px-1 py-4 text-center w-[5%]">P. E1</th>
                                             <th className="px-1 py-4 text-center w-[5%]">P. E2</th>
                                             <th className="px-1 py-4 text-center w-[5%]">Total</th>
-                                            
+                                            <th className="px-2 py-4 text-center w-[10%]">Estado</th>
                                             <th className="px-2 py-4 text-center w-[20%]">Acciones</th>
                                         </tr>
                                     </thead>
+                                    
                                     <tbody className="bg-white divide-y divide-gray-100">
-                                        {postulantesFiltrados.map((item: any) => {
-                                            const nombreAsig = mapAsig[item.id_asignatura] || item.id_asignatura;
-                                            const coordNombre = item.nombre_coordinador || (item.coordinador ? `${item.coordinador.nombres} ${item.coordinador.apellidos}` : "N/A");
-                                            
-                                            const p1 = item.puntuacion_etapa1 || 0;
-                                            const p2 = item.puntuacion_etapa2;
-                                            const total = p1 + (p2 || 0);
+                                        {dataPaginada.length > 0 ? (
+                                            dataPaginada.map((item: any) => {
+                                                const nombreAsig = mapAsig[item.id_asignatura] || item.id_asignatura;
+                                                const coordNombre = item.nombre_coordinador || (item.coordinador ? `${item.coordinador.nombres} ${item.coordinador.apellidos}` : "N/A");
+                                                
+                                                const p1 = item.puntuacion_etapa1 || 0;
+                                                const p2 = item.puntuacion_etapa2;
+                                                const total = p1 + (p2 || 0);
 
-                                            return (
-                                                <tr key={item.id} className="hover:bg-slate-50 transition-colors group">
-                                                    <td className="px-2 py-4 text-sm font-medium text-gray-900 font-mono truncate">
+                                                const yaTieneAyudantia = listaAyudantias?.some((ayudantia) => 
+                                                    ayudantia.alumno.rut === item.rut_alumno && 
+                                                    ayudantia.asignatura.id === item.id_asignatura
+                                                );
+
+                                                return (
+                                                    <tr key={item.id} className="hover:bg-gray-50 transition-colors group">
+                                                    {/* 1. RUT */}
+                                                    <td className="px-2 py-4 text-sm font-medium text-gray-900 font-mono">
                                                         {item.rut_alumno}
                                                     </td>
-                                                    <td className="px-2 py-4 text-sm text-gray-700 font-medium truncate max-w-[150px]" title={`${item.alumno.nombres} ${item.alumno.apellidos}`}>
+
+                                                    {/* 2. ALUMNO */}
+                                                    <td className="px-2 py-4 text-sm text-gray-700 font-medium break-words whitespace-normal">
                                                         {item.alumno.nombres} {item.alumno.apellidos}
                                                     </td>
+
+                                                    {/* 3. ASIGNATURA */}
                                                     <td className="px-2 py-4 text-center text-sm text-gray-600">
-                                                        <span className="inline-block px-2 py-1 bg-gray-100 rounded text-xs truncate max-w-[120px]" title={nombreAsig}>
+                                                        <span className="inline-block px-2 py-1 bg-gray-100 rounded text-xs truncate whitespace-normal w-full">
                                                             {nombreAsig}
                                                         </span>
                                                     </td>
-                                                    <td className="px-2 py-4 text-center text-sm text-gray-500 text-xs truncate max-w-[100px]" title={coordNombre}>
+
+                                                    <td className="px-2 py-4 text-center text-sm text-gray-500 text-xs break-words whitespace-normal">
                                                         {coordNombre}
                                                     </td>
+
                                                     <td className="px-1 py-4 text-center text-sm text-gray-600">
                                                         {p1}
                                                     </td>
@@ -477,12 +586,24 @@ return (
                                                             {total}
                                                         </span>
                                                     </td>
-                                                    
+
                                                     <td className="px-2 py-4 text-center">
-                                                        <div className="flex items-center justify-center gap-1.5">
+                                                        {yaTieneAyudantia ? (
+                                                            <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800 border border-green-200">
+                                                                Seleccionado
+                                                            </span>
+                                                        ) : (
+                                                            <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800 border border-yellow-200">
+                                                                Pendiente
+                                                            </span>
+                                                        )}
+                                                    </td>
+                                                    
+                                                    <td className="px-2 py-4 text-center align-middle">
+                                                        <div className="flex flex-wrap items-center justify-center gap-1">
                                                             <button 
                                                                 onClick={() => setPostulanteVerDetalle(item)}
-                                                                className="p-1.5 bg-gray-50 text-gray-600 rounded-md hover:bg-gray-100 border border-gray-200 transition-colors"
+                                                                className="p-1 bg-gray-50 text-gray-600 rounded-md hover:bg-gray-100 border border-gray-200 transition-colors"
                                                                 title="Ver Postulación"
                                                             >
                                                                 <Eye size={15} />
@@ -490,36 +611,46 @@ return (
 
                                                             <button 
                                                                 onClick={() => setRutVerCurriculum(item.rut_alumno)}
-                                                                className="p-1.5 bg-indigo-50 text-indigo-600 rounded-md hover:bg-indigo-100 border border-indigo-200 transition-colors"
+                                                                className="p-1 bg-indigo-50 text-indigo-600 rounded-md hover:bg-indigo-100 border border-indigo-200 transition-colors"
                                                                 title="Ver Curriculum"
                                                             >
                                                                 <FileText size={15} />
                                                             </button>
 
                                                             <button 
-                                                                onClick={() => setIdPostulacionDescartar(item.id)}
-                                                                className="p-1.5 bg-red-50 text-red-600 rounded-md hover:bg-red-100 border border-red-200 transition-colors"
+                                                                onClick={() => !yaTieneAyudantia && setIdPostulacionDescartar(item.id)}
+                                                                disabled={yaTieneAyudantia}
+                                                                className={`p-1 rounded-md border transition-colors ${yaTieneAyudantia ? 'bg-gray-100 text-gray-300 border-gray-200 cursor-not-allowed' : 'bg-red-50 text-red-600 hover:bg-red-100 border-red-200'}`}
                                                                 title="Descartar"
                                                             >
                                                                 <XCircle size={15} />
                                                             </button>
 
-                                                            <button
-                                                                onClick={() => handleFormalizar(item)}
-                                                                className="flex items-center gap-1 bg-blue-600 hover:bg-blue-700 text-white px-2 py-1.5 rounded-lg text-xs font-semibold shadow-sm transition-all whitespace-nowrap"
-                                                                title="Formalizar Ayudantía"
-                                                            >
-                                                                <UserCheck size={14}/> Escoger
-                                                            </button>
+                                                            {yaTieneAyudantia ? (
+                                                                <button
+                                                                    disabled
+                                                                    className="flex items-center gap-1 bg-green-600 text-white px-2 py-1.5 rounded-lg text-xs font-semibold shadow-sm opacity-90 cursor-default whitespace-nowrap"
+                                                                >
+                                                                    <CheckCircle size={14}/>
+                                                                </button>
+                                                            ) : (
+                                                                <button
+                                                                    onClick={() => handleFormalizar(item)}
+                                                                    className="flex items-center gap-1 bg-blue-600 hover:bg-blue-700 text-white px-2 py-1 rounded-lg text-xs font-semibold shadow-sm transition-all whitespace-nowrap"
+                                                                    title="Formalizar Ayudantía"
+                                                                >
+                                                                    <UserCheck size={14}/> Escoger
+                                                                </button>
+                                                            )}
                                                         </div>
                                                     </td>
                                                 </tr>
-                                            );
-                                        })}
-                                        {postulantesFiltrados.length === 0 && (
+                                                );
+                                            })
+                                        ) : (
                                             <tr>
-                                                <td colSpan={8} className="bg-white">
-                                                    <div className="flex flex-col items-center justify-center min-h-[400px] text-gray-400 text-sm">
+                                                <td colSpan={9} className="bg-white">
+                                                    <div className="flex flex-col items-center justify-center min-h-[300px] text-gray-400 text-sm py-12">
                                                         <div className="bg-gray-50 p-4 rounded-full mb-3">
                                                             <Search size={40} className="text-gray-300"/>
                                                         </div>
@@ -537,8 +668,4 @@ return (
             </div>
         </div>
     );
-
-
-
-
 }
