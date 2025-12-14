@@ -1,4 +1,4 @@
-/*import { Injectable, Logger } from '@nestjs/common';
+import { Injectable, Logger } from '@nestjs/common';
 import nodemailer, { Transporter } from 'nodemailer';
 
 export type SendEmailParams = {
@@ -56,4 +56,4 @@ export class EmailService {
     this.logger.log(`Email sent: ${info.messageId}`);
     return info;
   }
-}*/
+}
