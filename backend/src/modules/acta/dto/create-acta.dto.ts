@@ -12,7 +12,7 @@ export class CreateActaDto {
     id_departamento: number
     @IsNotEmpty()
     @IsString()
-    fecha : Date;
+    fecha : string;
     @IsNotEmpty()
     @IsString()
     hora_inicio: string
