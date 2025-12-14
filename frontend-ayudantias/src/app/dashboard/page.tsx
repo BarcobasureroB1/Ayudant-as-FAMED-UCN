@@ -9,6 +9,8 @@ import SecretariaDeptoPage from "../secretaria-depto/page";
 import { useAuth } from "@/context/AuthContext";
 import CoordinadorPage from "../coordinador/page";
 import DirectorDepartamentoPage from "../directorDepartamento/page";
+import SecretariaDocentePage from "../secretariaDocente/page";
+import DobleTipoPage from "../DobleTipo/page";
 
 export default function DashboardPage() {
     const router = useRouter();
@@ -40,7 +42,7 @@ export default function DashboardPage() {
                 case 'alumno':
                     router.push("/postulante");
                     break;
-                case 'secretariaDepto':
+                case 'secretaria_depto':
                     router.push("/secretaria-depto");
                     break;
                 case 'coordinador':
@@ -51,6 +53,15 @@ export default function DashboardPage() {
                     break;
                 case 'director_depto':
                     router.push("/directorDepartamento");
+                    break;
+                case 'secretaria_docente':
+                    router.push("/secretariaDocente");
+                    break;
+                case 'coordinador_secretariaDocente':
+                    router.push("/DobleTipo");
+                    break;
+                case 'coordinador_directorDepto':
+                    router.push("/DobleTipo");
                     break;
             }
         }
@@ -80,6 +91,16 @@ export default function DashboardPage() {
     if (rutaActual.startsWith("/directorDepartamento"))
     {
         return <DirectorDepartamentoPage/>;
+    }
+
+    if (rutaActual.startsWith("/secretariaDocente"))
+    {
+        return <SecretariaDocentePage/>;
+    }
+
+    if (rutaActual.startsWith("/DobleTipo"))
+    {
+        return <DobleTipoPage/>;
     }
 
     if (isLoading)

@@ -28,6 +28,14 @@ export default function SecretariaDocentePage() {
         }
     }, [isError, user, router]);
 
+    const handleBackToAdmin = () => {
+        router.push('/adminDashboard');
+    };
+
+    const handleBackToDobleTipo = () => {
+        router.push('/DobleTipo');
+    };
+
     const logout = () => {
         setToken(null);
         setUsertipo(null);
@@ -54,6 +62,33 @@ export default function SecretariaDocentePage() {
             <div className="bg-white rounded-lg shadow-sm p-6 mb-6 border border-gray-200">
                 <div className="flex justify-between items-center">
                     <div>
+                        {user.tipo === 'admin' && (
+                        <button 
+                            onClick={handleBackToAdmin}
+                            className="flex items-center text-blue-600 hover:text-blue-800 mb-2 transition-colors"
+                        >
+                            <span className="mr-2">←</span>
+                            Volver al Panel Principal
+                        </button>
+                        )}
+                        {user.tipo === 'encargado_ayudantias' && (
+                        <button 
+                            onClick={handleBackToAdmin}
+                            className="flex items-center text-blue-600 hover:text-blue-800 mb-2 transition-colors"
+                        >
+                            <span className="mr-2">←</span>
+                            Volver al Panel Principal
+                        </button>
+                        )}
+                        {user.tipo === 'coordinador_secretariaDocente' && (
+                        <button 
+                            onClick={handleBackToDobleTipo}
+                            className="flex items-center text-blue-600 hover:text-blue-800 mb-2 transition-colors"
+                        >
+                            <span className="mr-2">←</span>
+                            Volver al Panel Principal
+                        </button>
+                        )}
                         <h1 className="text-2xl font-bold text-gray-800">
                             Secretaría Docente
                         </h1>

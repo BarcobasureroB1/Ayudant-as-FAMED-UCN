@@ -9,7 +9,6 @@ import Cookies from 'js-cookie';
 import AutorizarConcursos from '@/components/FuncionesEncargado/AutorizarConcursos';
 import { DirectorCoordinacionVista } from '@/components/Director/DirectorCoordinacionVista';
 import { useSolicitudesDeConcurso } from '@/hooks/useAsignaturas';
-//import { usePostulantesCoordinador, useAyudantesActivos } from '@/hooks/useCoordinadores';
 import { usePostulantesGlobales, useAyudantesGlobales } from '@/hooks/useCoordinadores';
 
 
@@ -32,6 +31,10 @@ export const DirectorDeptoDashboard = ({ user }: UserProps) => {
 
     const handleBackToAdmin = () => {
         router.push('/adminDashboard');
+    };
+
+    const handleBackToDobleTipo = () => {
+        router.push('/DobleTipo');
     };
 
     const logout = () => {
@@ -57,15 +60,15 @@ export const DirectorDeptoDashboard = ({ user }: UserProps) => {
                                 Volver al Panel Principal
                             </button>
                         )}
-                        {/*user.tipo === 'encargado_ayudantias' && (
-                        <button 
-                            onClick={handleBackToAdmin}
-                            className="flex items-center text-blue-600 hover:text-blue-800 mb-2 transition-colors"
-                        >
-                            <span className="mr-2">←</span>
-                            Volver al Panel Principal
-                        </button>
-                        )*/}
+                        {user.tipo === 'coordinador_directorDepto' && (
+                            <button 
+                                onClick={handleBackToDobleTipo}
+                                className="flex items-center text-blue-600 hover:text-blue-800 mb-2 transition-colors"
+                            >
+                                <span className="mr-2">←</span>
+                                Volver al Panel Principal
+                            </button>
+                        )}
                         <h1 className="text-2xl font-bold text-gray-800">
                             Dirección de Departamento
                         </h1>
@@ -74,7 +77,6 @@ export const DirectorDeptoDashboard = ({ user }: UserProps) => {
                         </p>
                     </div>
                     <div className="text-right">
-                        <p className="text-sm text-gray-600">Rol: {user.tipo}</p>
                         <p className="text-sm text-gray-600">RUT: {user.rut}</p>
                     </div>
                     <div className="flex items-center gap-3">
