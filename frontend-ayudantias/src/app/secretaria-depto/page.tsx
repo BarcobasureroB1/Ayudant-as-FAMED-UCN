@@ -63,22 +63,23 @@ export const SecretariaDeptoDashboard = ({ user, asignaturas, asignaturasCoordin
             <div className="bg-white rounded-lg shadow-sm p-6 mb-6 border border-gray-200">
                 <div className="flex justify-between items-center">
                     <div>
-                        <button 
-                            onClick={handleBackToAdmin}
-                            className="flex items-center text-blue-600 hover:text-blue-800 mb-2 transition-colors"
-                        >
-                            <span className="mr-2">←</span>
-                            Volver al Panel Principal
-                        </button>
+                        {(user.tipo === 'admin' || user.tipo === 'encargado_ayudantias') && (
+                            <button 
+                                onClick={handleBackToAdmin}
+                                className="flex items-center text-blue-600 hover:text-blue-800 mb-2 transition-colors"
+                            >
+                                <span className="mr-2">←</span>
+                                Volver al Panel Principal
+                            </button>
+                        )}
                         <h1 className="text-2xl font-bold text-gray-800">
                             Secretaría de Departamento
                         </h1>
                         <p className="text-gray-600 mt-1">
-                            Bienvenido, {user.nombres} {user.apellido}
+                            Bienvenido, {user.nombres} {user.apellidos}
                         </p>
                     </div>
                     <div className="text-right">
-                        <p className="text-sm text-gray-600">Rol: {user.tipo}</p>
                         <p className="text-sm text-gray-600">RUT: {user.rut}</p>
                     </div>
                     <div className="flex items-center gap-3">
@@ -133,14 +134,33 @@ export const SecretariaDeptoDashboard = ({ user, asignaturas, asignaturasCoordin
                                         asignaturas={asignaturas}
                                     />
                                     )}
+                                    {user.tipo === 'encargado_ayudantias' && (
+                                        <AperturaConcursoAdmin
+                                        rutSecretaria={user.rut} 
+                                        asignaturas={asignaturas}
+                                    />
+                                    )}
                                     {user.tipo ==='secretaria_depto' && (
-                                        <AperturaConcursoSecreDepto datosUsuario={user} />
+                                        <AperturaConcursoAdmin
+                                        rutSecretaria={user.rut} 
+                                        asignaturas={asignaturas}
+                                    />
                                     )}
                                 </div>
                                 
                             ): vista === 'Constancia' ? (
                                 <div className="space-y-6">
                                     {user.tipo === 'admin' && (
+                                        <GenerarConstanciaAdmin 
+                                        alumnos={alumnos}
+                                    />
+                                    )}
+                                    {user.tipo === 'encargado_ayudantias' && (
+                                        <GenerarConstanciaAdmin 
+                                        alumnos={alumnos}
+                                    />
+                                    )}
+                                    {user.tipo === 'secretaria_depto' && (
                                         <GenerarConstanciaAdmin 
                                         alumnos={alumnos}
                                     />
@@ -154,8 +174,17 @@ export const SecretariaDeptoDashboard = ({ user, asignaturas, asignaturasCoordin
                                         coordinadoresTodos={coordinadoresTodos}
                                     />
                                     )}
+                                    {user.tipo === 'encargado_ayudantias' && (
+                                        <GestionCoordinadoresAdmin
+                                        asignaturas={asignaturasCoordinadores}
+                                        coordinadoresTodos={coordinadoresTodos}
+                                    />
+                                    )}
                                     {user.tipo ==='secretaria_depto' && (
-                                        <GestionCoordinadores datosUsuario={user} />
+                                        <GestionCoordinadoresAdmin
+                                        asignaturas={asignaturasCoordinadores}
+                                        coordinadoresTodos={coordinadoresTodos}
+                                        />
                                     )}
                                     
                                 </div>

@@ -63,10 +63,11 @@ export default function AdministrarUsuarios({
         { value: "admin", label: "Administrador" },
         { value: "secretaria_depto", label: "Secretaría de Departamento" },
         { value: "coordinador", label: "Coordinador" },
-        { value: "alumno", label: "Postulante" },
+        { value: "alumno", label: "Alumno" },
         { value: "encargado_ayudantias", label: "Encargado de ayudantías" }, 
         { value: "director_depto", label: "Director de departamento" },
         { value: "secretaria_docente", label: "Secretaría docente" },
+        { value: "director_y_coordinador", label: "Director de departamento y Coordinador" },
     ];
 
     // -------------------------
@@ -82,11 +83,6 @@ export default function AdministrarUsuarios({
     const totalPaginasFiltradas = Math.ceil(
     usuariosFiltrados.length / (itemsPorPagina || 1)
     );
-
-    // -------------------------
-    // PAGINACION
-    // -------------------------
-    const totalPaginas = Math.ceil(usuariosFiltrados.length / itemsPorPagina);
 
     const usuariosPaginados = useMemo(() => {
         const inicio = (paginaActual - 1) * itemsPorPagina;
@@ -183,7 +179,6 @@ export default function AdministrarUsuarios({
             const rut = pending.rut;
             const tipoReal = usuarios.find((u) => u.rut === rut)!.tipo;
 
-            // restaurar selector
             setSelectedTipos((prev) => ({ ...prev, [rut]: tipoReal }));
         }
 
@@ -198,7 +193,7 @@ export default function AdministrarUsuarios({
     const crearAlumnoSubmit = async () => {
         if (!pending) return;
 
-        // validación
+
         const campos = [
             "correo",
             "fecha_admision",
@@ -230,7 +225,6 @@ export default function AdministrarUsuarios({
             periodo: formAlumno.periodo,
         });
 
-        // cambiar tipo finalmente
         cambiarTipo.mutate({
             rut_usuario: pending.rut,
             nuevo_tipo: "alumno",
@@ -241,9 +235,6 @@ export default function AdministrarUsuarios({
         setPending(null);
     };
 
-    // -------------------------
-    // RENDER
-    // -------------------------
     return (
         <div className="bg-white rounded-xl shadow-lg p-6 border border-gray-200 relative">
 
@@ -257,7 +248,6 @@ export default function AdministrarUsuarios({
                 </button>
             </div>
 
-            {/* BUSQUEDA */}
             <div className="flex flex-col sm:flex-row justify-between items-center mb-4">
                 <input
                   type="text"
@@ -285,7 +275,7 @@ export default function AdministrarUsuarios({
                     }}
                     className="w-20 border border-gray-300 text-black rounded-md px-2 py-1 text-sm text-center"
                   />
-                  <span className="text-sm text-gray-700">asignaturas</span>
+                  <span className="text-sm text-gray-700">usuarios</span>
                 </div>
 
                 {totalPaginasFiltradas > 1 && (
@@ -321,7 +311,6 @@ export default function AdministrarUsuarios({
                 )}
             </div>
 
-            {/* TABLA */}
             <div className="overflow-y-auto max-h-[60vh]">
                 <table className="w-full text-left">
                     <thead>
@@ -387,13 +376,13 @@ export default function AdministrarUsuarios({
                 </div>
             )}
 
-            {/* POPUP FORM ALUMNO */}
+            {/* POPUP FORM PARA CAMBIAR UN TIPO POR ALUMNO */}
             {showAlumnoPopup && (
                 <div className="fixed inset-0 bg-black/50 flex justify-center items-center text-black overflow-auto p-4">
                     <div className="bg-white p-6 rounded-xl w-[420px]">
                         <h3 className="text-lg font-semibold mb-4">Crear un perfil de alumno para el cambio:</h3>
 
-                        <div className="flex flex-col gap-3">
+                        <div className="flex flex-col gap-3 overflow-auto p-4 max-h-[60vh]">
 
                             <input className="border px-3 py-2 rounded" value={formAlumno.rut_alumno} readOnly />
                             <input className="border px-3 py-2 rounded" value={formAlumno.nombres} readOnly />
@@ -449,9 +438,10 @@ export default function AdministrarUsuarios({
                                 onChange={(e) => setFormAlumno({ ...formAlumno, promedio: e.target.value })}
                             />
 
-                            <p className="text-black">Periodo entre ingreso y actualidad/término</p>
+                            <p className="text-black">Periodo actual (formato YYYYSemestre) (Ej: 202520)</p>
                             <input
                                 className="border px-3 py-2 rounded"
+                                type="number"
                                 placeholder="Periodo"
                                 value={formAlumno.periodo}
                                 onChange={(e) => setFormAlumno({ ...formAlumno, periodo: e.target.value })}

@@ -1,4 +1,4 @@
-import {useQuery} from '@tanstack/react-query';
+import {useMutation, useQuery, useQueryClient} from '@tanstack/react-query';
 import api from '../api/axios';
 
 
@@ -35,4 +35,52 @@ export function useAyudantiasPorAlumno(rut_alumno?: string){
         },
         enabled : !!rut_alumno,
     });
+}
+
+interface CrearAyudantíaData
+{
+    rut_alumno: string;
+    id_asignatura: number;
+    rut_coordinador_otro: string;
+    periodo: string;
+    remunerada: string;
+}
+
+export function useCrearAyudantia() {
+    const clienteQuery = useQueryClient();
+    return useMutation({
+        mutationFn: async (ayudantia: CrearAyudantíaData) => {
+            const respuesta = await api.post('ayudantia', ayudantia);
+            return respuesta.data;
+        },
+        onSuccess: (_data) => {
+            clienteQuery.invalidateQueries({ queryKey: ['ayudantias'] });
+            clienteQuery.invalidateQueries({queryKey: ['postulantes']});
+        },
+    });
+}
+
+export interface AyudantiaGlobalData {
+    id: number;
+    alumno: {
+        rut: string;
+        nombres: string;
+        apellidos: string;
+    };
+    asignatura: {
+        id: number;
+        nombre: string;
+    };
+}
+
+export function useTodasAyudantias() {
+    return useQuery<AyudantiaGlobalData[], Error>({
+        queryKey: ['ayudantiasGlobales'],
+        queryFn: async () => {
+            const respuesta = await api.get('/ayudantia');
+            return respuesta.data;
+        },
+
+        staleTime: 1000 * 60,
+    })
 }

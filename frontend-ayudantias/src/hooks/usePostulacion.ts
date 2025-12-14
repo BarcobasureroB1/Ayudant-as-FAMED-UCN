@@ -90,3 +90,16 @@ export function useEditarPostulacion() {
     });
 
 }
+
+export function useDescartarPostulacion(){   
+    const clienteQuery = useQueryClient();
+    return useMutation({
+        mutationFn: async ({id}:{id: number}) => {
+            await api.patch(`/postulacion/descartar-postulacion/${id}`)
+        },
+        onSuccess: (_data) => {
+            clienteQuery.invalidateQueries({queryKey:['postulaciones']});
+        }                        
+    });
+
+}

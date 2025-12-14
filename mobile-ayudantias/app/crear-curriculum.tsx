@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useMemo, useState } from 'react';
 import {
   StyleSheet,
   ScrollView,
@@ -16,6 +16,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { Stack, useRouter} from 'expo-router';
 import { useAuth } from '@/context/AuthContext';
 import { useQueryClient } from '@tanstack/react-query';
+import { useThemeColors } from '@/hooks/useThemeColors';
 
 
 interface FormInputProps {
@@ -28,6 +29,8 @@ interface FormInputProps {
     numberOfLines?: number;
     disabled?: boolean;
     autoCapitalize?: TextInputProps['autoCapitalize'];
+    styles: any;
+    placeholderTextcolor: string;
 }
 
 const FormInput: React.FC<FormInputProps> = ({
@@ -40,6 +43,8 @@ const FormInput: React.FC<FormInputProps> = ({
     numberOfLines = 1,
     disabled = false,
     autoCapitalize= "none",
+    styles,
+    placeholderTextcolor
 }) => (
     <View style={styles.inputContainer}>
         <ThemedText style={styles.inputLabel}>{label}</ThemedText>
@@ -52,7 +57,7 @@ const FormInput: React.FC<FormInputProps> = ({
             multiline={multiline}
             numberOfLines={numberOfLines}
             editable={!disabled}
-            placeholderTextColor="#999"
+            placeholderTextColor={placeholderTextcolor}
             autoCapitalize={autoCapitalize}
         />
     </View>
@@ -65,6 +70,9 @@ export default function CrearCurriculumScreen() {
     const { setToken, setUsertipo } = useAuth();
 
     const clienteQuery = useQueryClient();
+
+    const colors = useThemeColors();
+    const styles = useMemo(() => getStyles(colors), [colors]);
 
     const [paso, setPaso] = useState<number>(1);
     const [form, setForm] = useState({
@@ -160,6 +168,8 @@ export default function CrearCurriculumScreen() {
                 options={{
                     title: 'Crear Curriculum',
                     headerBackVisible: false,
+                    headerStyle: {backgroundColor: colors.background },
+                    headerTitleStyle: { color: colors.text },
                     headerRight: () => (
                         <TouchableOpacity onPress={logout} style={styles.logoutButton}>
                             <Ionicons name="log-out-outline" size={22} color="#C70039"/>
@@ -189,6 +199,8 @@ export default function CrearCurriculumScreen() {
                             value={form.rut_alumno}
                             onChangeText={(text) => handleChange('rut_alumno', text)}
                             disabled
+                            styles={styles}
+                            placeholderTextcolor={colors.textPlaceholder}
                             
                         />
                         <FormInput
@@ -196,30 +208,40 @@ export default function CrearCurriculumScreen() {
                             value={form.nombres}
                             onChangeText={(text) => handleChange('nombres', text)}
                             placeholder="Juan Andrés"
+                            styles={styles}
+                            placeholderTextcolor={colors.textPlaceholder}
                         />
                         <FormInput
                             label="Apellidos"
                             value={form.apellidos}
                             onChangeText={(text) => handleChange('apellidos', text)}
                             placeholder="Pérez Gonzáles"
+                            styles={styles}
+                            placeholderTextcolor={colors.textPlaceholder}
                         />
                         <FormInput
                             label="Fecha de Nacimiento (AAAA-MM-DD)"
                             value={form.fecha_nacimiento}
                             onChangeText={(text) => handleChange('fecha_nacimiento', text)}
                             placeholder="1999-12-31"
+                            styles={styles}
+                            placeholderTextcolor={colors.textPlaceholder}
                         />
                         <FormInput
                             label="Comuna"
                             value={form.comuna}
                             onChangeText={(text) => handleChange('comuna', text)}
                             placeholder="Providencia"
+                            styles={styles}
+                            placeholderTextcolor={colors.textPlaceholder}
                         />
                         <FormInput
                             label="Ciudad"
                             value={form.ciudad}
                             onChangeText={(text) => handleChange('ciudad', text)}
                             placeholder="Santiago"
+                            styles={styles}
+                            placeholderTextcolor={colors.textPlaceholder}
                         />
                         <FormInput
                             label="Número de Celular"
@@ -227,6 +249,8 @@ export default function CrearCurriculumScreen() {
                             onChangeText={(text) => handleChange('num_celular', text)}
                             keyboardType="phone-pad"
                             placeholder="+56912345678"
+                            styles={styles}
+                            placeholderTextcolor={colors.textPlaceholder}
                         />
                         <FormInput
                             label="Correo"
@@ -235,12 +259,16 @@ export default function CrearCurriculumScreen() {
                             keyboardType="email-address"
                             autoCapitalize="none"
                             placeholder="tu.correo@universidad.cl"
+                            styles={styles}
+                            placeholderTextcolor={colors.textPlaceholder}
                         />
                         <FormInput
                             label="Carrera"
                             value={form.carrera}
                             onChangeText={(text) => handleChange('carrera', text)}
                             placeholder="Medicina, Kinesiología, etc..."
+                            styles={styles}
+                            placeholderTextcolor={colors.textPlaceholder}
                         />
                         <TouchableOpacity
                             style={[styles.button, styles.buttonNext]}
@@ -262,16 +290,16 @@ export default function CrearCurriculumScreen() {
                             <ThemedText style={styles.sectionTitle}>Ayudantias Previas</ThemedText>
                             {form.ayudantias.map((a, i) => (
                                 <View key={`ayudantia-${i}`} style={styles.dynamicItem}>
-                                    <FormInput label="Asignatura" value={a.nombre_asig} onChangeText={(t) => handleArrayChange('ayudantias', i, 'nombre_asig', t)}/>
-                                    <FormInput label="Coordinador" value={a.nombre_coordinador} onChangeText={(t) => handleArrayChange('ayudantias', i, 'nombre_coordinador', t)}/>
-                                    <FormInput label="Evaluación (Nota)" value={a.evaluacion_obtenida} onChangeText={(t) => handleArrayChange('ayudantias', i, 'evaluacion_obtenida', t)} keyboardType="numeric"/>
+                                    <FormInput label="Asignatura" value={a.nombre_asig} onChangeText={(t) => handleArrayChange('ayudantias', i, 'nombre_asig', t)} styles={styles} placeholderTextcolor={colors.textPlaceholder}/>
+                                    <FormInput label="Coordinador" value={a.nombre_coordinador} onChangeText={(t) => handleArrayChange('ayudantias', i, 'nombre_coordinador', t)} styles={styles} placeholderTextcolor={colors.textPlaceholder}/>
+                                    <FormInput label="Evaluación (Nota)" value={a.evaluacion_obtenida} onChangeText={(t) => handleArrayChange('ayudantias', i, 'evaluacion_obtenida', t)} keyboardType="numeric" styles={styles} placeholderTextcolor={colors.textPlaceholder}/>
                                     <TouchableOpacity style={styles.removeButton} onPress={() => removeItem('ayudantias', i)}>
                                         <Ionicons name="trash-outline" size={20} color="#C70039"/>
                                     </TouchableOpacity>
                                 </View>      
                             ))}
                             <TouchableOpacity style={styles.addButton} onPress={() => addItem('ayudantias', { nombre_asig: "", nombre_coordinador: "", evaluacion_obtenida: ""})}>
-                                <Ionicons name="add" size={20} color="#007bff" />
+                                <Ionicons name="add" size={20} color={colors.primary} />
                                 <ThemedText style={styles.addButtonText}>Agregar Ayudantía</ThemedText>
                             </TouchableOpacity>
                         </View>
@@ -280,16 +308,16 @@ export default function CrearCurriculumScreen() {
                             <ThemedText style={styles.sectionTitle}>Cursos, Titulos y Grados</ThemedText>
                             {form.cursos_titulos_grados.map((c, i) => (
                                 <View key={`curso-${i}`} style={styles.dynamicItem}>
-                                    <FormInput label="Nombre Título/Curso" value={c.nombre_asig} onChangeText={(t) => handleArrayChange('cursos_titulos_grados', i, 'nombre_asig', t)} />
-                                    <FormInput label="Institución" value={c.n_coordinador} onChangeText={(t) => handleArrayChange('cursos_titulos_grados', i, 'n_coordinador', t)} />
-                                    <FormInput label="Fecha (AAAA-MM-DD)" value={c.evaluacion} onChangeText={(t) => handleArrayChange('cursos_titulos_grados', i, 'evaluacion', t)} />
+                                    <FormInput label="Nombre Título/Curso" value={c.nombre_asig} onChangeText={(t) => handleArrayChange('cursos_titulos_grados', i, 'nombre_asig', t)} styles={styles} placeholderTextcolor={colors.textPlaceholder} />
+                                    <FormInput label="Institución" value={c.n_coordinador} onChangeText={(t) => handleArrayChange('cursos_titulos_grados', i, 'n_coordinador', t)} styles={styles} placeholderTextcolor={colors.textPlaceholder} />
+                                    <FormInput label="Fecha (AAAA-MM-DD)" value={c.evaluacion} onChangeText={(t) => handleArrayChange('cursos_titulos_grados', i, 'evaluacion', t)} styles={styles} placeholderTextcolor={colors.textPlaceholder} />
                                     <TouchableOpacity style={styles.removeButton} onPress={() => removeItem('cursos_titulos_grados', i)}>
                                         <Ionicons name="trash-outline" size={20} color="#C70039" />
                                     </TouchableOpacity>
                                 </View>
                             ))}
                             <TouchableOpacity style={styles.addButton} onPress={() => addItem('cursos_titulos_grados', { nombre_asig: "", n_coordinador: "", evaluacion: "" })}>
-                                <Ionicons name="add" size={20} color="#007bff" />
+                                <Ionicons name="add" size={20} color={colors.primary} />
                                 <ThemedText style={styles.addButtonText}>Agregar Curso/Título</ThemedText>
                             </TouchableOpacity>
                         </View>
@@ -298,16 +326,16 @@ export default function CrearCurriculumScreen() {
                             <ThemedText style={styles.sectionTitle}>Actividades Científicas</ThemedText>
                             {form.actividades_cientificas.map((a, i) => (
                                 <View key={`cientifica-${i}`} style={styles.dynamicItem}>
-                                    <FormInput label="Nombre Actividad" value={a.nombre} onChangeText={(t) => handleArrayChange('actividades_cientificas', i, 'nombre', t)} />
-                                    <FormInput label="Descripción" value={a.descripcion} onChangeText={(t) => handleArrayChange('actividades_cientificas', i, 'descripcion', t)} />
-                                    <FormInput label="Periodo de Participación" value={a.periodo_participacion} onChangeText={(t) => handleArrayChange('actividades_cientificas', i, 'periodo_participacion', t)} />
+                                    <FormInput label="Nombre Actividad" value={a.nombre} onChangeText={(t) => handleArrayChange('actividades_cientificas', i, 'nombre', t)} styles={styles} placeholderTextcolor={colors.textPlaceholder}/>
+                                    <FormInput label="Descripción" value={a.descripcion} onChangeText={(t) => handleArrayChange('actividades_cientificas', i, 'descripcion', t)} styles={styles} placeholderTextcolor={colors.textPlaceholder}/>
+                                    <FormInput label="Periodo de Participación" value={a.periodo_participacion} onChangeText={(t) => handleArrayChange('actividades_cientificas', i, 'periodo_participacion', t)} styles={styles} placeholderTextcolor={colors.textPlaceholder}/>
                                     <TouchableOpacity style={styles.removeButton} onPress={() => removeItem('actividades_cientificas', i)}>
                                         <Ionicons name="trash-outline" size={20} color="#C70039" />
                                     </TouchableOpacity>
                                 </View>
                             ))}
                             <TouchableOpacity style={styles.addButton} onPress={() => addItem('actividades_cientificas', { nombre: "", descripcion: "", periodo_participacion: "" })}>
-                                <Ionicons name="add" size={20} color="#007bff" />
+                                <Ionicons name="add" size={20} color={colors.primary} />
                                 <ThemedText style={styles.addButtonText}>Agregar Act. Científica</ThemedText>
                             </TouchableOpacity>
                         </View>
@@ -316,17 +344,17 @@ export default function CrearCurriculumScreen() {
                             <ThemedText style={styles.sectionTitle}>Actividades Extracurriculares</ThemedText>
                             {form.actividades_extracurriculares.map((a, i) => (
                                 <View key={`extra-${i}`} style={styles.dynamicItem}>
-                                    <FormInput label="Nombre Actividad" value={a.nombre} onChangeText={(t) => handleArrayChange('actividades_extracurriculares', i, 'nombre', t)} />
-                                    <FormInput label="Docente / Institución" value={a.docente} onChangeText={(t) => handleArrayChange('actividades_extracurriculares', i, 'docente', t)} />
-                                    <FormInput label="Descripción" value={a.descripcion} onChangeText={(t) => handleArrayChange('actividades_extracurriculares', i, 'descripcion', t)} />
-                                    <FormInput label="Periodo de Participación" value={a.periodo_participacion} onChangeText={(t) => handleArrayChange('actividades_extracurriculares', i, 'periodo_participacion', t)} />
+                                    <FormInput label="Nombre Actividad" value={a.nombre} onChangeText={(t) => handleArrayChange('actividades_extracurriculares', i, 'nombre', t)} styles={styles} placeholderTextcolor={colors.textPlaceholder}/>
+                                    <FormInput label="Docente / Institución" value={a.docente} onChangeText={(t) => handleArrayChange('actividades_extracurriculares', i, 'docente', t)} styles={styles} placeholderTextcolor={colors.textPlaceholder}/>
+                                    <FormInput label="Descripción" value={a.descripcion} onChangeText={(t) => handleArrayChange('actividades_extracurriculares', i, 'descripcion', t)} styles={styles} placeholderTextcolor={colors.textPlaceholder}/>
+                                    <FormInput label="Periodo de Participación" value={a.periodo_participacion} onChangeText={(t) => handleArrayChange('actividades_extracurriculares', i, 'periodo_participacion', t)} styles={styles} placeholderTextcolor={colors.textPlaceholder}/>
                                     <TouchableOpacity style={styles.removeButton} onPress={() => removeItem('actividades_extracurriculares', i)}>
                                         <Ionicons name="trash-outline" size={20} color="#C70039" />
                                     </TouchableOpacity>
                                 </View>
                             ))}
                             <TouchableOpacity style={styles.addButton} onPress={() => addItem('actividades_extracurriculares', { nombre: "", docente: "", descripcion: "", periodo_participacion: "" })}>
-                                <Ionicons name="add" size={20} color="#007bff" />
+                                <Ionicons name="add" size={20} color={colors.primary} />
                                 <ThemedText style={styles.addButtonText}>Agregar Act. Extracurricular</ThemedText>
                             </TouchableOpacity>
                         </View>                       
@@ -338,6 +366,8 @@ export default function CrearCurriculumScreen() {
                             multiline
                             numberOfLines={5}
                             placeholder="Logros, habilidades, proyectos, etc."
+                            styles={styles} 
+                            placeholderTextcolor={colors.textPlaceholder}
                         />
 
                         <View style={styles.buttonRow}>
@@ -345,7 +375,7 @@ export default function CrearCurriculumScreen() {
                                 style={[styles.button, styles.buttonBack]}
                                 onPress={() => setPaso(1)}
                             >
-                                <Ionicons name="arrow-back" size={18} color="#333"/>
+                                <Ionicons name="arrow-back" size={18} color={colors.text}/>
                                 <ThemedText style={styles.buttonTextBack}>Anterior</ThemedText>
                             </TouchableOpacity>
 
@@ -369,7 +399,7 @@ export default function CrearCurriculumScreen() {
     
 
 
-    const styles = StyleSheet.create({
+    /*const styles = StyleSheet.create({
     container: {
         flex: 1,
     },
@@ -501,6 +531,167 @@ export default function CrearCurriculumScreen() {
     },
     buttonTextBack: {
         color: '#333',
+        fontSize: 16,
+        fontWeight: '600',
+    },
+    buttonSubmit: {
+        flex: 2,
+        backgroundColor: '#28a745', 
+    },
+    logoutButton: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        paddingVertical: 4,
+        paddingHorizontal: 8,
+        marginRight: 10,
+        gap: 4,
+    },
+    logoutButtonText: {
+        color: '#C70039',
+        fontWeight: '600',
+        fontSize: 16,
+    }
+});*/
+
+const getStyles = (colors: ReturnType<typeof useThemeColors>) => StyleSheet.create({
+    container: {
+        flex: 1,
+        backgroundColor: colors.background,
+    },
+    scrollContent: {
+        padding: 20,
+        paddingBottom: 40,
+    },
+    formContainer: {
+        gap: 16,
+    },
+    title: {
+        textAlign: 'center',
+        marginBottom: 16,
+        fontSize: 24,
+        color: colors.text,
+    },
+    inputContainer: {
+        marginBottom: 4,
+    },
+    inputLabel: {
+        fontSize: 14,
+        fontWeight: '600',
+        marginBottom: 6,
+        color: colors.textLabel,
+    },
+    input: {
+        borderWidth: 1,
+        borderColor: colors.inputBorder,
+        borderRadius: 8,
+        paddingHorizontal: 14,
+        paddingVertical: 12,
+        fontSize: 16,
+        backgroundColor: colors.inputBackground, 
+        color: colors.text, 
+    },
+    inputDisabled: {
+        backgroundColor: colors.card, 
+        color: colors.textPlaceholder,
+    },
+    textArea: {
+        height: 120,
+        textAlignVertical: 'top',
+    },
+    stepIndicatorContainer: {
+        marginBottom: 24,
+    },
+    stepText: {
+        textAlign: 'center',
+        fontSize: 16,
+        fontWeight: '600',
+        color: colors.primary,
+        marginBottom: 8,
+    },
+    stepBar: {
+        height: 6,
+        backgroundColor: colors.inputBorder,
+        borderRadius: 3,
+    },
+    stepBarProgress: {
+        height: 6,
+        backgroundColor: colors.primary,
+        borderRadius: 3,
+    },
+    dynamicSection: {
+        borderWidth: 1,
+        borderColor: colors.inputBorder,
+        borderRadius: 8,
+        padding: 12,
+        marginBottom: 16,
+        backgroundColor: colors.card
+    },
+    sectionTitle: {
+        fontSize: 18,
+        fontWeight: '600',
+        marginBottom: 12,
+        color: colors.text, 
+    },
+    dynamicItem: {
+        borderBottomWidth: 1,
+        borderBottomColor: colors.inputBorder,
+        paddingBottom: 12,
+        marginBottom: 12,
+        position: 'relative',
+    },
+    addButton: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        justifyContent: 'center',
+        paddingVertical: 10,
+        borderRadius: 6,
+        backgroundColor: colors.background, 
+        borderWidth: 1,
+        borderColor: colors.primary,
+        borderStyle: 'dashed'
+    },
+    addButtonText: {
+        color: colors.primary,
+        fontSize: 15,
+        fontWeight: '600',
+        marginLeft: 8,
+    },
+    removeButton: {
+        position: 'absolute',
+        top: 0,
+        right: 0,
+        padding: 4,
+    },
+    button: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        justifyContent: 'center',
+        paddingVertical: 14,
+        borderRadius: 10,
+        gap: 10,
+    },
+    buttonNext: {
+        backgroundColor: colors.primary,
+        marginTop: 16,
+    },
+    buttonText: {
+        color: '#fff', 
+        fontSize: 16,
+        fontWeight: '600',
+    },
+    buttonRow: {
+        flexDirection: 'row',
+        gap: 12,
+        marginTop: 16,
+    },
+    buttonBack: {
+        flex: 1,
+        backgroundColor: colors.card, 
+        borderWidth: 1,
+        borderColor: colors.inputBorder,
+    },
+    buttonTextBack: {
+        color: colors.text, 
         fontSize: 16,
         fontWeight: '600',
     },

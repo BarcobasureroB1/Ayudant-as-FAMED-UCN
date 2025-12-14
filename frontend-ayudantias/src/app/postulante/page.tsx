@@ -6,8 +6,8 @@ import { useUserProfile, User } from '@/hooks/useUserProfile';
 import { useAlumnoProfile, AlumnoData } from '@/hooks/useAlumnoProfile';
 import { useComprobarCurriculum, useCrearCurriculum, useActividadesExtracurriculares, useActividadescientificas, useCursos_titulos_grados, useAyudantias, CurriculumResponse, useEditarCurriculum} from '@/hooks/useCurriculum';
 import { useAuth } from '@/context/AuthContext';
-import { AyudantiasAnteriores, useAyudantiasPorAlumno } from '@/hooks/useAyudantia';
-import { PostulacionData, usePostulacionesPorAlumno, useCancelarPostulacion, useCrearPostulacion } from '@/hooks/usePostulacion';
+import { useAyudantiasPorAlumno } from '@/hooks/useAyudantia';
+import { usePostulacionesPorAlumno, useCancelarPostulacion, useCrearPostulacion } from '@/hooks/usePostulacion';
 import { useAsignaturasDisponiblesPostulacion, useTodasAsignaturas } from '@/hooks/useAsignaturas';
 import Cookies from 'js-cookie';
 import Select from 'react-select';
@@ -122,7 +122,9 @@ export const PostulanteVista = ({user, alumno, curriculum, actividadesExtracurri
         router.refresh();
     }
 
-    
+    const handleBackToAdmin = () => {
+        router.push('/adminDashboard');
+    };
 
     const mostrarCurriculum = () => {
         return (
@@ -192,7 +194,7 @@ export const PostulanteVista = ({user, alumno, curriculum, actividadesExtracurri
             {ayudantiasAnteriores && Array.isArray(ayudantiasAnteriores) && ayudantiasAnteriores.length > 0 && (
                 <InfoCard title="Ayudantías Anteriores">
                     <div className="space-y-4">
-                        {ayudantiasAnteriores.map((a: AyudantiasAnteriores) => (
+                        {ayudantiasAnteriores.map((a: any) => (
                             <div key={a.id} className="border-l-4 border-green-500 pl-4 py-2">
                                 <p className="font-medium text-gray-900">Nombre: {a.asignatura.nombre}</p>
                                 <p className="text-sm text-gray-600">Coordinador: {a.coordinador.nombres} {a.coordinador.apellidos}</p>
@@ -262,7 +264,7 @@ export const PostulanteVista = ({user, alumno, curriculum, actividadesExtracurri
                             <p className="font-medium">{postulacionSeleccionada.nombre_asignatura}</p>
                         </div>
                         <div>
-                            <p className="text-sm text-gray-600">Correo del profesor</p>
+                            <p className="text-sm text-gray-600">Correo del profesor </p>
                             <p className="font-medium">{postulacionSeleccionada.correo_profe || "No especificado"}</p>
                         </div>
                         <div>
@@ -295,7 +297,6 @@ export const PostulanteVista = ({user, alumno, curriculum, actividadesExtracurri
 
     const handleSubmitPostulacion = (e: SyntheticEvent) => {
         e.preventDefault();
-        console.log("enviando postulacion: ", formPostulacion);
 
         const datosAEnviar = {
             ...formPostulacion,
@@ -395,9 +396,24 @@ export const PostulanteVista = ({user, alumno, curriculum, actividadesExtracurri
             label: a.nombre,
         })) || [];
 
+    if (user.deshabilitado === true) {
+        
+        return (
+            <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 p-4 md:p-6 text-black flex items-center justify-center">
+                <div className="absolute top-4 right-4 flex items-center gap-3">
+                    <button 
+                        onClick={logout} 
+                        className="bg-gray-800 hover:bg-black text-white font-semibold py-2 px-4 rounded-lg transition duration-200 flex items-center gap-2"
+                    >
+                        <span>Cerrar Sesión</span>
+                    </button>
+                </div>
 
-    
-    if (curriculum && user.tipo === 'alumno') {
+                <h1>Tu cuenta ha sido deshabilitada. Por favor, contacta con un administrador para más información.</h1>
+            </div>
+        );
+
+    } else if (curriculum && user.tipo === 'alumno') {
         return (
             <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 p-4 md:p-6">
                 <div className="max-w-6xl mx-auto">
@@ -405,7 +421,7 @@ export const PostulanteVista = ({user, alumno, curriculum, actividadesExtracurri
                         <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
                             <div>
                                 <h1 className="text-2xl md:text-3xl font-bold text-gray-900">
-                                    Portal del Postulante
+                                    Tus Postulaciones
                                 </h1>
                                 <p className="text-gray-600 mt-1">
                                     Gestiona tu perfil y postulaciones
@@ -454,7 +470,7 @@ export const PostulanteVista = ({user, alumno, curriculum, actividadesExtracurri
                                     </div>
                                     <div>
                                         <p className="text-sm text-black">Nombre</p>
-                                        <p className="font-medium text-black">{user.nombres} {user.apellido}</p>
+                                        <p className="font-medium text-black">{user.nombres} {user.apellidos}</p>
                                     </div>
                                     <div>
                                         <p className="text-sm text-black">Correo</p>
@@ -625,18 +641,6 @@ export const PostulanteVista = ({user, alumno, curriculum, actividadesExtracurri
                                                     </p>
                                                 )}
                                             </div>
-                                            {/*<div>
-                                                <label className="block text-sm font-medium text-gray-700 mb-2">Correo del profesor</label>
-                                                <input 
-                                                    name="correo_profe" 
-                                                    type="email"
-                                                    value={formPostulacion.correo_profe} 
-                                                    onChange={(e) => setFormPostulacion({ ...formPostulacion, [e.target.name]: e.target.value })} 
-                                                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors text-black"
-                                                    placeholder="profesor@universidad.cl"
-                                                    required
-                                                />
-                                            </div>*/}
                                             <div>
                                                 <label className="block text-sm font-medium text-gray-700 mb-2">Actividad propuesta</label>
                                                 <input 
@@ -755,16 +759,24 @@ export const PostulanteVista = ({user, alumno, curriculum, actividadesExtracurri
         );
     }
 
-   
-    if (curriculum && user.tipo === 'admin') {
+    if (curriculum && (user.tipo === 'admin' || user.tipo === 'encargado_ayudantias' )) {
         return (
             <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 p-4 md:p-6">
                 <div className="max-w-6xl mx-auto">
                     <div className="bg-white rounded-2xl shadow-lg p-6 mb-6">
                         <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
                             <div>
+                                {(user.tipo === 'admin' || user.tipo === 'encargado_ayudantias') && (
+                                    <button 
+                                        onClick={handleBackToAdmin}
+                                        className="flex items-center text-blue-600 hover:text-blue-800 mb-2 transition-colors"
+                                    >
+                                        <span className="mr-2">←</span>
+                                        Volver al Panel Principal
+                                    </button>
+                                )}
                                 <h1 className="text-2xl md:text-3xl font-bold text-gray-900">
-                                    Portal del Postulante
+                                    Tus Postulaciones
                                 </h1>
                                 <p className="text-gray-600 mt-1">
                                     Gestiona tu perfil y postulaciones
@@ -813,7 +825,7 @@ export const PostulanteVista = ({user, alumno, curriculum, actividadesExtracurri
                                     </div>
                                     <div>
                                         <p className="text-sm text-gray-600">Nombre</p>
-                                        <p className="font-medium">{user.nombres} {user.apellido}</p>
+                                        <p className="font-medium">{user.nombres} {user.apellidos}</p>
                                     </div>
                                     <div>
                                         <p className="text-sm text-gray-600">Correo</p>
@@ -939,52 +951,75 @@ export const PostulanteVista = ({user, alumno, curriculum, actividadesExtracurri
                                         </div>
 
                                         <div>
-                                            <label htmlFor="descripcion_carta" className="block text-sm font-medium text-gray-700 mb-2">Carta de interés</label>
-                                            <textarea name="descripcion_carta" value={formPostulacion.descripcion_carta} onChange={(e) => setFormPostulacion({ ...formPostulacion, [e.target.name]: e.target.value })} className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors h-32 resize-none" placeholder="Describe por qué estás interesado en esta ayudantía..." required/>
-                                            
+                                            <label className="block text-sm font-medium text-gray-700 mb-2">Carta de interés</label>
+                                            <textarea 
+                                                name="descripcion_carta" 
+                                                value={formPostulacion.descripcion_carta} 
+                                                onChange={(e) => setFormPostulacion({ ...formPostulacion, [e.target.name]: e.target.value })} 
+                                                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors h-32 text-black"
+                                                placeholder="Describe por qué estás interesado en esta ayudantía..."
+                                                required
+                                            />
                                         </div>
 
-                                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 items-start">
+                                            <div className="bg-gray-50 p-3 rounded-lg border border-gray-200 h-full">
+                                                <div className="flex items-center gap-2 mb-2">
+                                                    <input
+                                                        type="checkbox"
+                                                        id="check_correo"
+                                                        checked={incluirCorreoProfe}
+                                                        onChange={(e) => {
+                                                            setIncluirCorreoProfe(e.target.checked);
+                                                            if (!e.target.checked)
+                                                            {
+                                                                setFormPostulacion({ ...formPostulacion, correo_profe: ""});
+                                                            }
+                                                        }}
+                                                        className="w-4 h-4 text-blue-600 rounded focus:ring-blue-500 cursor-pointer"     
+                                                    />
+                                                    <label htmlFor="check_correo" className="text-xs font-bold text-gray-700 cursor-pointer select-none">
+                                                        Incluir correo de recomendación
+                                                    </label>
+                                                </div>
+
+                                                {incluirCorreoProfe ? (
+                                                    <input
+                                                        name="correo_profe"
+                                                        type="email"
+                                                        value={formPostulacion.correo_profe}
+                                                        onChange={(e) => setFormPostulacion({ ...formPostulacion, [e.target.name]: e.target.value})}
+                                                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors text-black text-sm animate-fadeIn"
+                                                        placeholder="profesor@ucn.cl"
+                                                        required={incluirCorreoProfe}
+                                                    />
+                                                ) : (
+                                                    <p className="text-xs text-gray-400 italic mt-2 pl-1">
+                                                        Opcional. Marque la casilla si tiene recomendación.
+                                                    </p>
+                                                )}
+                                            </div>
                                             <div>
-                                                <label className="block text-sm font-medium text-gray-700 mb-2">Correo del profesor</label>
+                                                <label className="block text-sm font-medium text-gray-700 mb-2">Actividad propuesta</label>
                                                 <input 
-                                                    name="correo_profe" 
-                                                    type="email"
-                                                    value={formPostulacion.correo_profe} 
+                                                    name="actividad" 
+                                                    value={formPostulacion.actividad} 
                                                     onChange={(e) => setFormPostulacion({ ...formPostulacion, [e.target.name]: e.target.value })} 
-                                                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
-                                                    placeholder="profesor@universidad.cl"
+                                                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors text-black"
+                                                    placeholder="Ej: Resolución de ejercicios"
                                                     required
                                                 />
                                             </div>
-                                        </div>
-
-                                        <div className="border-t border-gray-200 pt-6">
-                                            <h4 className="text-lg font-semibold text-gray-900 mb-4">Plan de Trabajo</h4>
-                                            
-                                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                                <div>
-                                                    <label className="block text-sm font-medium text-gray-700 mb-2">Actividad propuesta</label>
-                                                    <input 
-                                                        name="actividad" 
-                                                        value={formPostulacion.actividad} 
-                                                        onChange={(e) => setFormPostulacion({ ...formPostulacion, [e.target.name]: e.target.value })} 
-                                                        className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
-                                                        placeholder="Ej: Resolución de ejercicios, revisión de contenidos..."
-                                                        required
-                                                    />
-                                                </div>
-                                                <div>
-                                                    <label className="block text-sm font-medium text-gray-700 mb-2">Metodología</label>
-                                                    <textarea 
-                                                        name="metodologia" 
-                                                        value={formPostulacion.metodologia} 
-                                                        onChange={(e) => setFormPostulacion({ ...formPostulacion, [e.target.name]: e.target.value })} 
-                                                        className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors h-24 resize-y"
-                                                        placeholder="Describe la metodología de enseñanza que utilizarás..."
-                                                        required
-                                                    />
-                                                </div>
+                                            <div>
+                                                <label className="block text-sm font-medium text-gray-700 mb-2">Metodología</label>
+                                                <input 
+                                                    name="metodologia" 
+                                                    value={formPostulacion.metodologia} 
+                                                    onChange={(e) => setFormPostulacion({ ...formPostulacion, [e.target.name]: e.target.value })} 
+                                                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors text-black"
+                                                    placeholder="Ej: Aprendizaje activo"
+                                                    required
+                                                />
                                             </div>
                                         </div>
 
@@ -995,7 +1030,7 @@ export const PostulanteVista = ({user, alumno, curriculum, actividadesExtracurri
                                                     name="dia" 
                                                     value={formPostulacion.dia} 
                                                     onChange={(e) => setFormPostulacion({ ...formPostulacion, [e.target.name]: e.target.value })} 
-                                                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
+                                                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors text-black"
                                                     required
                                                 >
                                                     <option value="">Seleccione un día</option>
@@ -1013,7 +1048,7 @@ export const PostulanteVista = ({user, alumno, curriculum, actividadesExtracurri
                                                     name="bloque" 
                                                     value={formPostulacion.bloque} 
                                                     onChange={(e) => setFormPostulacion({ ...formPostulacion, [e.target.name]: e.target.value })} 
-                                                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
+                                                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors text-black"
                                                     required
                                                 >
                                                     <option value="">Seleccione un bloque</option>
@@ -1082,7 +1117,6 @@ export const PostulanteVista = ({user, alumno, curriculum, actividadesExtracurri
             </div>
         );
     };
-
     
     const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
         setForm({ ...form, [e.target.name]: e.target.value });

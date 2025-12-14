@@ -9,10 +9,6 @@ import {
   useCrearConcurso,
   useCancelarAficheConcurso,
 } from "@/hooks/useConcursoPostulacion";
-import {
-  useCoordinadoresTodos,
-  CoordinadorData,
-} from '@/hooks/useCoordinadores';
 import api from "@/api/axios";
 import {Document, Page, Text, View, StyleSheet, Image } from "@react-pdf/renderer";
 import dynamic from "next/dynamic";
@@ -34,6 +30,7 @@ interface AsignaturaData {
   semestre: string;
   nrc: string;
   abierta_postulacion: boolean;
+  coordinadores?: { rut: string; nombres: string; apellidos: string}[];
 }
 
 interface Props {
@@ -429,27 +426,6 @@ export default function AperturaConcursoAdmin({ asignaturas = [], rutSecretaria 
 
   const [aficheExists, setAficheExists] = useState<Record<number, boolean | undefined>>({});
 
-  const { data: listaCoordinadores, isLoading: cargaCoord} = useCoordinadoresTodos();
-
-  const [coordinadoresSeleccionados, setCoordinadoresSeleccionados] = useState<string[]>([]);
-
-  const [busquedaCoordinador, setBusquedaCoordinador] = useState("");
-
-  const coordinadoresFiltrados = useMemo(() => {
-    if (!listaCoordinadores)
-    {
-      return [];
-    }
-    const busquedaMin = busquedaCoordinador.toLowerCase();
-    return (listaCoordinadores as CoordinadorData[]).filter(
-      (coord: CoordinadorData) => {
-        const nombreCompleto = 
-          `${coord.nombres} ${coord.apellidos}`.toLowerCase();
-        return nombreCompleto.includes(busquedaMin);
-      }
-    );
-  }, [listaCoordinadores, busquedaCoordinador]);
-
   const asignaturasFiltradas = useMemo(
     () => asignaturas.filter((a) => a.nombre.toLowerCase().includes(busqueda.toLowerCase())),
     [asignaturas, busqueda]
@@ -496,7 +472,8 @@ export default function AperturaConcursoAdmin({ asignaturas = [], rutSecretaria 
   };
 
 
-  const abrirModalCrear = (a: AsignaturaData) => {
+  const abrirModalCrear = async (a: AsignaturaData) => {
+    console.log("datos de la asignatura", a);
     setAsignaturaParaCrear(a);
     setSemestre(a.semestre ?? "");
     setDescripciones([""]);
@@ -511,9 +488,28 @@ export default function AperturaConcursoAdmin({ asignaturas = [], rutSecretaria 
     setDiaActual(opcionesDias[0].value);
     setBloqueActual(opcionesBloques[0].value);
     setCantAyudantes("");
-    setCoordinadoresSeleccionados([]);
-    setBusquedaCoordinador("");
     setMostrarModalCrear(true);
+
+    try{
+      const resp = await api.get('/asignatura/coordinadores/sinfiltro/dif');
+      const listaAsig = resp.data;
+
+      if (Array.isArray(listaAsig))
+      {
+        const asignaturaCoord = listaAsig.find((item: any) => item.id === a.id);
+        if (asignaturaCoord && asignaturaCoord.coordinadores)
+        {
+          console.log("coordinadores:", asignaturaCoord.coordinadores);
+          setAsignaturaParaCrear((prev) => 
+          prev && prev.id === a.id
+            ? {...prev, coordinadores: asignaturaCoord.coordinadores}
+            : prev
+          );
+        } 
+      }
+    } catch (error) {
+      console.error("error al cargar los coordinadores", error);
+    }
   };
 
   const agregarDescripcion = () => setDescripciones((d) => [...d, ""]);
@@ -544,24 +540,13 @@ export default function AperturaConcursoAdmin({ asignaturas = [], rutSecretaria 
     setHorarios(prev => prev.filter((_, i) => i !== index));
   }
 
-  const handleToggleCoordinador = (rut: string) => {
-    setCoordinadoresSeleccionados((prev) => {
-      if (prev.includes(rut))
-      {
-        return prev.filter((r) => r !== rut);  
-      } else {
-        return [...prev, rut];
-      }
-    });
-  };
-
   const handleSubmitCrear = (e?: React.FormEvent) => {
     e?.preventDefault();
     if (!asignaturaParaCrear) return;
 
-    if (coordinadoresSeleccionados.length === 0)
+    if(!asignaturaParaCrear.coordinadores || asignaturaParaCrear.coordinadores.length === 0)
     {
-      setMensajePopup("Debes seleccionar al menos un coordinador");
+      setMensajePopup("Esta asignatura no tiene coordinadores asignados, Porfavor vaya a la seccion 'Gestionar Coordinadores' y asignelos antes de crear el afiche.");
       setMostrarPopup(true);
       return;
     }
@@ -594,7 +579,7 @@ export default function AperturaConcursoAdmin({ asignaturas = [], rutSecretaria 
       estado: "abierto",
       rut_secretaria: String(rutSecretaria), 
       descripcion: descripciones,
-      coordinadores: coordinadoresSeleccionados,
+      coordinadores: asignaturaParaCrear.coordinadores.map(c => c.rut),
     };
 
     crearConcurso.mutate(payload, {
@@ -633,15 +618,23 @@ export default function AperturaConcursoAdmin({ asignaturas = [], rutSecretaria 
       {
         const coordinadoresNombres = (
           datosConcurso.coordinadores || []
-        ).map((rut: string) => {
-          const coord = (listaCoordinadores || []).find(
-            (c: CoordinadorData) => c.rut === rut
-          );
+        ).map((i: any) => {
+          if (typeof i === 'object' && i !== null && i.nombres)
+            {
+              return {
+                rut: i.rut,
+                nombreCompleto: `${i.nombres} ${i.apellidos}`
+              }
+            }
+
+          const rutString = String(i);
+          const coord = (a.coordinadores || []).find((c) => c.rut === rutString);
+
           return {
-            rut: rut,
+            rut: rutString,
             nombreCompleto: coord
               ? `${coord.nombres} ${coord.apellidos}`
-              : rut,
+              : rutString,
           };
         });
 
@@ -985,43 +978,34 @@ export default function AperturaConcursoAdmin({ asignaturas = [], rutSecretaria 
 
                         <div className="sm:col-span-2">
                           <label className="text-sm text-black">
-                            Coordinador(es)
+                            Coordinador(es) asignado(s) a esta asignatura:
                           </label>
-                            <input
-                              type="text"
-                              placeholder="Buscar coordinador por nombre..."
-                              value={busquedaCoordinador}
-                              onChange={(e) => setBusquedaCoordinador(e.target.value)}
-                              className="w-full mt-1 border rounded text-black px-2 py-1 mb-2"
-                            />
-                            <div className="w-full mt-1 border rounded text-black px-3 py-2 bg-white h-32 overflow-y-auto space-y-2">
-                              {cargaCoord ? (
-                                <p className="text-gray-500 text-sm italic">Cargando coordinadores...</p>
-                              ) : coordinadoresFiltrados.length === 0 ? (
-                                <p className="text-gray-500 text-sm italic">No se encontraron coordinadores</p>
-                              ):(
-                                coordinadoresFiltrados.map(
-                                  (coord: CoordinadorData) => (
-                                    <div key={coord.rut} className="flex items-center gap-2">
-                                      <input
-                                        type="checkbox"
-                                        id={`coord-${coord.rut}`}
-                                        value={coord.rut}
-                                        checked={coordinadoresSeleccionados.includes(coord.rut)}
-                                        onChange={() => handleToggleCoordinador(coord.rut)}
-                                        className="h-4 w-4 rounded text-blue-600 focus:ring-blue-500"
-                                      />
-                                      <label
-                                        htmlFor={`coord-${coord.rut}`}
-                                        className="text-sm text-black"
-                                      >
-                                        {coord.nombres} {coord.apellidos}
-                                      </label>
-                                    </div>
+                            
+                            <div className="w-full mt-1 border rounded text-black px-3 py-2 bg-gray-50 max-h-32 overflow-y-auto">
+                              {asignaturaParaCrear.coordinadores && asignaturaParaCrear.coordinadores.length > 0 ? (
+                                <ul className="space-y-1">
+                                  {asignaturaParaCrear.coordinadores.map((coord) => (
+                                    <li key={coord.rut} className="flex items-center gap-2 text-sm">
+                                      <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 text-blue-600" viewBox="0 0 20 20" fill="currentColor">
+                                        <path fillRule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clipRule="evenodd" />
+                                      </svg>
+                                      <span>Nombres: {coord.nombres} {coord.apellidos} - Rut: {coord.rut}</span>
+                                    </li>
                                   )
-                                )
+                                )}
+                                </ul>
+                              ):(
+                                <div className="text-red-600 text-sm font-medium flex items-center gap-2 bg-red-50 p-2 rounded">
+                                  <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                                    <path fillRule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
+                                  </svg>
+                                  No hay coordinadores asignados previamente.
+                                </div>
                               )}
                             </div>
+                            <p className="text-xs text-gray-500 mt-1">
+                              *Estos son los coordinadores que aparecerán automáticamente en el afiche. Si necesita cambiarlos, vaya a Gestionar Coordinadores.
+                            </p>
                         </div>
 
 
@@ -1081,13 +1065,8 @@ export default function AperturaConcursoAdmin({ asignaturas = [], rutSecretaria 
                             </div>
                           )}
                         </div>
-
-                        {/*<label className="text-sm flex items-center gap-2  text-black ">
-                          <input type="checkbox" checked={horarioFijo} onChange={(e) => setHorarioFijo(e.target.checked)} />
-                          Horario fijo
-                        </label>*/}
-
                         
+              
                       </div>
 
                       <div>

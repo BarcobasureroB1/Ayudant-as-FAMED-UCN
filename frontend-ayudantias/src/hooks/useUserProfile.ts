@@ -5,8 +5,9 @@ export interface User
 {
     rut: string;
     nombres: string;
-    apellido: string;
+    apellidos: string;
     tipo: 'admin' | 'postulante' | 'secretaria de departamento' | string; //despues añadir mas roles
+    deshabilitado: boolean;
 }
 
 
@@ -15,7 +16,7 @@ export function useUserProfile(){
         queryKey:['user'],
         queryFn: async () => {
             const respuesta = await api.get('/auth/profile');
-            console.log("datos usuario: ", respuesta.data);
+            console.log("revisar si está deshabilitado: ",respuesta.data);
             return respuesta.data;
         },
     });
