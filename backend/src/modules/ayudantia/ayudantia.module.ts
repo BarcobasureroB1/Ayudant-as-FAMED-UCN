@@ -6,9 +6,10 @@ import { Ayudantia } from './entities/ayudantia.entity';
 import { Asignatura } from '../asignatura/entities/asignatura.entity';
 import { Usuario } from '../usuario/entities/usuario.entity';
 import { Coordinador } from '../coordinador/entities/coordinador.entity';
+import { Alumno } from '../alumno/entities/alumno.entity';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([Ayudantia,Asignatura, Usuario, Coordinador])],
+  imports: [TypeOrmModule.forFeature([Ayudantia,Asignatura, Usuario, Coordinador,Alumno])],
   controllers: [AyudantiaController],
   providers: [AyudantiaService],
 })
