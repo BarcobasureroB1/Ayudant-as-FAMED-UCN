@@ -8,8 +8,8 @@ export class Acta {
     id: number;
     @Column()
     departamento: string;
-    @Column(type => Date)
-    fecha: Date;
+    @Column()
+    fecha: string;
     @Column()
     hora_inicio: string;
     @Column()
