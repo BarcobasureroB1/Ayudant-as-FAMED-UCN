@@ -13,6 +13,10 @@ export class AyudantiaController {
   create(@Body() createAyudantiaDto: CreateAyudantiaDto) {
     return this.ayudantiaService.create(createAyudantiaDto);
   }
+  @Get()
+  findAll() {
+    return this.ayudantiaService.findAll();
+  }
   @Get(':rut')
   findByUsuario(@Param('rut') rut: string) {
     return this.ayudantiaService.findByUsuario(rut);
