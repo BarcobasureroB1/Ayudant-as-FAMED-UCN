@@ -51,7 +51,8 @@ export class AuthService {
     newUser.nombres = registerDto.nombres;
     newUser.apellidos = registerDto.apellidos;
     const alumnoExists = await this.alumnoService.findByRut(registerDto.rut);
-    if (!alumnoExists) {
+    
+    if (!alumnoExists && registerDto.tipo === 'alumno') {
       newUser.tipo = registerDto.tipo;
       throw new Error('El usuario no tiene data de alumno registrado');
     }

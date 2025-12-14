@@ -53,7 +53,7 @@ export class UsuarioController {
     return this.usuarioService.habilitarUsuario(rut);
   }
 
-  @Get('secretaria-docente')
+  @Get('secretaria-docente/endpoint/a')
   getSecretarioDocente() {
     return this.usuarioService.getsecretario_docente();
   }
