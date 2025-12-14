@@ -22,7 +22,7 @@ import { AuthModule } from './modules/auth/auth.module';
 import { AlumnoModule } from './modules/alumno/alumno.module';
 import { LlamadoPostulacionModule } from './modules/llamado_postulacion/llamado_postulacion.module';
 import { AsignaturaAlumnoModule } from './modules/asignatura_alumno/asignatura_alumno.module';
-import { EmailModule } from './modules/email/email.module';
+//import { EmailModule } from './modules/email/email.module';
 
 
 
@@ -60,7 +60,7 @@ import { EmailModule } from './modules/email/email.module';
     AlumnoModule,
     LlamadoPostulacionModule,
     AsignaturaAlumnoModule,
-    EmailModule,
+    //EmailModule,
     
 
 

@@ -55,6 +55,7 @@ export function useCrearAyudantia() {
         },
         onSuccess: (_data) => {
             clienteQuery.invalidateQueries({ queryKey: ['ayudantias'] });
+            clienteQuery.invalidateQueries({queryKey: ['postulantes']});
         },
     });
 }

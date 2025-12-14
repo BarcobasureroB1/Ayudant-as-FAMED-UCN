@@ -1066,6 +1066,7 @@ export default function AperturaConcursoAdmin({ asignaturas = [], rutSecretaria 
                           )}
                         </div>
                         
+              
                       </div>
 
                       <div>

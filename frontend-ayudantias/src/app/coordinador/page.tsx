@@ -17,15 +17,17 @@ import {ModalDescarte} from '@/components/Coordinador/ModalDescarte';
 import {ModalEvaluacionPostulante} from '@/components/Coordinador/ModalEvaluacionPostulante'; 
 import {ModalEvaluacionAyudante} from '@/components/Coordinador/ModalEvaluacionAyudante';
 import { ModalVerCurriculum } from '@/components/Coordinador/ModalVerCurriculum';
+import { ModalDetallePostulacion } from '@/components/SecretariaDocente/ModalDetallePostulacion';
 import { CoordinadorAdmin } from '@/components/Coordinador/CoordinadorAdmin';
 import { CoordinadorUser } from '@/components/Coordinador/CoordinadorUser';
-import { Filter, Search } from 'lucide-react';
+import { Filter, Search, Eye } from 'lucide-react';
 
 interface CoordinadorDashboardProps {
     user: User;
     postulantes: PostulanteCoordinadorData[] | undefined;
     ayudantes: AyudanteActivoData[] | undefined;
     loading: boolean;
+    adminBar?: React.ReactNode;
 }
 
 const InfoCard = ({ title, children }: { title: string; children: React.ReactNode }) => (
@@ -36,7 +38,7 @@ const InfoCard = ({ title, children }: { title: string; children: React.ReactNod
 );
 
 
-export const CoordinadorDashboard = ({ user,postulantes, ayudantes, loading }: CoordinadorDashboardProps) => {
+export const CoordinadorDashboard = ({ user,postulantes, ayudantes, loading, adminBar}: CoordinadorDashboardProps) => {
     const router = useRouter();
     const { setToken, setUsertipo } = useAuth();
 
@@ -58,6 +60,7 @@ export const CoordinadorDashboard = ({ user,postulantes, ayudantes, loading }: C
     const [ordenNota, setOrdenNota] = useState<"desc" | "asc" | "">("");
 
     const [idPostulacionDescartar, setIdPostulacionDescartar] = useState<number | null>(null);
+    const [postulanteVerDetalle, setPostulanteVerDetalle] = useState<PostulanteCoordinadorData | null>(null);
     const [postulanteAEvaluar, setPostulanteAEvaluar] = useState<PostulanteCoordinadorData | null>(null);
     const [ayudanteAEvaluar, setAyudanteAEvaluar ] = useState<AyudanteActivoData | null>(null);
 
@@ -68,7 +71,7 @@ export const CoordinadorDashboard = ({ user,postulantes, ayudantes, loading }: C
     const listaPostulantes = useMemo(() => postulantes || [], [postulantes]);
     const listaAyudantes = useMemo(() => ayudantes || [], [ayudantes]);
 
-    const { data: listaAsignaturas, isLoading: cargaAsignaturas } = useTodasAsignaturas();
+    const { data: listaAsignaturas } = useTodasAsignaturas();
 
     const mapAsig = useMemo(() => {
         if (!listaAsignaturas)
@@ -105,7 +108,7 @@ export const CoordinadorDashboard = ({ user,postulantes, ayudantes, loading }: C
     const dataFiltrada = useMemo(() => {
         let data: any[] = [];
 
-        if (isPostulantes )
+        if (isPostulantes)
         {
         
             data = listaPostulantes.filter(p => {
@@ -185,7 +188,6 @@ export const CoordinadorDashboard = ({ user,postulantes, ayudantes, loading }: C
             setIdPostulacionDescartar(null);
         }
     };
-
     const handleConfirmarEvaluacionPost = async (puntajeTotal: number) => {
         if (postulanteAEvaluar)
         {
@@ -196,7 +198,6 @@ export const CoordinadorDashboard = ({ user,postulantes, ayudantes, loading }: C
             setPostulanteAEvaluar(null);
         }
     };
-
 
     const handleConfirmarEvaluacionAyu = async (nota: number) => {
         if (ayudanteAEvaluar)
@@ -243,16 +244,7 @@ export const CoordinadorDashboard = ({ user,postulantes, ayudantes, loading }: C
             <div className="bg-white rounded-lg shadow-sm p-6 mb-6 border border-gray-200">
                 <div className="flex justify-between items-center">
                     <div>
-                        {user.tipo === 'admin' && (
-                        <button 
-                            onClick={handleBackToAdmin}
-                            className="flex items-center text-blue-600 hover:text-blue-800 mb-2 transition-colors"
-                        >
-                            <span className="mr-2">←</span>
-                            Volver al Panel Principal
-                        </button>
-                        )}
-                        {user.tipo === 'encargado_ayudantias' && (
+                        {user.tipo === 'admin' || user.tipo === 'encargado_ayudantias' && (
                         <button 
                             onClick={handleBackToAdmin}
                             className="flex items-center text-blue-600 hover:text-blue-800 mb-2 transition-colors"
@@ -301,6 +293,11 @@ export const CoordinadorDashboard = ({ user,postulantes, ayudantes, loading }: C
                 </div>
             </div>
 
+            {adminBar && (
+                <div className="mb-6 max-w-7xl mx-auto w-full">
+                    {adminBar}
+                </div>
+            )}
 
             <div className="flex flex-col lg:flex-row gap-6 items-start justify-center max-w-7xl mx-auto w-full">
                 <div className="w-full lg:w-72 flex-shrink-0">
@@ -530,6 +527,14 @@ export const CoordinadorDashboard = ({ user,postulantes, ayudantes, loading }: C
                                                             </td>
                                                             <td className="p-4 text-center flex justify-center gap-2">
                                                                 <button 
+                                                                    onClick={() => setPostulanteVerDetalle(p)}
+                                                                    className="bg-gray-100 text-gray-600 border border-gray-200 px-3 py-1.5 rounded hover:bg-gray-200 text-xs font-medium transition-colors flex items-center gap-1 shadow-sm"
+                                                                    title="Ver Detalle Postulación"
+                                                                >
+                                                                    <Eye size={14} />
+                                                                </button>
+
+                                                                <button 
                                                                     onClick={() => setPostulanteAEvaluar(p)} 
                                                                     className={`px-3 py-1.5 rounded text-white text-xs font-medium shadow-sm transition-colors ${esEvaluado ? "bg-yellow-500 hover:bg-yellow-600" : "bg-blue-600 hover:bg-blue-700"}`}
                                                                 >
@@ -631,7 +636,13 @@ export const CoordinadorDashboard = ({ user,postulantes, ayudantes, loading }: C
                     onClose={() => setRutVerCurriculum(null)} 
                 />
             )}
-
+            
+            {postulanteVerDetalle && (
+                <ModalDetallePostulacion 
+                    postulante={postulanteVerDetalle} 
+                    onClose={() => setPostulanteVerDetalle(null)} 
+                />
+            )}
 
         </div>        
     );
