@@ -4,6 +4,7 @@ import { CreatePostulacionDto } from './dto/create-postulacion.dto';
 import { UpdatePostulacionDto } from './dto/update-postulacion.dto';
 import { PuntuarDto } from './dto/puntuar.dto';
 import { DescartarDto } from './dto/descartar.dto';
+import { ConseguirPostulacionDto } from './dto/conseguir-postulacion.dto';
 
 
 @Controller('postulacion')
@@ -51,6 +52,10 @@ export class PostulacionController {
   @Patch('descartar-postulacion/:id_postulacion')
   descartarPostulacion(@Param('id_postulacion') id_postulacion: string, @Body() dto: DescartarDto) {
     return this.postulacionService.rechazarPorJefatura(+id_postulacion, dto);
+  }
+  @Get('postulacion-especifica')
+  findcurrentbyAsignatura(@Body() dto: ConseguirPostulacionDto) {
+    return this.postulacionService.findCurrentByAsignatura(dto.rut_alumno,dto.id_asignatura);
   }
 
 

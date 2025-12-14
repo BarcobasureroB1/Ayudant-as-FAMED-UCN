@@ -23,7 +23,7 @@ export class AuthService {
    if (!passwordIsValid) {
      throw new Error('Contraseña incorrecta');
    }
-   const payload = { rut: usuario.rut, nombres: usuario.nombres, apellidos: usuario.apellidos, tipo : usuario.tipo };
+   const payload = { rut: usuario.rut, nombres: usuario.nombres, apellidos: usuario.apellidos, tipo : usuario.tipo, deshabilitado: usuario.deshabilitado };
    const access_token = this.jwtService.sign(payload);
    return {
      access_token,
@@ -51,7 +51,8 @@ export class AuthService {
     newUser.nombres = registerDto.nombres;
     newUser.apellidos = registerDto.apellidos;
     const alumnoExists = await this.alumnoService.findByRut(registerDto.rut);
-    if (!alumnoExists) {
+    
+    if (!alumnoExists && registerDto.tipo === 'alumno') {
       newUser.tipo = registerDto.tipo;
       throw new Error('El usuario no tiene data de alumno registrado');
     }

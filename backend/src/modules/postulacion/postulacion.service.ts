@@ -162,6 +162,54 @@ export class PostulacionService {
       puntuacion_etapa2: Number(r.puntuacion_etapa2) || 0,
     }));
   }
+  
+  async findCurrentByAsignatura(rut_alumno: string, id_asignatura: number) {
+    const id = Number(id_asignatura);
+    if (Number.isNaN(id)) return null;
+
+    const row = await this.postulacionRepository
+      .createQueryBuilder('postulacion')
+      .leftJoin('postulacion.usuario', 'usuario')
+      .leftJoin('postulacion.asignatura', 'asignatura')
+      .select([
+        'postulacion.id AS id',
+        'asignatura.nombre AS nombre_asignatura',
+        'postulacion.descripcion_carta AS descripcion_carta',
+        'postulacion.correo_profe AS correo_profe',
+        'postulacion.actividad AS actividad',
+        'postulacion.metodologia AS metodologia',
+        'postulacion.dia AS dia',
+        'postulacion.bloque AS bloque',
+        'postulacion.cancelada_por_usuario AS estado',
+      ])
+      .where('usuario.rut = :rut', { rut: rut_alumno })
+      .andWhere('asignatura.id = :idAsignatura', { idAsignatura: id })
+      .andWhere('postulacion.cancelada_por_usuario = false')
+      .andWhere('postulacion.rechazada_por_jefatura = false')
+      .andWhere('postulacion.es_actual = true')
+      .getRawOne();
+
+    if (!row) return null;
+    return {
+      id: row.id,
+      alumno: {
+        rut: row.alumno_rut,
+        nombres: row.alumno_nombres,
+        apellidos: row.alumno_apellidos,
+      },
+      asignatura: row.nombre_asignatura,
+      descripcion_carta: row.descripcion_carta,
+      correo_profe: row.correo_profe,
+      actividad: row.actividad,
+      metodologia: row.metodologia,
+      dia: row.dia,
+      bloque: row.bloque,
+      puntuacion_etapa1: Number(row.puntuacion_etapa1) || 0,
+      puntuacion_etapa2: Number(row.puntuacion_etapa2) || 0,
+    };
+  }
+
+
 
   /**
    * Devuelve las postulaciones asociadas a las asignaturas que coordina

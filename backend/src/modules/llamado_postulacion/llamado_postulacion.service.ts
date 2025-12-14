@@ -7,17 +7,21 @@ import { LlamadoPostulacion } from './entities/llamado_postulacion.entity';
 import { Repository, In } from 'typeorm';
 import { Asignatura } from '../asignatura/entities/asignatura.entity';
 import { Usuario } from '../usuario/entities/usuario.entity';
+import { Postulacion } from '../postulacion/entities/postulacion.entity';
 
 @Injectable()
 export class LlamadoPostulacionService {
 
-  constructor(@InjectRepository(LlamadoPostulacion)
-  private readonly llamadoPostulacionRepository: Repository<LlamadoPostulacion>,
-  @InjectRepository(Usuario)
-  private readonly usuarioRepository: Repository<Usuario>,
-  @InjectRepository(Asignatura)
-  private readonly asignaturaRepository: Repository<Asignatura>,
-) {}
+  constructor(
+    @InjectRepository(LlamadoPostulacion)
+    private readonly llamadoPostulacionRepository: Repository<LlamadoPostulacion>,
+    @InjectRepository(Usuario)
+    private readonly usuarioRepository: Repository<Usuario>,
+    @InjectRepository(Asignatura)
+    private readonly asignaturaRepository: Repository<Asignatura>,
+    @InjectRepository(Postulacion)
+    private readonly postulacionRepository: Repository<Postulacion>,
+  ) {}
   async create(createLlamadoPostulacionDto: CreateLlamadoPostulacionDto) {
 
     const rutSecretaria = String(createLlamadoPostulacionDto.rut_secretaria);
@@ -124,12 +128,28 @@ export class LlamadoPostulacionService {
   }
 
   async cambiarEstado(id: number) {
-    const entity = await this.llamadoPostulacionRepository.findOneBy({ id });
+    // Obtener el llamado con su asignatura
+    const entity = await this.llamadoPostulacionRepository.findOne({
+      where: { id },
+      relations: ['asignatura'],
+    });
     if (!entity) {
       throw new Error('Llamado no encontrado');
     }
+
+    // Cambiar estado del llamado
     entity.estado = 'cerrado';
-    return await this.llamadoPostulacionRepository.save(entity);
+    await this.llamadoPostulacionRepository.save(entity);
+
+    // Actualizar las postulaciones (no la asignatura) vinculadas a esta asignatura: es_actual = false
+    if (entity.asignatura?.id) {
+      await this.postulacionRepository.update(
+        { asignatura: { id: entity.asignatura.id }, es_actual: true },
+        { es_actual: false },
+      );
+    }
+
+    return entity;
   }
 
  

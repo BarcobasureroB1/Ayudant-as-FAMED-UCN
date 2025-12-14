@@ -6,10 +6,11 @@ import { Usuario } from '../usuario/entities/usuario.entity';
 import { LlamadoPostulacion } from './entities/llamado_postulacion.entity';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { RequisitoExtra } from './entities/requisito_extra.entity';
+import { Postulacion } from '../postulacion/entities/postulacion.entity';
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([LlamadoPostulacion, Usuario, Asignatura, RequisitoExtra]),
+    TypeOrmModule.forFeature([LlamadoPostulacion, Usuario, Asignatura, RequisitoExtra,Postulacion]),
   ],
   controllers: [LlamadoPostulacionController],
   providers: [LlamadoPostulacionService],
