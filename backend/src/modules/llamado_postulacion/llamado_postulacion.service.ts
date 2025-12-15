@@ -138,7 +138,7 @@ export class LlamadoPostulacionService {
     if (!entity) {
       throw new Error('Llamado no encontrado');
     }
-
+    
     // Cambiar estado del llamado
     entity.estado = 'cerrado';
     await this.llamadoPostulacionRepository.save(entity);
