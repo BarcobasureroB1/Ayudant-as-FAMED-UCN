@@ -52,6 +52,7 @@ export function useCancelarAficheConcurso(){
         },
         onSuccess: (_data) => {
             clienteQuery.invalidateQueries({queryKey:['llamado-postulacion']});
+            clienteQuery.invalidateQueries({queryKey:['asignaturas']});
             
         }                        
     });
