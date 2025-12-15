@@ -25,6 +25,10 @@ interface Firma {
 interface Acta {
     id: number;
     departamento: string;
+    id_departamento: {
+        id: number;
+        nombre: string;
+    };
     fecha: string;
     hora_inicio: string;
     hora_fin: string;
@@ -39,6 +43,10 @@ interface ModalVerActaProps {
 }
 
 export default function ModalVerActa({ acta, onClose }: ModalVerActaProps) {
+    const datosParaPDF = {
+        ...acta,
+        departamento: acta.id_departamento ? acta.id_departamento.nombre : acta.departamento
+    };
     return (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4 backdrop-blur-sm">
             <div className="bg-white rounded-xl shadow-2xl w-full max-w-5xl h-[90vh] flex flex-col overflow-hidden animate-in fade-in zoom-in duration-200">
@@ -49,7 +57,7 @@ export default function ModalVerActa({ acta, onClose }: ModalVerActaProps) {
                             Vista Previa de Acta
                         </h3>
                         <p className="text-sm text-gray-500">
-                            {acta.departamento} - {acta.fecha}
+                            {acta.id_departamento.nombre} - {acta.fecha}
                         </p>
                     </div>
                     <button
@@ -65,7 +73,7 @@ export default function ModalVerActa({ acta, onClose }: ModalVerActaProps) {
 
                 <div className="flex-1 bg-gray-100 p-0 overflow-hidden relative">
                     <PDFViewer width="100%" height="100%" className="border-none absolute inset-0">
-                        <ActaPDF data={acta} />
+                        <ActaPDF data={datosParaPDF} />
                     </PDFViewer>
                 </div>
             </div>

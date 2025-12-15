@@ -1,7 +1,6 @@
 "use client"
 
 import React, { useState, useMemo, useEffect } from 'react';
-import { User } from '@/hooks/useUserProfile';
 import {
     useCoordinadoresTodos,
     CoordinadorData,
@@ -12,48 +11,29 @@ import {
 
 import { useTodasAyudantias } from '@/hooks/useAyudantia';
 import { useTodasAsignaturas } from '@/hooks/useAsignaturas';
-import { useSecretariaDocente } from '@/hooks/useUsuarios';
 
-import { ModalSeleccionarSecretariaAdmin } from './ModalSeleccionarSecretariaAdmin';
 import { ModalCrearAyudantia } from './ModalCrearAyudantia';
-
-
 import { ModalDetallePostulacion } from './ModalDetallePostulacion';
 import { ModalDescarte } from '../Coordinador/ModalDescarte';
 import { ModalVerCurriculum } from '../Coordinador/ModalVerCurriculum';
 
-
 import { 
     Search, Users, CheckSquare, Square, Filter, ChevronDown, 
-    Briefcase, RefreshCw, UserCheck, FileText, Eye, XCircle, CheckCircle
+    UserCheck, FileText, Eye, XCircle, CheckCircle
 } from 'lucide-react';
 
 
 interface Props {
-    user: User;
+    rutSecretaria: string; 
     onBack: () => void;
 }
 
-export default function GenerarAyudantia({ user, onBack }: Props) {
+export default function GenerarAyudantia({ rutSecretaria }: Props) {
 
-    const { data: listaSecretarias, isLoading: cargaSecretarias } = useSecretariaDocente();
-    const [rutSecretariaSeleccionada, setRutSecretariaSeleccionada] = useState<string>("");
-    const [nombreSecretariaSeleccionada, setNombreSecretariaSeleccionada] = useState<string>("");
-    const [modalSecAbierto, setModalSecAbierto] = useState(false);
-
-    useEffect(() => {
-        if (user.tipo === 'secretaria_docente' || user.tipo === 'secretaria') {
-            setRutSecretariaSeleccionada(user.rut);
-            setNombreSecretariaSeleccionada(`${user.nombres} ${user.apellidos}`);
-        } else if (user.tipo === 'admin' && !rutSecretariaSeleccionada) {
-            setModalSecAbierto(true);
-        }
-    }, [user, rutSecretariaSeleccionada]);
 
     const { data: coordinadores } = useCoordinadoresTodos();    
     const { data: postulantes, isLoading: cargaPostulantes } = usePostulantesGlobales();
     const { data: listaAyudantias } = useTodasAyudantias();
-
     const { data: listaAsignaturas } = useTodasAsignaturas();
     const descartarPostulacion = useDescartarPostulacion();
 
@@ -69,7 +49,7 @@ export default function GenerarAyudantia({ user, onBack }: Props) {
     const [paginaActual, setPaginaActual] = useState(1);
     const [itemsPagina, setItemsPagina] = useState(10);
 
-    // Modales y Selecciones
+    // Modales
     const [postulanteSeleccionado, setPostulanteSeleccionado] = useState<PostulanteCoordinadorData | null>(null);
     const [modalAyudantiaAbierto, setModalAyudantiaAbierto] = useState(false);
     const [rutVerCurriculum, setRutVerCurriculum] = useState<string | null>(null);
@@ -101,15 +81,12 @@ export default function GenerarAyudantia({ user, onBack }: Props) {
         if (!postulantes) return [];
 
         const filtrados = postulantes.filter((item: any) => {
-            // filtro alumno
             const matchTexto = item.alumno.nombres.toLowerCase().includes(busquedaAlumno.toLowerCase()) || 
                                item.rut_alumno.toLowerCase().includes(busquedaAlumno.toLowerCase());
             
-            // filtro Asignatura
             const idAsigStr = item.id_asignatura.toString();
             const matchAsignatura = filtroAsignatura ? idAsigStr === filtroAsignatura : true;
 
-            // filtro Coordinadores Seleccionados
             let matchCoordinador = true;
             if (coordinadoresSeleccionados.length > 0) {
                 const rutCoordItem = item.rut_coordinador || (item.coordinador ? item.coordinador.rut : null);
@@ -120,7 +97,6 @@ export default function GenerarAyudantia({ user, onBack }: Props) {
                 }
             }
 
-            // filtro Estado (Pendiente / Seleccionado)
             let matchEstado = true;
             if (filtroEstado && listaAyudantias) {
                 const yaTieneAyudantia = listaAyudantias.some((ayudantia) => 
@@ -128,75 +104,46 @@ export default function GenerarAyudantia({ user, onBack }: Props) {
                     ayudantia.asignatura.id === item.id_asignatura
                 );
                 
-                if (filtroEstado === "Seleccionado") {
-                    matchEstado = yaTieneAyudantia;
-                } else if (filtroEstado === "Pendiente") {
-                    matchEstado = !yaTieneAyudantia;
-                }
+                if (filtroEstado === "Seleccionado") matchEstado = yaTieneAyudantia;
+                else if (filtroEstado === "Pendiente") matchEstado = !yaTieneAyudantia;
             }
 
-            // solo mostrar los que NO están descartados
             const noDescartado = !item.motivo_descarte;
 
             return matchTexto && matchAsignatura && matchCoordinador && noDescartado && matchEstado;
         });
 
-        if (ordenTotal)
-        {
+        if (ordenTotal) {
             filtrados.sort((a: any, b: any) => {
                 const totalA = (a.puntuacion_etapa1 || 0) + (a.puntuacion_etapa2 || 0);
                 const totalB = (b.puntuacion_etapa1 || 0) + (b.puntuacion_etapa2 || 0);
-
-                if (ordenTotal === 'desc') {
-                    return totalB - totalA; 
-                } else {
-                    return totalA - totalB; 
-                }
+                return ordenTotal === 'desc' ? totalB - totalA : totalA - totalB; 
             });
-            
         }
-
         return filtrados;
 
     }, [postulantes, busquedaAlumno, filtroAsignatura, coordinadoresSeleccionados, ordenTotal, filtroEstado, listaAyudantias]);
 
-    // Lógica de Paginación
+    // Lógica Paginación
     const totalPaginas = Math.ceil(postulantesFiltrados.length / (itemsPagina || 1));
     const indiceInicio = (paginaActual - 1) * (itemsPagina || 1);
     const indiceFin = indiceInicio + (itemsPagina || 1);
     const dataPaginada = postulantesFiltrados.slice(indiceInicio, indiceFin);
 
     const handlePaginaChange = (nuevaPagina: number) => {
-        if (nuevaPagina >= 1 && nuevaPagina <= totalPaginas) {
-            setPaginaActual(nuevaPagina);
-        }
+        if (nuevaPagina >= 1 && nuevaPagina <= totalPaginas) setPaginaActual(nuevaPagina);
     };
 
     const handleChangeItemsPorPagina = (e: React.ChangeEvent<HTMLInputElement>) => {
         const valor = Number(e.target.value);
-        if (valor > 0) {
-            setItemsPagina(valor);
-            setPaginaActual(1);
-        }
+        if (valor > 0) { setItemsPagina(valor); setPaginaActual(1); }
     };
     
-    // Resetear pagina al filtrar
-    useEffect(() => {
-        setPaginaActual(1);
-    }, [busquedaAlumno, filtroAsignatura, coordinadoresSeleccionados, ordenTotal, filtroEstado]);
+    useEffect(() => { setPaginaActual(1); }, [busquedaAlumno, filtroAsignatura, coordinadoresSeleccionados, ordenTotal, filtroEstado]);
 
 
     const toggleCoordinador = (rut: string) => {
-        setCoordinadoresSeleccionados(prev => 
-            prev.includes(rut) ? prev.filter(r => r !== rut) : [...prev, rut]
-        );
-    };
-
-    const handleSelectSecretaria = (rut: string, nombre: string) => {
-        setRutSecretariaSeleccionada(rut);
-        setNombreSecretariaSeleccionada(nombre);
-        setModalSecAbierto(false);
-
+        setCoordinadoresSeleccionados(prev => prev.includes(rut) ? prev.filter(r => r !== rut) : [...prev, rut]);
     };
 
     const handleFormalizar = (p: PostulanteCoordinadorData) => {
@@ -205,8 +152,7 @@ export default function GenerarAyudantia({ user, onBack }: Props) {
     };
 
     const handleConfirmarDescarte = async (motivo: string) => {
-        if (idPostulacionDescartar)
-        {
+        if (idPostulacionDescartar) {
             try {
                 await descartarPostulacion.mutateAsync({
                     id_postulacion: idPostulacionDescartar,
@@ -219,41 +165,17 @@ export default function GenerarAyudantia({ user, onBack }: Props) {
             } finally {
                 setIdPostulacionDescartar(null);
             }
-            
-        }
-    }
-
-    const handleCerrarModalSecretaria = () => {
-        if(rutSecretariaSeleccionada)
-        {
-            setModalSecAbierto(false);
-            return;
-        }
-        
-        if (user.tipo === 'admin')
-        {
-            onBack();
-        } else {
-            setModalSecAbierto(false);
         }
     }
 
 return (
         <div className="space-y-6 animate-in fade-in pb-10">
             
-            <ModalSeleccionarSecretariaAdmin 
-                abierto={modalSecAbierto}
-                onClose={handleCerrarModalSecretaria}
-                onSelect={handleSelectSecretaria}
-                secretarias={listaSecretarias}
-                isLoading={cargaSecretarias}
-            />
-
             <ModalCrearAyudantia 
                 abierto={modalAyudantiaAbierto}
                 onClose={() => setModalAyudantiaAbierto(false)}
                 postulante={postulanteSeleccionado}
-                rutSecretaria={rutSecretariaSeleccionada}
+                rutSecretaria={rutSecretaria} // Usamos la prop que viene de page.tsx
                 nombreAsignatura={postulanteSeleccionado ? (mapAsig[postulanteSeleccionado.id_asignatura] || `ID: ${postulanteSeleccionado.id_asignatura}`) : ''}
             />
 
@@ -278,41 +200,8 @@ return (
                 />
             )}
 
-            {/* Barra admin */}
-            {user.tipo === 'admin' && (
-                <div className="bg-indigo-50 border border-indigo-100 rounded-lg p-3 flex items-center justify-between">
-                    <div className="flex items-center gap-3">
-                        <div className="bg-indigo-100 p-2 rounded-full text-indigo-600">
-                            <Briefcase size={18} />
-                        </div>
-                        <div>
-                            <p className="text-xs text-indigo-600 font-bold uppercase">Modo Supervisión: Gestionando como</p>
-                            <p className="text-sm font-bold text-gray-800">
-                                {nombreSecretariaSeleccionada ? (
-                                    <span>
-                                        {nombreSecretariaSeleccionada} 
-                                        <span className="text-gray-500 font-normal ml-1">
-                                            (Rut: {rutSecretariaSeleccionada})
-                                        </span>
-                                    </span>
-                                ) : (
-                                    "Seleccione Secretaria..."
-                                )}
-                            </p>
-                        </div>
-                    </div>
-                    <button 
-                        onClick={() => setModalSecAbierto(true)}
-                        className="flex items-center gap-2 bg-white text-indigo-600 px-3 py-1.5 rounded-md text-xs font-medium border border-indigo-200 hover:bg-indigo-50 transition"
-                    >
-                        <RefreshCw size={14} /> Cambiar
-                    </button>
-                </div>
-            )}
-
             <div className="flex flex-col xl:flex-row gap-4 items-start justify-center w-full max-w-full mx-auto px-4">
                 
-                {/* Columna izq: Filtros y Coordinadores */}
                 <div className="w-full xl:w-72 flex-shrink-0 space-y-4">
                     
                     <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
@@ -479,7 +368,6 @@ return (
                                 <p className="text-xs text-gray-500 mt-0.5">Seleccione un postulante para formalizar su ayudantía.</p>
                             </div>
                             
-                            {/* Controles de Paginación */}
                             <div className="flex items-center gap-4">
                                 <div className="flex items-center gap-2">
                                     <span className="text-sm text-gray-500 hidden sm:block">Mostrar</span>

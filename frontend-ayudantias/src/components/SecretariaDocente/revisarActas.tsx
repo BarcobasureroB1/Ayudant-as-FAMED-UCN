@@ -17,6 +17,10 @@ interface Firma {
 interface Acta {
     id: number;
     departamento: string;
+    id_departamento: {
+        id: number;
+        nombre: string;
+    };
     fecha: string;
     hora_inicio: string;
     hora_fin: string;
@@ -61,7 +65,7 @@ export default function VerActas({ actas }: Props) {
                             className="border-b hover:bg-gray-50 transition"
                         >
                             <td className="p-3">{acta.fecha}</td>
-                            <td className="p-3">{acta.departamento}</td>
+                            <td className="p-3">{acta.id_departamento.nombre}</td>
                             <td className="p-3 text-center">
                                 <button
                                     onClick={() => setActaSeleccionada(acta)}
