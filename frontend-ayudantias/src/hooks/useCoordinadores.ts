@@ -99,6 +99,7 @@ export interface PostulanteCoordinador {
   nombre_asignatura: string;
   descripcion_carta: string;
   metodologia: string;
+  actividad:string;
   puntuacion_etapa1: number;
   puntuacion_etapa2: number | null;
   motivo_descarte: string | null;

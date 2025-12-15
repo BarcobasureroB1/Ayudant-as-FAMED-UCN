@@ -1,8 +1,8 @@
-import { PostulanteCoordinadorData } from '@/hooks/useCoordinadores';
+import { PostulanteCoordinador } from '@/hooks/useCoordinadores';
 import React from 'react';
 
 interface Props {
-    postulante: PostulanteCoordinadorData;
+    postulante: PostulanteCoordinador;
     onClose: () => void;
 }
 

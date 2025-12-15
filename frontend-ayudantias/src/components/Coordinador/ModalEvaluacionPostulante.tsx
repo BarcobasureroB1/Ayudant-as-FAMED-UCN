@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
-import { PostulanteCoordinadorData } from '@/hooks/useCoordinadores';
+import { PostulanteCoordinador } from '@/hooks/useCoordinadores';
 
 interface EvaluacionPostulanteProps {
-    postulante: PostulanteCoordinadorData;
+    postulante: PostulanteCoordinador;
     onClose: () => void;
     onConfirm: (total: number) => void;
 }

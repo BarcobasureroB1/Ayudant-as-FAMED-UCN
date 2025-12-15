@@ -8,7 +8,8 @@ import {
     AyudanteCoordinador,
     useEvaluarPostulacion,
     useDescartarPostulacion,
-    useEvaluarAyudanteFinal
+    useEvaluarAyudanteFinal,
+    PostulanteCoordinadorData
 } from '@/hooks/useCoordinadores';
 import { useTodasAsignaturas } from '@/hooks/useAsignaturas';
 import { Filter, Search, Users, CheckSquare, Square, ChevronDown, Eye } from 'lucide-react';
@@ -20,7 +21,7 @@ import { ModalVerCurriculum } from '../Coordinador/ModalVerCurriculum';
 import { ModalDetallePostulacion } from '../SecretariaDocente/ModalDetallePostulacion';
 
 interface DirectorCoordinacionVistaProps {
-    postulantes: PostulanteCoordinador[] | undefined;
+    postulantes: PostulanteCoordinador[] | PostulanteCoordinadorData[]| undefined;
     ayudantes: AyudanteCoordinador[] | undefined;
     loading: boolean;
 }
@@ -414,7 +415,7 @@ export const DirectorCoordinacionVista = ({ postulantes, ayudantes, loading }: D
                                     </tr>
                                 </thead>
                                 <tbody className="bg-white divide-y divide-gray-100">
-                                    {dataPaginada.map((item: any) => {
+                                    {dataPaginada.map((item: any, index: number) => {
                                         const nombreAsig = isPostulante 
                                             ? (mapAsig[item.id_asignatura] || item.id_asignatura) 
                                             : item.asignatura;
@@ -429,8 +430,10 @@ export const DirectorCoordinacionVista = ({ postulantes, ayudantes, loading }: D
 
                                         const rutAlumno = isPostulante ? item.rut_alumno : item.alumno.rut;
 
+                                        const keyUnica = `${item.id}-${rutAlumno}-${isPostulante ? item.id_asignatura : item.asignatura}-${index}`;
+
                                         return (
-                                            <tr key={item.id} className="hover:bg-slate-50 transition-colors group">
+                                            <tr key={keyUnica} className="hover:bg-slate-50 transition-colors group">
                                                 <td className="px-2 py-4 text-sm font-medium text-gray-900 align-middle break-words">
                                                     {rutAlumno}
                                                 </td>

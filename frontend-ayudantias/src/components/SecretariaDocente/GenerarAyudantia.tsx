@@ -4,8 +4,8 @@ import React, { useState, useMemo, useEffect } from 'react';
 import {
     useCoordinadoresTodos,
     CoordinadorData,
-    PostulanteCoordinadorData,
-    usePostulantesGlobales,
+    PostulanteCoordinador,
+    usePostulacionesCoordinador,
     useDescartarPostulacion
 } from '@/hooks/useCoordinadores';
 
@@ -32,7 +32,7 @@ export default function GenerarAyudantia({ rutSecretaria }: Props) {
 
 
     const { data: coordinadores } = useCoordinadoresTodos();    
-    const { data: postulantes, isLoading: cargaPostulantes } = usePostulantesGlobales();
+    const { data: postulantes, isLoading: cargaPostulantes } = usePostulacionesCoordinador();
     const { data: listaAyudantias } = useTodasAyudantias();
     const { data: listaAsignaturas } = useTodasAsignaturas();
     const descartarPostulacion = useDescartarPostulacion();
@@ -50,7 +50,7 @@ export default function GenerarAyudantia({ rutSecretaria }: Props) {
     const [itemsPagina, setItemsPagina] = useState(10);
 
     // Modales
-    const [postulanteSeleccionado, setPostulanteSeleccionado] = useState<PostulanteCoordinadorData | null>(null);
+    const [postulanteSeleccionado, setPostulanteSeleccionado] = useState<PostulanteCoordinador | null>(null);
     const [modalAyudantiaAbierto, setModalAyudantiaAbierto] = useState(false);
     const [rutVerCurriculum, setRutVerCurriculum] = useState<string | null>(null);
     const [idPostulacionDescartar, setIdPostulacionDescartar] = useState<number | null>(null);
@@ -89,7 +89,7 @@ export default function GenerarAyudantia({ rutSecretaria }: Props) {
 
             let matchCoordinador = true;
             if (coordinadoresSeleccionados.length > 0) {
-                const rutCoordItem = item.rut_coordinador || (item.coordinador ? item.coordinador.rut : null);
+                const rutCoordItem = item.coordinador?.rut;
                 if (rutCoordItem) {
                     matchCoordinador = coordinadoresSeleccionados.includes(rutCoordItem);
                 } else {
@@ -98,13 +98,14 @@ export default function GenerarAyudantia({ rutSecretaria }: Props) {
             }
 
             let matchEstado = true;
-            if (filtroEstado && listaAyudantias) {
-                const yaTieneAyudantia = listaAyudantias.some((ayudantia) => 
-                    ayudantia.alumno.rut === item.rut_alumno && 
-                    ayudantia.asignatura.id === item.id_asignatura
-                );
-                
-                if (filtroEstado === "Seleccionado") matchEstado = yaTieneAyudantia;
+            
+            const yaTieneAyudantia = listaAyudantias?.some((ayudantia: any) => 
+                ayudantia.alumno.rut === item.rut_alumno && 
+                ayudantia.asignatura.id === item.id_asignatura
+            );
+
+            if (filtroEstado) {
+                if (filtroEstado === "Seleccionado") matchEstado = !!yaTieneAyudantia;
                 else if (filtroEstado === "Pendiente") matchEstado = !yaTieneAyudantia;
             }
 
@@ -146,7 +147,7 @@ export default function GenerarAyudantia({ rutSecretaria }: Props) {
         setCoordinadoresSeleccionados(prev => prev.includes(rut) ? prev.filter(r => r !== rut) : [...prev, rut]);
     };
 
-    const handleFormalizar = (p: PostulanteCoordinadorData) => {
+    const handleFormalizar = (p: PostulanteCoordinador) => {
         setPostulanteSeleccionado(p);
         setModalAyudantiaAbierto(true);
     };
@@ -175,7 +176,7 @@ return (
                 abierto={modalAyudantiaAbierto}
                 onClose={() => setModalAyudantiaAbierto(false)}
                 postulante={postulanteSeleccionado}
-                rutSecretaria={rutSecretaria} // Usamos la prop que viene de page.tsx
+                rutSecretaria={rutSecretaria}
                 nombreAsignatura={postulanteSeleccionado ? (mapAsig[postulanteSeleccionado.id_asignatura] || `ID: ${postulanteSeleccionado.id_asignatura}`) : ''}
             />
 
@@ -427,21 +428,25 @@ return (
                                     
                                     <tbody className="bg-white divide-y divide-gray-100">
                                         {dataPaginada.length > 0 ? (
-                                            dataPaginada.map((item: any) => {
+                                            dataPaginada.map((item: any, index:number) => {
                                                 const nombreAsig = mapAsig[item.id_asignatura] || item.id_asignatura;
-                                                const coordNombre = item.nombre_coordinador || (item.coordinador ? `${item.coordinador.nombres} ${item.coordinador.apellidos}` : "N/A");
+                                                const coordNombre = item.coordinador 
+                                                    ? `${item.coordinador.nombres} ${item.coordinador.apellidos}` 
+                                                    : "N/A";
                                                 
                                                 const p1 = item.puntuacion_etapa1 || 0;
                                                 const p2 = item.puntuacion_etapa2;
                                                 const total = p1 + (p2 || 0);
 
-                                                const yaTieneAyudantia = listaAyudantias?.some((ayudantia) => 
+                                                const yaTieneAyudantia = listaAyudantias?.some((ayudantia: any) => 
                                                     ayudantia.alumno.rut === item.rut_alumno && 
                                                     ayudantia.asignatura.id === item.id_asignatura
                                                 );
 
+                                                const keyUnica = `${item.id}-${item.rut_alumno}-${item.id_asignatura}-${index}`;
+
                                                 return (
-                                                    <tr key={item.id} className="hover:bg-gray-50 transition-colors group">
+                                                    <tr key={keyUnica} className="hover:bg-gray-50 transition-colors group">
                                                     {/* 1. RUT */}
                                                     <td className="px-2 py-4 text-sm font-medium text-gray-900 font-mono">
                                                         {item.rut_alumno}
