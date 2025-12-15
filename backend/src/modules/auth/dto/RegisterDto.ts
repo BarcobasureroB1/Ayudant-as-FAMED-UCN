@@ -11,5 +11,7 @@ export class RegisterDto {
     password: string;
     @IsString()
     tipo: string;
+    @IsString()
+    correo: string;
 
 }

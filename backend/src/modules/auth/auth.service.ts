@@ -52,6 +52,7 @@ export class AuthService {
     newUser.rut = registerDto.rut;
     newUser.nombres = registerDto.nombres;
     newUser.apellidos = registerDto.apellidos;
+    newUser.correo = registerDto.correo;
     const alumnoExists = await this.alumnoService.findByRut(registerDto.rut);
     
     if (!alumnoExists && registerDto.tipo === 'alumno') {
