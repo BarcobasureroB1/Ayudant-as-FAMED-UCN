@@ -39,7 +39,7 @@ export class PostulacionController {
   findByCoordinador(@Param('rut_coordinador') rut_coordinador: string) {
     return this.postulacionService.findPostulacionesByCoordinadorRut(rut_coordinador);
   }
-  @Get('coordinador')
+  @Get('coord')
   findAllByCoordinador() {
     return this.postulacionService.findPostulacionesByCoordinadores();
   }
