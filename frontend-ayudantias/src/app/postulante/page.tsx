@@ -474,7 +474,7 @@ export const PostulanteVista = ({user, alumno, curriculum, actividadesExtracurri
                                     </div>
                                     <div>
                                         <p className="text-sm text-black">Correo</p>
-                                        <p className="font-medium text-black">{curriculum?.correo}</p>
+                                        <p className="font-medium text-black">{user.correo}</p>
                                     </div>
                                     <div>
                                         <p className="text-sm text-black">Año de ingreso</p>
