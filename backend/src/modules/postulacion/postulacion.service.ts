@@ -297,6 +297,7 @@ export class PostulacionService {
       id_asignatura: Number(r.id_asignatura),
       descripcion_carta: r.descripcion_carta,
       nombre_asignatura: r.nombre_asignatura,
+      actividad: r.actividad,
       metodologia: r.metodologia,
       puntuacion_etapa1: r.puntuacion_etapa1 !== null && r.puntuacion_etapa1 !== undefined ? Number(r.puntuacion_etapa1) : 0,
       puntuacion_etapa2: r.puntuacion_etapa2 !== null && r.puntuacion_etapa2 !== undefined ? Number(r.puntuacion_etapa2) : null,
