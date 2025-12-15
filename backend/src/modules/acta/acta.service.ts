@@ -70,7 +70,7 @@ export class ActaService {
 
   async findAll() {
     return this.actaRepository.find({
-      relations: ['firmas', 'participantes'],
+      relations: ['firmas', 'participantes', 'id_departamento'],
       order: { id: 'DESC' },
     });
   }
@@ -82,7 +82,7 @@ export class ActaService {
   findbysecretaria(rut_secretaria: string) {
     return this.actaRepository.find({
       where: { rut_secretaria },
-      relations: ['firmas', 'participantes'],
+      relations: ['firmas', 'participantes', 'id_departamento'],
       order: { id: 'DESC' },
     });
   }

@@ -19,7 +19,7 @@ export class LlamadoPostulacionController {
   }
   @Get(':id')
   findByAsignatura(@Param('id') id: string) {
-    return this.llamadoPostulacionService.findbyAsignatura(+id);
+    return this.llamadoPostulacionService.findOnebyAsignatura(+id);
   }
 
   @Patch(':id')

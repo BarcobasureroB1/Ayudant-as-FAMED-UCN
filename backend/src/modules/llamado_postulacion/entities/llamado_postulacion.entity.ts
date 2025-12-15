@@ -42,7 +42,7 @@ export class LlamadoPostulacion {
   @Column()
   cant_ayudantes: number;
 
-  @Column()
+  @Column({default: 'abierto'})
   estado: string;
   @ManyToOne(() => Usuario)
   @JoinColumn({ name: 'rut_secretaria', referencedColumnName: 'rut' })
