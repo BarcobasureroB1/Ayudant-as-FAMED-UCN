@@ -5,6 +5,7 @@ export interface User
 {
     rut: string;
     nombres: string;
+    correo: string;
     apellidos: string;
     tipo: 'admin' | 'postulante' | 'secretaria de departamento' | string; //despues añadir mas roles
     deshabilitado: boolean;

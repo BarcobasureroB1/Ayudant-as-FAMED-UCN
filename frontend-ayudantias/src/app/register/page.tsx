@@ -10,6 +10,7 @@ export default function RegisterPage() {
     const [rut, setRut] = useState("");
     const [apellidos, setApellidos] = useState("");
     const [password, setPassword] = useState("");
+    const [correo, setCorreo] = useState("");
     const [showPassword, setShowPassword] = useState(false); 
     const [errorMsg, setErrorMsg] = useState("");
     const router = useRouter();
@@ -24,7 +25,7 @@ export default function RegisterPage() {
         e.preventDefault();
         setErrorMsg("");
         registrar.mutate({
-            rut, nombres: nombre, apellidos: apellidos, tipo: "alumno", password: password,
+            rut, nombres: nombre, apellidos: apellidos, tipo: "alumno", correo:correo, password: password,
         });
     };
 
@@ -54,6 +55,20 @@ export default function RegisterPage() {
                     <div>
                         <label htmlFor="rut" className="block text-sm font-medium text-gray-700">RUT</label>
                         <input type="text" name="rut" id="rut" required value={rut} onChange={(e) => setRut(e.target.value)} placeholder="Ingrese su RUT sin puntos ni guiones..." className="mt-1 w-full px-3 py-2 border rounded-md shadow-sm focus:ring-black focus:border-black placeholder:text-gray-400 text-gray-800" />
+                    </div>
+
+                    <div>
+                        <label htmlFor="correo" className="block text-sm font-medium text-gray-700">Correo Electrónico</label>
+                        <input 
+                            type="email" 
+                            name="correo" 
+                            id="correo" 
+                            required 
+                            value={correo} 
+                            onChange={(e) => setCorreo(e.target.value)} 
+                            placeholder="Ingrese su correo institucional" 
+                            className="mt-1 w-full px-3 py-2 border rounded-md shadow-sm focus:ring-black focus:border-black placeholder:text-gray-400 text-gray-800" 
+                        />
                     </div>
 
                     <div>
