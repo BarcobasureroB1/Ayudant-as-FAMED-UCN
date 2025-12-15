@@ -157,6 +157,15 @@ export class AsignaturaService {
     asignatura.estado = 'cerrado';
     asignatura.abierta_postulacion = false;
     const saved = await this.asignaturaRepository.save(asignatura);
+
+    // Cerrar llamados de postulación asociados a esta asignatura
+    await this.llamadoPostulacionRepository
+      .createQueryBuilder()
+      .update(LlamadoPostulacion)
+      .set({ estado: 'cerrado' })
+      .where('id_asignatura = :id', { id })
+      .execute();
+
     return saved;
   }
 

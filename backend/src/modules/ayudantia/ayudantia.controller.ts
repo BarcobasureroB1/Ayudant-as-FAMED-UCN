@@ -29,4 +29,8 @@ export class AyudantiaController {
   evaluar(@Param('id') id: string, @Body() dto: evaluarAyudantiaDto) {
     return this.ayudantiaService.evaluarAyudantia(+id, dto);
   }
+  @Get('coord/ina/dor/a')
+  findAllByCoordinador() {
+    return this.ayudantiaService.findAyudantiasByCoordinadores();
+  }
 }
