@@ -94,13 +94,17 @@ export class AuthService {
 
     // Buscar correo del alumno si existe
     const alumno = await this.alumnoService.findByRut(rut);
-    const correo = alumno?.correo;
-
+    if (alumno?.correo !== usuario.correo) {
+      throw new Error('el correo proporcionado no está asociado a ningún usuario');
+    }
+    const correo = alumno?.correo ?? usuario.correo;
+    
+    
     if (!correo) {
       throw new Error('No se encontró correo para este usuario');
     }
 
-    const enlaceRecuperacion = `${process.env.FRONTEND_URL || 'http://localhost:3000'}/reset-password?token=${resetToken}`;
+    const enlaceRecuperacion = `${process.env.FRONTEND_URL || 'http://localhost:8080'}/reset-password?token=${resetToken}`;
 
     const html = `
       <p>Estimado/a ${usuario.nombres} ${usuario.apellidos},</p>

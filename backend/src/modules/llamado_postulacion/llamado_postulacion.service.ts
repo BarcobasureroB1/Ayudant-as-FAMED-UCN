@@ -88,42 +88,44 @@ export class LlamadoPostulacionService {
     return await this.llamadoPostulacionRepository.find();
   }
 
-  async findbyAsignatura(id_asignatura: number) {
+  async findOnebyAsignatura(id_asignatura: number) {
     // Include requisitos relation and return descripcion list for each llamado
-    const llamados = await this.llamadoPostulacionRepository.find({
-      where: { asignatura: { id: id_asignatura }, estado: 'abierto' },
-      relations: ['asignatura', 'requisitos', 'coordinadores'],
-    });
+        const l = await this.llamadoPostulacionRepository.findOne({
+          where: { asignatura: { id: id_asignatura }, estado: 'abierto' },
+          relations: ['asignatura', 'requisitos', 'coordinadores'],
+        });
 
-    return llamados.map((l) => ({
-      id: l.id,
-      semestre: l.semestre,
-      entrega_antecedentes: l.entrega_antecedentes,
-      fecha_inicio: l.fecha_inicio,
-      fecha_termino: l.fecha_termino,
-      tipo_ayudantia: l.tipo_ayudantia,
-      tipo_remuneracion: l.tipo_remuneracion,
-      horas_mensuales: l.horas_mensuales,
-      horario_fijo: l.horario_fijo,
-      horarios: l.horarios || [],
-      cant_ayudantes: l.cant_ayudantes,
-      estado: l.estado,
-      descripcion: (l.requisitos || []).map((r) => r.descripcion),
-      asignatura: l.asignatura
-        ? {
-            id: l.asignatura.id,
-            nombre: l.asignatura.nombre,
-            semestre: l.asignatura.semestre,
-            nrc: l.asignatura.nrc,
-            estado: l.asignatura.estado,
-            abierta_postulacion: l.asignatura.abierta_postulacion,
-          }
-        : null,
-      coordinadores:
-        Array.isArray(l.coordinadores) && l.coordinadores.length > 0
-          ? l.coordinadores.map((c) => ({ rut: c.rut, nombres: c.nombres, apellidos: c.apellidos }))
-          : [],
-    }));
+        if (!l) return null;
+
+        return {
+          id: l.id,
+          semestre: l.semestre,
+          entrega_antecedentes: l.entrega_antecedentes,
+          fecha_inicio: l.fecha_inicio,
+          fecha_termino: l.fecha_termino,
+          tipo_ayudantia: l.tipo_ayudantia,
+          tipo_remuneracion: l.tipo_remuneracion,
+          horas_mensuales: l.horas_mensuales,
+          horario_fijo: l.horario_fijo,
+          horarios: l.horarios || [],
+          cant_ayudantes: l.cant_ayudantes,
+          estado: l.estado,
+          descripcion: (l.requisitos || []).map((r) => r.descripcion),
+          asignatura: l.asignatura
+            ? {
+                id: l.asignatura.id,
+                nombre: l.asignatura.nombre,
+                semestre: l.asignatura.semestre,
+                nrc: l.asignatura.nrc,
+                estado: l.asignatura.estado,
+                abierta_postulacion: l.asignatura.abierta_postulacion,
+              }
+            : null,
+          coordinadores:
+            Array.isArray(l.coordinadores) && l.coordinadores.length > 0
+              ? l.coordinadores.map((c) => ({ rut: c.rut, nombres: c.nombres, apellidos: c.apellidos }))
+              : [],
+        };
 
   }
 
@@ -136,17 +138,19 @@ export class LlamadoPostulacionService {
     if (!entity) {
       throw new Error('Llamado no encontrado');
     }
-
+    
     // Cambiar estado del llamado
     entity.estado = 'cerrado';
     await this.llamadoPostulacionRepository.save(entity);
 
     // Actualizar las postulaciones (no la asignatura) vinculadas a esta asignatura: es_actual = false
     if (entity.asignatura?.id) {
-      await this.postulacionRepository.update(
-        { asignatura: { id: entity.asignatura.id }, es_actual: true },
-        { es_actual: false },
-      );
+      await this.postulacionRepository
+        .createQueryBuilder()
+        .update(Postulacion)
+        .set({ es_actual: false })
+        .where('asignaturaId = :id AND es_actual = true', { id: entity.asignatura.id })
+        .execute();
     }
 
     return entity;

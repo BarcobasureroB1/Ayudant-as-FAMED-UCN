@@ -48,10 +48,11 @@ export function useCancelarAficheConcurso(){
     const clienteQuery = useQueryClient();
     return useMutation({
         mutationFn: async (id_concurso : number) => {
-            await api.patch('llamado-postulacion', id_concurso);
+            await api.patch(`llamado-postulacion/${id_concurso}`);
         },
         onSuccess: (_data) => {
             clienteQuery.invalidateQueries({queryKey:['llamado-postulacion']});
+            clienteQuery.invalidateQueries({queryKey:['asignaturas']});
             
         }                        
     });

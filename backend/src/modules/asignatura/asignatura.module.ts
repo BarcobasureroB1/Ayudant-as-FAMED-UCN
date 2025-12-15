@@ -12,10 +12,12 @@ import { Alumno } from '../alumno/entities/alumno.entity';
 import { AlumnoModule } from '../alumno/alumno.module';
 import { AsignaturaAlumno } from '../asignatura_alumno/entities/asignatura_alumno.entity';
 import { AsignaturaAlumnoModule } from '../asignatura_alumno/asignatura_alumno.module';
+import { LlamadoPostulacion } from '../llamado_postulacion/entities/llamado_postulacion.entity';
+import { LlamadoPostulacionModule } from '../llamado_postulacion/llamado_postulacion.module';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([Asignatura,Departamento,Usuario,Postulacion,Alumno,AsignaturaAlumno]),
-DepartamentoModule,UsuarioModule,AlumnoModule,AsignaturaAlumnoModule],
+  imports: [TypeOrmModule.forFeature([Asignatura,Departamento,Usuario,Postulacion,Alumno,AsignaturaAlumno,LlamadoPostulacion]),
+DepartamentoModule,UsuarioModule,AlumnoModule,AsignaturaAlumnoModule,LlamadoPostulacionModule],
   controllers: [AsignaturaController],
   providers: [AsignaturaService],
 })

@@ -14,5 +14,6 @@ import { Postulacion } from '../postulacion/entities/postulacion.entity';
   ],
   controllers: [LlamadoPostulacionController],
   providers: [LlamadoPostulacionService],
+  exports: [LlamadoPostulacionService],
 })
 export class LlamadoPostulacionModule {}

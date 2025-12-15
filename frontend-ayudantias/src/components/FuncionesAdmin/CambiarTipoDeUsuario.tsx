@@ -67,7 +67,8 @@ export default function AdministrarUsuarios({
         { value: "encargado_ayudantias", label: "Encargado de ayudantías" }, 
         { value: "director_depto", label: "Director de departamento" },
         { value: "secretaria_docente", label: "Secretaría docente" },
-        { value: "director_y_coordinador", label: "Director de departamento y Coordinador" },
+        { value: "coordinador_secretariaDocente", label: "Secretaría docente y Coordinador" },
+        { value: "coordinador_directorDepto", label: "Coordinador y Director de departamento" },
     ];
 
     // -------------------------
