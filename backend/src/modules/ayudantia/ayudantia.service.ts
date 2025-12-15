@@ -195,6 +195,7 @@ export class AyudantiaService {
 
   // Nuevo: Busca ayudantías para todas las asignaturas coordinadas por coordinadores actuales
   async findAyudantiasByCoordinadores() {
+    console.log('Finding ayudantias for all coordinadores');
     const asignaturaIds = await this.getAsignaturaIdsForAllCoordinadores();
     if (asignaturaIds.length === 0) return [];
     const raws = await this.getAyudantiasByAsignaturas(asignaturaIds);
