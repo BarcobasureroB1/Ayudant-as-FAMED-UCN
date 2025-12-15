@@ -163,7 +163,7 @@ export class AsignaturaService {
       .createQueryBuilder()
       .update(LlamadoPostulacion)
       .set({ estado: 'cerrado' })
-      .where('asignaturaId = :id', { id })
+      .where('id_asignatura = :id', { id })
       .execute();
 
     return saved;
