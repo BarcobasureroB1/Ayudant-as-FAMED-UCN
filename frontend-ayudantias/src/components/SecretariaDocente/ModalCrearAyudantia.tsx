@@ -1,13 +1,13 @@
 "use client";
 import React, { useState } from 'react';
-import { PostulanteCoordinadorData } from '@/hooks/useCoordinadores';
+import { PostulanteCoordinador } from '@/hooks/useCoordinadores';
 import { useCrearAyudantia } from '@/hooks/useAyudantia';
 import { Calendar, DollarSign, X, CheckCircle, AlertCircle } from 'lucide-react';
 
 interface Props {
     abierto: boolean;
     onClose: () => void;
-    postulante: PostulanteCoordinadorData | null;
+    postulante: PostulanteCoordinador | null;
     rutSecretaria: string;
     nombreAsignatura?: string;
 }

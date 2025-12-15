@@ -9,8 +9,8 @@ import {
     useEvaluarPostulacion,
     useDescartarPostulacion,
     useEvaluarAyudanteFinal,
-    PostulanteCoordinadorData,
-    AyudanteActivoData
+    PostulanteCoordinador,
+    AyudanteCoordinador
 } from '@/hooks/useCoordinadores';
 import { useTodasAsignaturas } from '@/hooks/useAsignaturas';
 import {ModalDescarte} from '@/components/Coordinador/ModalDescarte';
@@ -24,8 +24,8 @@ import { Filter, Search, Eye } from 'lucide-react';
 
 interface CoordinadorDashboardProps {
     user: User;
-    postulantes: PostulanteCoordinadorData[] | undefined;
-    ayudantes: AyudanteActivoData[] | undefined;
+    postulantes: PostulanteCoordinador[] | undefined;
+    ayudantes: AyudanteCoordinador[] | undefined;
     loading: boolean;
     adminBar?: React.ReactNode;
 }
@@ -60,9 +60,9 @@ export const CoordinadorDashboard = ({ user,postulantes, ayudantes, loading, adm
     const [ordenNota, setOrdenNota] = useState<"desc" | "asc" | "">("");
 
     const [idPostulacionDescartar, setIdPostulacionDescartar] = useState<number | null>(null);
-    const [postulanteVerDetalle, setPostulanteVerDetalle] = useState<PostulanteCoordinadorData | null>(null);
-    const [postulanteAEvaluar, setPostulanteAEvaluar] = useState<PostulanteCoordinadorData | null>(null);
-    const [ayudanteAEvaluar, setAyudanteAEvaluar ] = useState<AyudanteActivoData | null>(null);
+    const [postulanteVerDetalle, setPostulanteVerDetalle] = useState<PostulanteCoordinador | null>(null);
+    const [postulanteAEvaluar, setPostulanteAEvaluar] = useState<PostulanteCoordinador | null>(null);
+    const [ayudanteAEvaluar, setAyudanteAEvaluar ] = useState<AyudanteCoordinador | null>(null);
 
     const evaluarPostulacion = useEvaluarPostulacion();
     const descartarPostulacion = useDescartarPostulacion();
@@ -143,7 +143,7 @@ export const CoordinadorDashboard = ({ user,postulantes, ayudantes, loading, adm
         {
             data = listaAyudantes.filter(a => {
                 const matchTexto = a.alumno.nombres.toLowerCase().includes(busqueda.toLowerCase()) ||
-                                   a.rut_alumno.toLowerCase().includes(busqueda.toLowerCase());
+                                   a.alumno.rut.toLowerCase().includes(busqueda.toLowerCase());
                 const matchAsignatura = filtroAsignatura ? a.asignatura.toString() === filtroAsignatura : true;
 
                 let matchEstado = true;
@@ -532,16 +532,17 @@ export const CoordinadorDashboard = ({ user,postulantes, ayudantes, loading, adm
                                     <tbody className="divide-y divide-gray-100">
                                         {dataPaginada.length > 0 ? (
                                             isPostulantes ? (
-                                                (dataPaginada as PostulanteCoordinadorData[]).map(p => {
+                                                (dataPaginada as PostulanteCoordinador[]).map((p,index) => {
                                                     const esEvaluado = p.puntuacion_etapa2 !== null && p.puntuacion_etapa2 > 0;
+                                                    const keyUnica = `${p.id}-${p.rut_alumno}-${p.id_asignatura}-${index}`; 
                                                     return (
-                                                        <tr key={p.id} className="hover:bg-gray-50 transition">
+                                                        <tr key={keyUnica} className="hover:bg-gray-50 transition">
                                                             <td className="p-4 font-medium text-gray-900 whitespace-nowrap">{p.rut_alumno}</td>
                                                             <td className="p-4 whitespace-nowrap">{p.alumno.nombres} {p.alumno.apellidos}</td>
                                                             <td className="p-4 text-center text-gray-700 text-sm">{mapAsig[p.id_asignatura] || p.id_asignatura}</td>
                                                             <td className="p-4 text-center font-bold text-blue-600">{p.puntuacion_etapa1} pts</td>
                                                             <td className="p-4 text-center font-bold text-blue-600">
-                                                                    {p.puntuacion_etapa2 ? `${p.puntuacion_etapa2} pts` : '-'}
+                                                                {p.puntuacion_etapa2 ? `${p.puntuacion_etapa2} pts` : '-'}
                                                             </td>
                                                             <td className="p-4 text-center">
                                                                 <span className={`px-2.5 py-0.5 rounded-full text-xs font-medium ${esEvaluado ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800'}`}>
@@ -583,12 +584,13 @@ export const CoordinadorDashboard = ({ user,postulantes, ayudantes, loading, adm
                                                     );
                                                 })
                                             ) : (
-                                                (dataPaginada as AyudanteActivoData[]).map(a => {
+                                                (dataPaginada as AyudanteCoordinador[]).map((a, index) => {
                                                     const esEvaluado = a.evaluacion !== null && a.evaluacion > 0;
                                                     const nota = esEvaluado ? (a.evaluacion! / 10).toFixed(1) : '-';
+                                                    const keyUnicaAyudante = `${a.id}-${a.alumno.rut}-${a.asignatura}-${index}`;
                                                     return (
-                                                        <tr key={a.id} className="hover:bg-gray-50 transition">
-                                                            <td className="p-4 font-medium text-gray-900 whitespace-nowrap">{a.rut_alumno}</td>
+                                                        <tr key={keyUnicaAyudante} className="hover:bg-gray-50 transition">
+                                                            <td className="p-4 font-medium text-gray-900 whitespace-nowrap">{a.alumno.rut}</td>
                                                             <td className="p-4">{a.alumno.nombres} {a.alumno.apellidos}</td>
                                                             <td className="p-4 text-center">{a.asignatura}</td>
                                                             <td className={`p-4 text-center font-bold ${esEvaluado ? 'text-green-600' : 'text-gray-400'}`}>
