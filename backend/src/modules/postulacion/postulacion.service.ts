@@ -221,7 +221,7 @@ export class PostulacionService {
   async findPostulacionesByCoordinadorRut(rutCoordinador: string) {
     const asignaturaIds = await this.getAsignaturaIdsForCoordinador(rutCoordinador);
     if (asignaturaIds.length === 0) return [];
-    const postulaciones = await this.getPostulacionesByAsignaturas(asignaturaIds);
+    const postulaciones = await this.getPostulacionesByAsignaturasAndCoordinador(asignaturaIds, rutCoordinador);
     return this.mapPostulacionesForCoordinador(postulaciones);
   }
 
@@ -252,7 +252,7 @@ export class PostulacionService {
     return Array.from(new Set(rows.map((r) => r.asignatura_id).filter(Boolean)));
   }
 
-  // Consulta postulaciones actuales por lista de asignaturas
+  // Consulta postulaciones actuales por lista de asignaturas (sin filtrar coordinador específico)
   private async getPostulacionesByAsignaturas(asignaturaIds: number[]) {
     return await this.postulacionRepository
       .createQueryBuilder('p')
@@ -260,6 +260,40 @@ export class PostulacionService {
       .leftJoin('p.asignatura', 'asignatura')
       .leftJoin('asignatura.coordinador', 'coord', 'coord.actual = :actual', { actual: true })
       .leftJoin('coord.usuario', 'coord_usuario')
+      .select([
+        'p.id AS id',
+        'usuario.rut AS rut_alumno',
+        'usuario.nombres AS alumno_nombres',
+        'usuario.apellidos AS alumno_apellidos',
+        'asignatura.id AS id_asignatura',
+        'asignatura.nombre AS nombre_asignatura',
+        'p.descripcion_carta AS descripcion_carta',
+        'p.actividad AS actividad',
+        'p.metodologia AS metodologia',
+        'p.dia AS dia',
+        'p.bloque AS bloque',
+        'p.puntuacion_etapa1 AS puntuacion_etapa1',
+        'p.puntuacion_etapa2 AS puntuacion_etapa2',
+        'p.motivo_descarte AS motivo_descarte',
+        'p.fecha_descarte AS fecha_descarte',
+        'p.rechazada_por_jefatura AS rechazada_por_jefatura',
+        'coord_usuario.rut AS coordinador_rut',
+        'coord_usuario.nombres AS coordinador_nombres',
+        'coord_usuario.apellidos AS coordinador_apellidos',
+      ])
+      .where('asignatura.id IN (:...ids)', { ids: asignaturaIds })
+      .andWhere('p.es_actual = :actual', { actual: true })
+      .getRawMany();
+  }
+
+  // Consulta postulaciones actuales por lista de asignaturas y coordinador específico
+  private async getPostulacionesByAsignaturasAndCoordinador(asignaturaIds: number[], rutCoordinador: string) {
+    return await this.postulacionRepository
+      .createQueryBuilder('p')
+      .leftJoin('p.usuario', 'usuario')
+      .leftJoin('p.asignatura', 'asignatura')
+      .innerJoin('asignatura.coordinador', 'coord', 'coord.actual = :actual', { actual: true })
+      .innerJoin('coord.usuario', 'coord_usuario', 'coord_usuario.rut = :rut', { rut: rutCoordinador })
       .select([
         'p.id AS id',
         'usuario.rut AS rut_alumno',
