@@ -304,6 +304,7 @@ export class PostulacionService {
 
   // Nuevo: Busca postulaciones para todas las asignaturas coordinadas por coordinadores actuales
   async findPostulacionesByCoordinadores() {
+    console.log('Buscando postulaciones para todas las asignaturas de coordinadores actuales...');
     const asignaturaIds = await this.getAsignaturaIdsForAllCoordinadores();
     if (asignaturaIds.length === 0) return [];
     const postulaciones = await this.getPostulacionesByAsignaturas(asignaturaIds);
