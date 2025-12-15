@@ -1,4 +1,4 @@
-import { useMutation, useQueries, useQuery, useQueryClient } from "@tanstack/react-query";
+import { useMutation,useQuery, useQueryClient } from "@tanstack/react-query";
 import api from "../api/axios";
 
 export interface CoordinadorAsignatura {
@@ -59,8 +59,9 @@ export interface PostulanteCoordinadorData {
 
 export interface AyudanteActivoData {
   id: number;
-  rut_alumno: string;
+  
   alumno: {
+    rut:string;
     nombres: string;
     apellidos: string;
   };
@@ -86,6 +87,50 @@ interface EvaluarAyudante {
   evaluacion: number;
 }
 
+export interface PostulanteCoordinador {
+  id: number;
+  rut_alumno: string;
+  alumno: {
+    rut: string;
+    nombres: string;
+    apellidos: string;
+  };
+  id_asignatura: number;
+  nombre_asignatura: string;
+  descripcion_carta: string;
+  metodologia: string;
+  puntuacion_etapa1: number;
+  puntuacion_etapa2: number | null;
+  motivo_descarte: string | null;
+  fecha_descarte: string | null;
+  rechazada_por_jefatura: boolean;
+  coordinador: {
+    rut: string;
+    nombres: string;
+    apellidos: string;
+  };
+}
+
+export interface AyudanteCoordinador {
+  id: number;
+  alumno: {
+    rut: string;
+    nombres: string;
+    apellidos: string;
+    correo: string;
+    nivel: number;
+    promedio: number;
+    nombre_carrera: string;
+  };
+  asignatura: string;
+  periodo: string;
+  evaluacion: number | null;
+  coordinador: {
+    rut: string;
+    nombres: string;
+    apellidos: string;
+  };
+}
 
 export function useAsignarCoordinador() {
   const clienteQuery = useQueryClient();
@@ -212,52 +257,24 @@ export function useEvaluarAyudanteFinal() {
   });
 }
 
-export function usePostulantesGlobales() {
-  const { data: coordinadores } = useCoordinadoresTodos();
-
-  const queries = useQueries({
-    queries: (coordinadores || []).map((coord: CoordinadorData) => ({
-      queryKey: ["postulantesCoordinador", coord.rut],
-      queryFn: async () => {
-        const respuesta = await api.get(`postulacion/coordinador/${coord.rut}`);
-        const data = respuesta.data as PostulanteCoordinadorData[];
-        return data.map(item => ({
-            ...item,
-            rut_coordinador: coord.rut,
-            nombre_coordinador: `${coord.nombres} ${coord.apellidos}`
-        }));
-      },
-      enabled: !!coord.rut,
-    }))
+export function usePostulacionesCoordinador() {
+  return useQuery<PostulanteCoordinador[], Error>({
+    queryKey: ["postulacionesCoordinadora"],
+    queryFn: async () => {
+      const respuesta = await api.get("postulacion/coord/in/ador/a"); 
+      return respuesta.data;
+    },
   });
-
-  const data = queries.flatMap(q => (q.data as unknown as PostulanteCoordinadorData[]) || []);
-  const isLoading = queries.some(q => q.isLoading);
-  return {data, isLoading};
 }
 
-export function useAyudantesGlobales() {
-  const { data: coordinadores } = useCoordinadoresTodos();
-
-  const queries = useQueries({
-    queries: (coordinadores || []).map((coord: CoordinadorData) => ({
-      queryKey: ["ayudantesActivos", coord.rut],
-      queryFn: async () => {
-        const respuesta = await api.get(`ayudantia/coordinador/${coord.rut}`);
-        const data = respuesta.data as AyudanteActivoData[];
-        return data.map(item => ({
-            ...item,
-            rut_coordinador: coord.rut,
-            nombre_coordinador: `${coord.nombres} ${coord.apellidos}`
-        }));
-      },
-      enabled: !!coord.rut,
-    }))
+export function useAyudantesCoordinador() {
+  return useQuery<AyudanteCoordinador[], Error>({
+    queryKey: ["ayudantesCoordinadora"],
+    queryFn: async () => {
+      const respuesta = await api.get("ayudantia/coord/ina/dor/a");
+      return respuesta.data;
+    },
   });
-
-  const data = queries.flatMap(q => (q.data as unknown as AyudanteActivoData[]) || []);
-  const isLoading = queries.some(q => q.isLoading);
-  return {data, isLoading};
 }
 
 

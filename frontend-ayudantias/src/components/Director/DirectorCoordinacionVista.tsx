@@ -4,8 +4,8 @@ import React, { useState, useMemo } from 'react';
 import {
     useCoordinadoresTodos,
     CoordinadorData,
-    PostulanteCoordinadorData,
-    AyudanteActivoData,
+    PostulanteCoordinador,
+    AyudanteCoordinador,
     useEvaluarPostulacion,
     useDescartarPostulacion,
     useEvaluarAyudanteFinal
@@ -20,8 +20,8 @@ import { ModalVerCurriculum } from '../Coordinador/ModalVerCurriculum';
 import { ModalDetallePostulacion } from '../SecretariaDocente/ModalDetallePostulacion';
 
 interface DirectorCoordinacionVistaProps {
-    postulantes: PostulanteCoordinadorData[] | undefined;
-    ayudantes: AyudanteActivoData[] | undefined;
+    postulantes: PostulanteCoordinador[] | undefined;
+    ayudantes: AyudanteCoordinador[] | undefined;
     loading: boolean;
 }
 
@@ -46,9 +46,9 @@ export const DirectorCoordinacionVista = ({ postulantes, ayudantes, loading }: D
     const isPostulante = vista === 'Postulantes';
 
     const [rutVerCurriculum, setRutVerCurriculum ] = useState<string | null>(null);
-    const [postulanteVerDetalle, setPostulanteVerDetalle] = useState<PostulanteCoordinadorData | null>(null);
-    const [postulanteAEvaluar, setPostulanteAEvaluar] = useState<PostulanteCoordinadorData | null>(null);
-    const [ayudanteAEvaluar, setAyudanteAEvaluar] = useState<AyudanteActivoData | null>(null);
+    const [postulanteVerDetalle, setPostulanteVerDetalle] = useState<PostulanteCoordinador | null>(null);
+    const [postulanteAEvaluar, setPostulanteAEvaluar] = useState<PostulanteCoordinador | null>(null);
+    const [ayudanteAEvaluar, setAyudanteAEvaluar] = useState<AyudanteCoordinador | null>(null);
     const [idPostulacionDescartar, setIdPostulacionDescartar] = useState<number | null>(null);
     const [paginaActual, setPaginaActual] = useState(1);
     const [itemsPagina, setItemsPagina] = useState(10);
@@ -98,11 +98,22 @@ export const DirectorCoordinacionVista = ({ postulantes, ayudantes, loading }: D
         const listaBase = isPostulante ? (postulantes || []) : (ayudantes || []);
 
         return listaBase.filter((item: any) => {
-            const matchTexto = item.alumno.nombres.toLowerCase().includes(busqueda.toLowerCase()) || 
-                                item.rut_alumno.toLowerCase().includes(busqueda.toLowerCase());
-            
-            const idAsigStr = isPostulante ? item.id_asignatura.toString() : item.asignatura.toString(); 
-            const matchAsignatura = filtroAsignatura ? idAsigStr === filtroAsignatura : true;
+
+            const nombres = item.alumno.nombres;
+            const rut = item.rut_alumno || item.alumno.rut;
+
+            const matchTexto = nombres.toLowerCase().includes(busqueda.toLowerCase()) || 
+                                rut.toLowerCase().includes(busqueda.toLowerCase());
+
+            let matchAsignatura = true;
+            if (filtroAsignatura) {
+                if (isPostulante) {
+                    matchAsignatura = item.id_asignatura.toString() === filtroAsignatura;
+                } else {
+                    const nombreAsigFiltro = mapAsig[Number(filtroAsignatura)];
+                    matchAsignatura = item.asignatura === nombreAsigFiltro;
+                }
+            }
 
             let matchEstado = true;
             if (filtroEstado) {
@@ -118,17 +129,19 @@ export const DirectorCoordinacionVista = ({ postulantes, ayudantes, loading }: D
             let matchCoordinador = true;
             if(coordinadoresSeleccionados.length > 0)
             {
-                const rutCoordItem = item.rut_coordinador || item.coordinador.rut;
+                const rutCoordItem = item.coordinador?.rut;
                 if(rutCoordItem){
                     matchCoordinador = coordinadoresSeleccionados.includes(rutCoordItem);
+                } else {
+                    matchCoordinador = false;
                 }
             }
 
-            const noDescartado = item.motivo_descarte ? false : true;
+            const noDescartado = (item as PostulanteCoordinador).motivo_descarte ? false : true;
 
             return matchTexto && matchAsignatura && noDescartado && matchEstado && matchCoordinador;
         });
-    }, [isPostulante, postulantes, ayudantes, busqueda, filtroAsignatura, filtroEstado, coordinadoresSeleccionados]);
+    }, [isPostulante, postulantes, ayudantes, busqueda, filtroAsignatura, filtroEstado, coordinadoresSeleccionados, mapAsig]);
 
 
     React.useEffect(() => {
@@ -402,16 +415,24 @@ export const DirectorCoordinacionVista = ({ postulantes, ayudantes, loading }: D
                                 </thead>
                                 <tbody className="bg-white divide-y divide-gray-100">
                                     {dataPaginada.map((item: any) => {
-                                        const nombreAsig = isPostulante ? (mapAsig[item.id_asignatura] || item.id_asignatura) : item.asignatura;
-                                        const coordNombre = item.nombre_coordinador || "No asignado";
+                                        const nombreAsig = isPostulante 
+                                            ? (mapAsig[item.id_asignatura] || item.id_asignatura) 
+                                            : item.asignatura;
+                                        
+                                        const coordNombre = item.coordinador 
+                                            ? `${item.coordinador.nombres} ${item.coordinador.apellidos}` 
+                                            : "No asignado";
+
                                         const esEvaluadoPostulante = isPostulante && item.puntuacion_etapa2 != null && item.puntuacion_etapa2 > 0;
                                         const esEvaluadoAyudante = !isPostulante && item.evaluacion != null && item.evaluacion > 0;
                                         const esEvaluado = isPostulante ? esEvaluadoPostulante : esEvaluadoAyudante;
 
+                                        const rutAlumno = isPostulante ? item.rut_alumno : item.alumno.rut;
+
                                         return (
                                             <tr key={item.id} className="hover:bg-slate-50 transition-colors group">
                                                 <td className="px-2 py-4 text-sm font-medium text-gray-900 align-middle break-words">
-                                                    {item.rut_alumno}
+                                                    {rutAlumno}
                                                 </td>
                                                 <td className="px-2 py-4 text-sm text-gray-700 font-medium align-middle break-words">
                                                     {item.alumno.nombres} {item.alumno.apellidos}
