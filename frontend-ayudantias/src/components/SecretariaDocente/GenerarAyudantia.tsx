@@ -70,7 +70,7 @@ export default function GenerarAyudantia({ rutSecretaria }: Props) {
         if (!coordinadores) return [];
         if (!busquedaCoordinador) return coordinadores;
         const term = busquedaCoordinador.toLowerCase();
-        return coordinadores.filter(c => 
+        return coordinadores.filter((c: any) => 
             `${c.nombres} ${c.apellidos}`.toLowerCase().includes(term) ||
             c.rut.includes(term)
         );
