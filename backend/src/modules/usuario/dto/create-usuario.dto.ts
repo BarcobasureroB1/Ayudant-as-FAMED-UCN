@@ -13,4 +13,6 @@ export class CreateUsuarioDto {
     tipo: string;
     @IsNumber()
     c_ayudantia: number;
+    @IsString()
+    correo: string;
 }
