@@ -310,24 +310,6 @@ export const DirectorCoordinacionVista = ({ postulantes, ayudantes, loading }: D
                             </div>
                         </div>
                         
-                        {/*isPostulante && (
-                             <div>
-                                <label className="block text-xs font-bold text-gray-500 uppercase mb-1.5">Estado</label>
-                                <div className="relative">
-                                    <select 
-                                        className="w-full appearance-none px-3 py-2 bg-gray-50 border border-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:bg-white outline-none transition-all text-gray-800 pr-8"
-                                        value={filtroEstado}
-                                        onChange={(e) => setFiltroEstado(e.target.value)}
-                                    >
-                                        <option value="">Todos los estados</option>
-                                        <option value="Pendiente">Pendiente</option>
-                                        <option value="Evaluado">Evaluado</option>
-                                    </select>
-                                    <ChevronDown className="absolute right-3 top-2.5 w-4 h-4 text-gray-400 pointer-events-none" />
-                                </div>
-                            </div>
-                        )*/}
-
                         <div>
                             <label className="block text-xs font-bold text-gray-500 uppercase mb-1.5">Estado</label>
                             <div className="relative">

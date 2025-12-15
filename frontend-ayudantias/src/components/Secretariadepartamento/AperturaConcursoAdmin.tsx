@@ -675,6 +675,7 @@ export default function AperturaConcursoAdmin({ asignaturas = [], rutSecretaria 
           else if (data && typeof data === "object" && data.id) id_concurso = data.id;
 
           if (id_concurso) {
+            console.log("ID CONCURSO: ",id_concurso);
             cancelarAfiche.mutate(id_concurso as any, {
               onSuccess: () => {
                 setMensajePopup("Concurso y afiche cancelados correctamente.");

@@ -3,39 +3,30 @@
 import { SyntheticEvent, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useRegister } from "@/hooks/useRegister";
-
+import { Eye, EyeOff } from "lucide-react";
 
 export default function RegisterPage() {
     const [nombre, setNombre] = useState("");
     const [rut, setRut] = useState("");
     const [apellidos, setApellidos] = useState("");
     const [password, setPassword] = useState("");
+    const [showPassword, setShowPassword] = useState(false); 
     const [errorMsg, setErrorMsg] = useState("");
     const router = useRouter();
 
-
-    const registrar = useRegister(() => 
-        {
-            router.push("/login") //redireccionar al login despues del registro
-        },
-        (error) => {
-            setErrorMsg(error || "error en el registro");
-        }
-    );
+    const registrar = useRegister(() => {
+        router.push("/login") 
+    }, (error) => {
+        setErrorMsg(error || "error en el registro");
+    });
 
     const enviar = (e: SyntheticEvent) => {
         e.preventDefault();
         setErrorMsg("");
-
         registrar.mutate({
-            rut,
-            nombres: nombre,
-            apellidos: apellidos,
-            tipo: "alumno",
-            password: password,
+            rut, nombres: nombre, apellidos: apellidos, tipo: "alumno", password: password,
         });
     };
-
 
     return (
         <div className="min-h-screen flex items-center justify-center bg-gray-50 px-4">
@@ -53,84 +44,49 @@ export default function RegisterPage() {
                 
                 <form onSubmit={enviar} className="space-y-4">
                     <div>
-                        <label htmlFor="nombre" className="block text-sm font-medium text-gray-700">
-                            Nombre
-                        </label>
-                        <input
-                            type="text"
-                            name="nombre"
-                            id="nombre"
-                            required
-                            value={nombre}
-                            onChange={(e) => setNombre(e.target.value)}
-                            placeholder="Ingrese su nombre completo..."
-                            className="mt-1 w-full px-3 py-2 border rounded-md shadow-sm focus:ring-black focus:border-black placeholder:text-gray-400 text-gray-800"
-                        />
+                        <label htmlFor="nombre" className="block text-sm font-medium text-gray-700">Nombre</label>
+                        <input type="text" name="nombre" id="nombre" required value={nombre} onChange={(e) => setNombre(e.target.value)} placeholder="Ingrese su nombre completo..." className="mt-1 w-full px-3 py-2 border rounded-md shadow-sm focus:ring-black focus:border-black placeholder:text-gray-400 text-gray-800" />
                     </div>
-
-
                     <div>
-                        <label htmlFor="apellidos" className="block text-sm font-medium text-gray-700">
-                            Apellidos
-                        </label>
-                        <input
-                            type="text"
-                            name="apellidos"
-                            id="apellidos"
-                            required
-                            value={apellidos}
-                            onChange={(e) => setApellidos(e.target.value)}
-                            placeholder="Ingrese sus apellidos..."
-                            className="mt-1 w-full px-3 py-2 border rounded-md shadow-sm focus:ring-black focus:border-black placeholder:text-gray-400 text-gray-800"
-                        />
+                        <label htmlFor="apellidos" className="block text-sm font-medium text-gray-700">Apellidos</label>
+                        <input type="text" name="apellidos" id="apellidos" required value={apellidos} onChange={(e) => setApellidos(e.target.value)} placeholder="Ingrese sus apellidos..." className="mt-1 w-full px-3 py-2 border rounded-md shadow-sm focus:ring-black focus:border-black placeholder:text-gray-400 text-gray-800" />
                     </div>
-
                     <div>
-                        <label htmlFor="rut" className="block text-sm font-medium text-gray-700">
-                            RUT
-                        </label>
-                        <input
-                            type="text"
-                            name="rut"
-                            id="rut"
-                            required
-                            value={rut}
-                            onChange={(e) => setRut(e.target.value)}
-                            placeholder="Ingrese su RUT sin puntos ni guiones..."
-                            className="mt-1 w-full px-3 py-2 border rounded-md shadow-sm focus:ring-black focus:border-black placeholder:text-gray-400 text-gray-800"
-                        />
+                        <label htmlFor="rut" className="block text-sm font-medium text-gray-700">RUT</label>
+                        <input type="text" name="rut" id="rut" required value={rut} onChange={(e) => setRut(e.target.value)} placeholder="Ingrese su RUT sin puntos ni guiones..." className="mt-1 w-full px-3 py-2 border rounded-md shadow-sm focus:ring-black focus:border-black placeholder:text-gray-400 text-gray-800" />
                     </div>
 
                     <div>
                         <label htmlFor="password" className="block text-sm font-medium text-gray-700">
                             Contraseña
                         </label>
-                        <input
-                            type="password"
-                            name="password"
-                            id="password"
-                            required
-                            value={password}
-                            onChange={(e) => setPassword(e.target.value)}
-                            placeholder="••••••••"
-                            className="mt-1 w-full px-3 py-2 border rounded-md shadow-sm focus:ring-black focus:border-black placeholder:text-gray-400 text-gray-800"
-                        />
+                        <div className="relative mt-1">
+                            <input
+                                type={showPassword ? "text" : "password"}
+                                name="password"
+                                id="password"
+                                required
+                                value={password}
+                                onChange={(e) => setPassword(e.target.value)}
+                                placeholder="••••••••"
+                                className="w-full px-3 py-2 border rounded-md shadow-sm focus:ring-black focus:border-black placeholder:text-gray-400 text-gray-800 pr-10"
+                            />
+                            <button
+                                type="button"
+                                onClick={() => setShowPassword(!showPassword)}
+                                className="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-400 hover:text-gray-600"
+                            >
+                                {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
+                            </button>
+                        </div>
                     </div>
 
-                    <button
-                        type="submit"
-                        disabled={registrar.isPending}
-                        className={`w-full py-2 rounded-md text-white font-semibold transition ${
-                            registrar.isPending ? "bg-gray-400 cursor-not-allowed" : "bg-black hover:bg-gray-800"
-                        }`}
-                    >
+                    <button type="submit" disabled={registrar.isPending} className={`w-full py-2 rounded-md text-white font-semibold transition ${registrar.isPending ? "bg-gray-400 cursor-not-allowed" : "bg-black hover:bg-gray-800"}`}>
                         {registrar.isPending ? "Registrando..." : "Registrarse"}
                     </button>
                 </form>
-                
                 {errorMsg && <p className="mt-4 text-sm text-red-600 text-center">{errorMsg}</p>}
             </div>
         </div>
-
     )
 }

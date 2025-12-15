@@ -108,11 +108,6 @@ export default function DashboardPage() {
         return <div>Cargando perfil...</div>;
     }
 
-    /*if(isError)
-    {
-        return <div>Error al cargar los datos </div>
-    }*/
-
     return (
         <div className="min-h-screen flex items-center justify-center">
             <div className="text-center">
