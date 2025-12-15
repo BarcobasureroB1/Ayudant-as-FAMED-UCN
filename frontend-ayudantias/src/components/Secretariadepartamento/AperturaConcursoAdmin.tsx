@@ -174,9 +174,6 @@ const styles = StyleSheet.create({
     marginBottom: 3,
   },
   footer: {
-    //bottom: 30,
-    //left: 30,
-   // right: 30,
     marginTop: 30,
     textAlign: "center",
   },
@@ -651,6 +648,7 @@ export default function AperturaConcursoAdmin({ asignaturas = [], rutSecretaria 
         setAficheExists((prev) => ({ ...prev, [a.id]: false}));
       }
     } catch (err) {
+      console.error(err);
       setMensajePopup("Error al consultar el afiche. Intenta nuevamente.");
       setMostrarPopup(true);
       setDatosAficheLocal(null);
@@ -679,6 +677,7 @@ export default function AperturaConcursoAdmin({ asignaturas = [], rutSecretaria 
           else if (data && typeof data === "object" && data.id) id_concurso = data.id;
           
         } catch (err) {
+          console.error(err);
           setMensajePopup("Concurso cerrado, pero ocurrió un error al buscar el afiche.");
           setMostrarPopup(true);
           return;
@@ -777,8 +776,7 @@ export default function AperturaConcursoAdmin({ asignaturas = [], rutSecretaria 
                   <tbody>
                     {asignaturasPaginadas.map((a) => {
                       const estadoLower = a.estado?.trim().toLowerCase();
-                      const puedeGestionarAfiche = estadoLower === "abierto" && a.abierta_postulacion === true;
-                      const tieneAfiche = aficheExists[a.id];
+                      
 
                       return (
                         <tr key={a.id} className="border-b hover:bg-gray-50 transition">
@@ -896,17 +894,17 @@ export default function AperturaConcursoAdmin({ asignaturas = [], rutSecretaria 
 
                         <label className="text-sm text-black ">
                           Entrega antecedentes (fecha)
-                          <input value={entregaAntecedentes} onChange={(e) => setEntregaAntecedentes(e.target.value)} type="date" className="w-full mt-1 border rounded text-black px-2 py-1" />
+                          <input value={entregaAntecedentes} onChange={(e) => setEntregaAntecedentes(e.target.value)} type="date" className="w-full mt-1 border rounded text-black px-2 py-1 cursor-pointer" onClick={(e) => e.currentTarget.showPicker()} />
                         </label>
 
                         <label className="text-sm text-black ">
                           Fecha inicio
-                          <input value={fechaInicio} onChange={(e) => setFechaInicio(e.target.value)} type="date" className="w-full mt-1 border rounded text-black px-2 py-1" />
+                          <input value={fechaInicio} onChange={(e) => setFechaInicio(e.target.value)} type="date" className="w-full mt-1 border rounded text-black px-2 py-1 cursor-pointer" onClick={(e) => e.currentTarget.showPicker()}/>
                         </label>
 
                         <label className="text-sm  text-black ">
                           Fecha término
-                          <input value={fechaTermino} onChange={(e) => setFechaTermino(e.target.value)} type="date" className="w-full mt-1 border rounded text-black px-2 py-1" />
+                          <input value={fechaTermino} onChange={(e) => setFechaTermino(e.target.value)} type="date" className="w-full mt-1 border rounded text-black px-2 py-1 cursor-pointer" onClick={(e) => e.currentTarget.showPicker()}/>
                         </label>
 
                         <label className="text-sm text-black ">
