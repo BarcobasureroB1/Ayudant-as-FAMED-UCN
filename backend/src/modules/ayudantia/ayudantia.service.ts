@@ -148,15 +148,28 @@ export class AyudantiaService {
     return Array.from(new Set(rows.map((r) => r.asignatura_id).filter(Boolean)));
   }
 
-  // Obtiene todos los IDs de asignaturas donde cualquier coordinador actual está asignado
-  private async getAsignaturaIdsForAllCoordinadores(): Promise<number[]> {
+  // Obtiene todos los IDs de asignaturas donde cualquier coordinador actual está asignado, con datos del coordinador
+  private async getAsignaturaIdsForAllCoordinadores(): Promise<{ asignaturaId: number; coordinador: any }[]> {
     const rows = await this.coordinadorRepository
       .createQueryBuilder('c')
       .innerJoin('c.asignaturas', 'asignatura')
+      .innerJoin('c.usuario', 'usuario')
       .where('c.actual = :actual', { actual: true })
-      .select(['asignatura.id AS asignatura_id'])
+      .select([
+        'asignatura.id AS asignatura_id',
+        'usuario.rut AS coordinador_rut',
+        'usuario.nombres AS coordinador_nombres',
+        'usuario.apellidos AS coordinador_apellidos',
+      ])
       .getRawMany();
-    return Array.from(new Set(rows.map((r) => r.asignatura_id).filter(Boolean)));
+    return rows.map((r) => ({
+      asignaturaId: r.asignatura_id,
+      coordinador: {
+        rut: r.coordinador_rut,
+        nombres: r.coordinador_nombres,
+        apellidos: r.coordinador_apellidos,
+      },
+    }));
   }
 
   // Consulta ayudantías por lista de asignaturas
@@ -164,15 +177,25 @@ export class AyudantiaService {
     return await this.ayudantiaRepository
       .createQueryBuilder('ayudantia')
       .leftJoin('ayudantia.alumno', 'alumno')
+      .leftJoin(Alumno, 'alumno_data', 'alumno_data.rut_alumno = alumno.rut')
       .leftJoin('ayudantia.asignatura', 'asignatura')
+      .leftJoin('asignatura.coordinador', 'coord', 'coord.actual = :actual', { actual: true })
+      .leftJoin('coord.usuario', 'coord_usuario')
       .select([
         'ayudantia.id AS id',
         'alumno.rut AS alumno_rut',
         'alumno.nombres AS alumno_nombres',
         'alumno.apellidos AS alumno_apellidos',
+        'alumno_data.correo AS alumno_correo',
+        'alumno_data.nivel AS alumno_nivel',
+        'alumno_data.promedio AS alumno_promedio',
+        'alumno_data.nombre_carrera AS alumno_nombre_carrera',
         'asignatura.nombre AS asignatura_nombre',
         'ayudantia.periodo AS periodo',
         'ayudantia.evaluacion AS evaluacion',
+        'coord_usuario.rut AS coordinador_rut',
+        'coord_usuario.nombres AS coordinador_nombres',
+        'coord_usuario.apellidos AS coordinador_apellidos',
       ])
       .where('asignatura.id IN (:...ids)', { ids: asignaturaIds })
       .getRawMany();
@@ -182,22 +205,32 @@ export class AyudantiaService {
   private mapAyudantias(rows: any[]) {
     return rows.map((r) => ({
       id: Number(r.id),
-      rut_alumno: r.alumno_rut,
       alumno: {
+        rut: r.alumno_rut,
         nombres: r.alumno_nombres,
         apellidos: r.alumno_apellidos,
+        correo: r.alumno_correo || null,
+        nivel: r.alumno_nivel || null,
+        promedio: r.alumno_promedio ? Number(r.alumno_promedio) : null,
+        nombre_carrera: r.alumno_nombre_carrera || null,
       },
       asignatura: r.asignatura_nombre,
       periodo: r.periodo,
       evaluacion: r.evaluacion !== null && r.evaluacion !== undefined ? Number(r.evaluacion) : null,
+      coordinador: r.coordinador_rut ? {
+        rut: r.coordinador_rut,
+        nombres: r.coordinador_nombres,
+        apellidos: r.coordinador_apellidos,
+      } : null,
     }));
   }
 
   // Nuevo: Busca ayudantías para todas las asignaturas coordinadas por coordinadores actuales
   async findAyudantiasByCoordinadores() {
     console.log('Finding ayudantias for all coordinadores');
-    const asignaturaIds = await this.getAsignaturaIdsForAllCoordinadores();
-    if (asignaturaIds.length === 0) return [];
+    const asignaturasConCoord = await this.getAsignaturaIdsForAllCoordinadores();
+    if (asignaturasConCoord.length === 0) return [];
+    const asignaturaIds = Array.from(new Set(asignaturasConCoord.map((a) => a.asignaturaId)));
     const raws = await this.getAyudantiasByAsignaturas(asignaturaIds);
     return this.mapAyudantias(raws);
   }
