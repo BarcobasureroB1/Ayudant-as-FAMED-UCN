@@ -66,7 +66,7 @@ export default function RegisterPage() {
                             required 
                             value={correo} 
                             onChange={(e) => setCorreo(e.target.value)} 
-                            placeholder="Ingrese su correo Institucional" 
+                            placeholder="Ingrese su correo institucional" 
                             className="mt-1 w-full px-3 py-2 border rounded-md shadow-sm focus:ring-black focus:border-black placeholder:text-gray-400 text-gray-800" 
                         />
                     </div>
