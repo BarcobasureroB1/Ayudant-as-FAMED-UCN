@@ -9,7 +9,7 @@ import Cookies from 'js-cookie';
 import AutorizarConcursos from '@/components/FuncionesEncargado/AutorizarConcursos';
 import { DirectorCoordinacionVista } from '@/components/Director/DirectorCoordinacionVista';
 import { useSolicitudesDeConcurso } from '@/hooks/useAsignaturas';
-import { usePostulantesGlobales, useAyudantesGlobales } from '@/hooks/useCoordinadores';
+import { usePostulantesCoordinador, useAyudantesCoordinador } from '@/hooks/useCoordinadores';
 
 
 interface UserProps {
@@ -22,8 +22,8 @@ export const DirectorDeptoDashboard = ({ user }: UserProps) => {
     const { setToken, setUsertipo } = useAuth();
     const { data: asignaturasConcursos, isLoading: cargaConcursos } = useSolicitudesDeConcurso();
 
-    const { data: postulantesGlobal, isLoading: cargaPostulantes} = usePostulantesGlobales();
-    const { data: ayudantesGlobal, isLoading: cargaAyudantes} = useAyudantesGlobales();
+    const { data: postulantesGlobal, isLoading: cargaPostulantes} = usePostulantesCoordinador();
+    const { data: ayudantesGlobal, isLoading: cargaAyudantes} = useAyudantesCoordinador();
 
     type Vista = 'Concurso' |'Coordinacion';
     const [vista, setVista] = useState<Vista>('Concurso');

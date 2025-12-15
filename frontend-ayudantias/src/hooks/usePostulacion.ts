@@ -52,6 +52,16 @@ export function usePostulacionesPorAlumno(rut_alumno?: string){
     });
 }
 
+export function useTodasPostulaciones() {
+    return useQuery<PostulacionData[], Error>({
+        queryKey: ['todasLasPostulaciones'],
+        queryFn: async () => {
+            const respuesta = await api.get('/postulacion');
+            return respuesta.data;
+        },
+    });
+}
+
 export function useCancelarPostulacion(){   
     const clienteQuery = useQueryClient();
     return useMutation({
