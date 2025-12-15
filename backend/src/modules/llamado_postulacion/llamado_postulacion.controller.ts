@@ -23,8 +23,8 @@ export class LlamadoPostulacionController {
   }
 
   @Patch(':id')
-  update(@Param('id') id: number) {
-    return this.llamadoPostulacionService.cambiarEstado(id);
+  update(@Param('id') id: string) {
+    return this.llamadoPostulacionService.cambiarEstado(+id);
   }
 
 }
