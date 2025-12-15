@@ -26,9 +26,9 @@ export class Postulacion {
     bloque : string;
     @Column({ default: false })
     cancelada_por_usuario: boolean;
-    @Column({ default: 0 },)
+    @Column({ type: 'numeric', precision: 5, scale: 2, default: 0 })
     puntuacion_etapa1: number;
-    @Column({ default: 0 })
+    @Column({ type: 'numeric', precision: 5, scale: 2, default: 0 })
     puntuacion_etapa2: number;
     @Column({ default: false })
     rechazada_por_jefatura: boolean;
