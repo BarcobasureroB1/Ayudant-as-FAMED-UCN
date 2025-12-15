@@ -648,6 +648,7 @@ export const PostulanteVista = ({user, alumno, curriculum, actividadesExtracurri
                                                     name="actividad" 
                                                     value={formPostulacion.actividad} 
                                                     onChange={(e) => setFormPostulacion({ ...formPostulacion, [e.target.name]: e.target.value })} 
+                                                    maxLength={700}
                                                     className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors text-black"
                                                     placeholder="Ej: Resolución de ejercicios"
                                                     required
@@ -658,7 +659,8 @@ export const PostulanteVista = ({user, alumno, curriculum, actividadesExtracurri
                                                 <input 
                                                     name="metodologia" 
                                                     value={formPostulacion.metodologia} 
-                                                    onChange={(e) => setFormPostulacion({ ...formPostulacion, [e.target.name]: e.target.value })} 
+                                                    onChange={(e) => setFormPostulacion({ ...formPostulacion, [e.target.name]: e.target.value })}
+                                                    maxLength={700} 
                                                     className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors text-black"
                                                     placeholder="Ej: Aprendizaje activo"
                                                     required
@@ -957,6 +959,7 @@ export const PostulanteVista = ({user, alumno, curriculum, actividadesExtracurri
                                                 name="descripcion_carta" 
                                                 value={formPostulacion.descripcion_carta} 
                                                 onChange={(e) => setFormPostulacion({ ...formPostulacion, [e.target.name]: e.target.value })} 
+                                                maxLength={700}
                                                 className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors h-32 text-black"
                                                 placeholder="Describe por qué estás interesado en esta ayudantía..."
                                                 required
@@ -1006,6 +1009,7 @@ export const PostulanteVista = ({user, alumno, curriculum, actividadesExtracurri
                                                     name="actividad" 
                                                     value={formPostulacion.actividad} 
                                                     onChange={(e) => setFormPostulacion({ ...formPostulacion, [e.target.name]: e.target.value })} 
+                                                    maxLength={700}
                                                     className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors text-black"
                                                     placeholder="Ej: Resolución de ejercicios"
                                                     required
@@ -1017,6 +1021,7 @@ export const PostulanteVista = ({user, alumno, curriculum, actividadesExtracurri
                                                     name="metodologia" 
                                                     value={formPostulacion.metodologia} 
                                                     onChange={(e) => setFormPostulacion({ ...formPostulacion, [e.target.name]: e.target.value })} 
+                                                    maxLength={700}
                                                     className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors text-black"
                                                     placeholder="Ej: Aprendizaje activo"
                                                     required

@@ -7,7 +7,7 @@ import {
 } from "@/hooks/useAsignaturas";
 import {
   useCrearConcurso,
-  useCancelarAficheConcurso,
+  useCancelarAficheConcurso, useBuscarDatosAfiche
 } from "@/hooks/useConcursoPostulacion";
 import api from "@/api/axios";
 import {Document, Page, Text, View, StyleSheet, Image } from "@react-pdf/renderer";
@@ -426,6 +426,8 @@ export default function AperturaConcursoAdmin({ asignaturas = [], rutSecretaria 
 
   const [aficheExists, setAficheExists] = useState<Record<number, boolean | undefined>>({});
 
+  const { data: afiche, isLoading, isError } = useBuscarDatosAfiche( Number(idAConfirmar) ?? undefined );
+
   const asignaturasFiltradas = useMemo(
     () => asignaturas.filter((a) => a.nombre.toLowerCase().includes(busqueda.toLowerCase())),
     [asignaturas, busqueda]
@@ -673,6 +675,8 @@ export default function AperturaConcursoAdmin({ asignaturas = [], rutSecretaria 
           let id_concurso: number | null = null;
           if (Array.isArray(data) && data.length > 0) id_concurso = data[0].id ?? null;
           else if (data && typeof data === "object" && data.id) id_concurso = data.id;
+          
+          //
 
           if (id_concurso) {
             cancelarAfiche.mutate(id_concurso as any, {
@@ -695,6 +699,19 @@ export default function AperturaConcursoAdmin({ asignaturas = [], rutSecretaria 
           setMensajePopup("Concurso cerrado, pero ocurrió un error al buscar el afiche.");
           setMostrarPopup(true);
         }
+
+        cancelarAfiche.mutate(afiche?.id, {
+          onSuccess: () => {
+            setMensajePopup("Concurso cerrado y afiche cancelado correctamente.");
+            setMostrarPopup(true);
+            setAficheExists((prev) => ({ ...prev, [Number(idAConfirmar)]: false }));
+          },
+          onError: () => {
+            setMensajePopup("Concurso cerrado pero error al cancelar afiche (intenta manualmente).");
+            setMostrarPopup(true);
+          },
+        });
+
       },
       onError: () => {
         setMensajePopup("Error al cerrar el concurso. Intenta nuevamente.");
@@ -711,50 +728,6 @@ export default function AperturaConcursoAdmin({ asignaturas = [], rutSecretaria 
     setIdAConfirmar(id);
     setMostrarConfirmacion(true);
   };
-
-
-  async function handleCancelarAfiche() {
-    if (!asignaturaParaVerAfiche) return;
-
-    try {
-      const resp = await api.get(`llamado-postulacion/${asignaturaParaVerAfiche.id}`);
-      const data = resp.data;
-      let id_concurso: number | null = null;
-      if (Array.isArray(data) && data.length > 0) id_concurso = data[0].id ?? null;
-      else if (data && typeof data === "object" && data.id) id_concurso = data.id;
-
-      if (!id_concurso) {
-        setMensajePopup("No se encontró ID del concurso a cancelar.");
-        setMostrarPopup(true);
-        return;
-      }
-
-      cerrarConcurso(String(asignaturaParaVerAfiche.id), {
-        onSuccess: () => {
-          cancelarAfiche.mutate(id_concurso as any, {
-            onSuccess: () => {
-              setMensajePopup("Afiche / concurso cancelado correctamente.");
-              setMostrarPopup(true);
-              setAsignaturaParaVerAfiche(null);
-              setDatosAficheLocal(null);
-              setAficheExists((prev) => ({ ...prev, [asignaturaParaVerAfiche.id]: false }));
-            },
-            onError: () => {
-              setMensajePopup("Error al cancelar el afiche. Intenta nuevamente.");
-              setMostrarPopup(true);
-            },
-          });
-        },
-        onError: () => {
-          setMensajePopup("Error al cerrar la asignatura. Intenta nuevamente.");
-          setMostrarPopup(true);
-        },
-      });
-    } catch (err) {
-      setMensajePopup("Error al consultar el afiche. Intenta nuevamente.");
-      setMostrarPopup(true);
-    }
-  }
 
   return (
     <div className="flex justify-center items-center w-full">
