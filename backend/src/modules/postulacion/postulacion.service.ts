@@ -258,14 +258,15 @@ export class PostulacionService {
       .createQueryBuilder('p')
       .leftJoin('p.usuario', 'usuario')
       .leftJoin('p.asignatura', 'asignatura')
+      .leftJoin('asignatura.coordinador', 'coord', 'coord.actual = :actual', { actual: true })
+      .leftJoin('coord.usuario', 'coord_usuario')
       .select([
         'p.id AS id',
         'usuario.rut AS rut_alumno',
         'usuario.nombres AS alumno_nombres',
         'usuario.apellidos AS alumno_apellidos',
-        // correo del alumno
-        'usuario.password AS alumno_password',
         'asignatura.id AS id_asignatura',
+        'asignatura.nombre AS nombre_asignatura',
         'p.descripcion_carta AS descripcion_carta',
         'p.metodologia AS metodologia',
         'p.puntuacion_etapa1 AS puntuacion_etapa1',
@@ -273,6 +274,9 @@ export class PostulacionService {
         'p.motivo_descarte AS motivo_descarte',
         'p.fecha_descarte AS fecha_descarte',
         'p.rechazada_por_jefatura AS rechazada_por_jefatura',
+        'coord_usuario.rut AS coordinador_rut',
+        'coord_usuario.nombres AS coordinador_nombres',
+        'coord_usuario.apellidos AS coordinador_apellidos',
       ])
       .where('asignatura.id IN (:...ids)', { ids: asignaturaIds })
       .andWhere('p.es_actual = :actual', { actual: true })
@@ -299,6 +303,11 @@ export class PostulacionService {
       motivo_descarte: r.motivo_descarte || null,
       fecha_descarte: r.fecha_descarte || null,
       rechazada_por_jefatura: Boolean(r.rechazada_por_jefatura),
+      coordinador: r.coordinador_rut ? {
+        rut: r.coordinador_rut,
+        nombres: r.coordinador_nombres,
+        apellidos: r.coordinador_apellidos,
+      } : null,
     }));
   }
 
