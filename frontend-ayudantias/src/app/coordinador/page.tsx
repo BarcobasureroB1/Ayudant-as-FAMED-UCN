@@ -145,7 +145,15 @@ export const CoordinadorDashboard = ({ user,postulantes, ayudantes, loading, adm
                 const matchTexto = a.alumno.nombres.toLowerCase().includes(busqueda.toLowerCase()) ||
                                    a.rut_alumno.toLowerCase().includes(busqueda.toLowerCase());
                 const matchAsignatura = filtroAsignatura ? a.asignatura.toString() === filtroAsignatura : true;
-                return matchTexto && matchAsignatura;
+
+                let matchEstado = true;
+                if (filtroEstado) {
+                    const esCalificado = a.evaluacion !== null && a.evaluacion > 0;
+                    const estadoActual = esCalificado ? "Calificado" : "Pendiente";
+                    matchEstado = estadoActual === filtroEstado;
+                }
+
+                return matchTexto && matchAsignatura && matchEstado;
            });
 
            if (ordenNota === 'desc')
@@ -155,6 +163,8 @@ export const CoordinadorDashboard = ({ user,postulantes, ayudantes, loading, adm
             {
                 data.sort((a,b) => (a.evaluacion || 0) - (b.evaluacion || 0));
             }
+
+            
         }
         return data;
     }, [filtroEstado,isPostulantes, isAyudantes, listaPostulantes, listaAyudantes, busqueda, filtroAsignatura, ordenPuntaje, ordenPuntaje2, ordenNota])
@@ -244,25 +254,25 @@ export const CoordinadorDashboard = ({ user,postulantes, ayudantes, loading, adm
             <div className="bg-white rounded-lg shadow-sm p-6 mb-6 border border-gray-200">
                 <div className="flex justify-between items-center">
                     <div>
-                        {user.tipo === 'admin' || user.tipo === 'encargado_ayudantias' && (
-                        <button 
-                            onClick={handleBackToAdmin}
-                            className="flex items-center text-blue-600 hover:text-blue-800 mb-2 transition-colors"
-                        >
-                            <span className="mr-2">←</span>
-                            Volver al Panel Principal
-                        </button>
+                        {(user.tipo === 'admin' || user.tipo === 'encargado_ayudantias') && (
+                            <button 
+                                onClick={handleBackToAdmin}
+                                className="flex items-center text-blue-600 hover:text-blue-800 mb-2 transition-colors"
+                            >
+                                <span className="mr-2">←</span>
+                                Volver al Panel Principal
+                            </button>
                         )}
                         {(user.tipo === 'coordinador_secretariaDocente' || user.tipo === 'coordinador_directorDepto') && (
-                        <button 
-                            onClick={handleBackToDobleTipo}
-                            className="flex items-center text-blue-600 hover:text-blue-800 mb-2 transition-colors"
-                        >
-                            <span className="mr-2">←</span>
-                            Volver al Panel Principal
-                        </button>
+                            <button 
+                                onClick={handleBackToDobleTipo}
+                                className="flex items-center text-blue-600 hover:text-blue-800 mb-2 transition-colors"
+                            >
+                                <span className="mr-2">←</span>
+                                Volver al Panel Principal
+                            </button>
                         )}
-                        <h1 className="text-2xl font-bold text-gray-800">Panel de Coordinación</h1>
+                        <h1 className="text-2xl font-bold text-gray-800">Coordinador</h1>
                         <p className="text-gray-600 mt-1">Bienvenido, {user.nombres} {user.apellidos}</p>
                     </div>
                     <div className="text-right">
@@ -397,6 +407,19 @@ export const CoordinadorDashboard = ({ user,postulantes, ayudantes, loading, adm
 
                             {isAyudantes && (
                                 <div>
+                                    <div className="mb-4 border-b border-gray-200 pb-4">
+                                        <label className="block text-sm font-semibold text-gray-700 mb-1">Estado</label>
+                                        <select 
+                                            className="w-full border border-gray-300 rounded-md p-2 text-sm bg-white focus:ring-2 focus:ring-blue-500 text-gray-900"
+                                            value={filtroEstado}
+                                            onChange={(e) => setFiltroEstado(e.target.value)}
+                                        >
+                                            <option value="">Todos</option>
+                                            <option value="Calificado">Calificado</option>
+                                            <option value="Pendiente">Pendiente</option>
+                                        </select>
+                                    </div>
+                                    
                                     <label className="block text-sm font-semibold text-gray-700 mb-2">Orden por Nota Final</label>
                                     <div className="flex flex-col gap-2">
                                         <label className="flex items-center gap-2 text-sm text-gray-600 cursor-pointer">

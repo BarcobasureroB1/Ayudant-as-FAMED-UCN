@@ -99,7 +99,7 @@ export const DirectorDeptoDashboard = ({ user }: UserProps) => {
                                     : 'text-gray-600 hover:text-gray-900 hover:bg-gray-200/50'
                                 }`}
                             >
-                                Panel de Coordinación
+                                Panel de Coordinador
                             </button>
                             </div>
                             <button 
