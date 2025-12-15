@@ -129,21 +129,39 @@ export class AyudantiaService {
    * identificado por `rut`. Retorna en el formato `AyudanteActivoData`.
    */
   async findAyudantiasByCoordinadorRut(rut: string) {
-    // 1) obtener ids de asignaturas donde este usuario es coordinador actual
+    const asignaturaIds = await this.getAsignaturaIdsForCoordinador(rut);
+    if (asignaturaIds.length === 0) return [];
+    const raws = await this.getAyudantiasByAsignaturas(asignaturaIds);
+    return this.mapAyudantias(raws);
+  }
+
+  // Obtiene IDs de asignaturas donde el coordinador (por rut) es actual
+  private async getAsignaturaIdsForCoordinador(rutCoordinador: string): Promise<number[]> {
     const rows = await this.coordinadorRepository
       .createQueryBuilder('c')
       .innerJoin('c.usuario', 'usuario')
       .innerJoin('c.asignaturas', 'asignatura')
-      .where('usuario.rut = :rut', { rut })
+      .where('usuario.rut = :rut', { rut: rutCoordinador })
       .andWhere('c.actual = :actual', { actual: true })
       .select(['asignatura.id AS asignatura_id'])
       .getRawMany();
+    return Array.from(new Set(rows.map((r) => r.asignatura_id).filter(Boolean)));
+  }
 
-    const asignaturaIds = Array.from(new Set(rows.map((r) => r.asignatura_id).filter(Boolean)));
-    if (asignaturaIds.length === 0) return [];
+  // Obtiene todos los IDs de asignaturas donde cualquier coordinador actual está asignado
+  private async getAsignaturaIdsForAllCoordinadores(): Promise<number[]> {
+    const rows = await this.coordinadorRepository
+      .createQueryBuilder('c')
+      .innerJoin('c.asignaturas', 'asignatura')
+      .where('c.actual = :actual', { actual: true })
+      .select(['asignatura.id AS asignatura_id'])
+      .getRawMany();
+    return Array.from(new Set(rows.map((r) => r.asignatura_id).filter(Boolean)));
+  }
 
-    // 2) obtener ayudantias cuya asignatura esté en la lista
-    const raws = await this.ayudantiaRepository
+  // Consulta ayudantías por lista de asignaturas
+  private async getAyudantiasByAsignaturas(asignaturaIds: number[]) {
+    return await this.ayudantiaRepository
       .createQueryBuilder('ayudantia')
       .leftJoin('ayudantia.alumno', 'alumno')
       .leftJoin('ayudantia.asignatura', 'asignatura')
@@ -158,8 +176,11 @@ export class AyudantiaService {
       ])
       .where('asignatura.id IN (:...ids)', { ids: asignaturaIds })
       .getRawMany();
+  }
 
-    return raws.map((r) => ({
+  // Mapea crudo a formato público
+  private mapAyudantias(rows: any[]) {
+    return rows.map((r) => ({
       id: Number(r.id),
       rut_alumno: r.alumno_rut,
       alumno: {
@@ -170,6 +191,14 @@ export class AyudantiaService {
       periodo: r.periodo,
       evaluacion: r.evaluacion !== null && r.evaluacion !== undefined ? Number(r.evaluacion) : null,
     }));
+  }
+
+  // Nuevo: Busca ayudantías para todas las asignaturas coordinadas por coordinadores actuales
+  async findAyudantiasByCoordinadores() {
+    const asignaturaIds = await this.getAsignaturaIdsForAllCoordinadores();
+    if (asignaturaIds.length === 0) return [];
+    const raws = await this.getAyudantiasByAsignaturas(asignaturaIds);
+    return this.mapAyudantias(raws);
   }
   async findAll() {
     return this.ayudantiaRepository.find({
