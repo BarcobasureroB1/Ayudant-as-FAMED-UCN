@@ -697,7 +697,7 @@ export default function AperturaConcursoAdmin({ asignaturas = [], rutSecretaria 
             },
           });
         } else {
-            setMensajePopup("Concurso cerrado, pero no se encontró un afiche activo para cancelar.");
+            setMensajePopup("Concurso cerrado, no se encontró un afiche activo para cancelar.");
             setMostrarPopup(true);
         }
       },
