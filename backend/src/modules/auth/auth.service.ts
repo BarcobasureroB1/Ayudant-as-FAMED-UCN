@@ -100,7 +100,7 @@ export class AuthService {
       throw new Error('No se encontró correo para este usuario');
     }
 
-    const enlaceRecuperacion = `${process.env.FRONTEND_URL || 'http://localhost:3000'}/reset-password?token=${resetToken}`;
+    const enlaceRecuperacion = `${process.env.FRONTEND_URL || 'http://localhost:8080'}/reset-password?token=${resetToken}`;
 
     const html = `
       <p>Estimado/a ${usuario.nombres} ${usuario.apellidos},</p>
