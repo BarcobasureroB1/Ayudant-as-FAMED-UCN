@@ -676,25 +676,6 @@ export default function AperturaConcursoAdmin({ asignaturas = [], rutSecretaria 
           if (Array.isArray(data) && data.length > 0) id_concurso = data[0].id ?? null;
           else if (data && typeof data === "object" && data.id) id_concurso = data.id;
           
-          //
-
-          if (id_concurso) {
-            cancelarAfiche.mutate(id_concurso as any, {
-              onSuccess: () => {
-                setMensajePopup("Concurso y afiche cancelados correctamente.");
-                setMostrarPopup(true);
-                setAficheExists((prev) => ({ ...prev, [Number(idAConfirmar)]: false }));
-              },
-              onError: () => {
-                setMensajePopup("Concurso cerrado pero error al cancelar afiche (intenta manualmente).");
-                setMostrarPopup(true);
-              },
-            });
-          } else {
-            setMensajePopup("Concurso cerrado (no se encontró afiche asociado).");
-            setMostrarPopup(true);
-            setAficheExists((prev) => ({ ...prev, [Number(idAConfirmar)]: false }));
-          }
         } catch (err) {
           setMensajePopup("Concurso cerrado, pero ocurrió un error al buscar el afiche.");
           setMostrarPopup(true);
