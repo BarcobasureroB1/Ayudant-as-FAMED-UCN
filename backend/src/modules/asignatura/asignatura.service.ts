@@ -10,6 +10,7 @@ import { Coordinador } from '../coordinador/entities/coordinador.entity';
 import { UsuarioService } from '../usuario/usuario.service';
 import { AlumnoService } from '../alumno/alumno.service';
 import { Alumno } from '../alumno/entities/alumno.entity';
+import { LlamadoPostulacion } from '../llamado_postulacion/entities/llamado_postulacion.entity';
 
 
 @Injectable()
@@ -25,6 +26,8 @@ export class AsignaturaService {
     private readonly alumnoRepository: Repository<Alumno>,
     @InjectRepository(AsignaturaAlumno)
     private readonly asignaturaAlumnoRepository: Repository<AsignaturaAlumno>,
+    @InjectRepository(LlamadoPostulacion)
+    private readonly llamadoPostulacionRepository: Repository<LlamadoPostulacion>,
   ) {}
   async create(createAsignaturaDto: CreateAsignaturaDto) {
     const departamento = await this.depa.findOne({ where: { nombre: createAsignaturaDto.Departamento } });
@@ -153,7 +156,17 @@ export class AsignaturaService {
     }
     asignatura.estado = 'cerrado';
     asignatura.abierta_postulacion = false;
-    return await this.asignaturaRepository.save(asignatura);
+    const saved = await this.asignaturaRepository.save(asignatura);
+
+    // Cerrar llamados de postulación asociados a esta asignatura
+    await this.llamadoPostulacionRepository
+      .createQueryBuilder()
+      .update(LlamadoPostulacion)
+      .set({ estado: 'cerrado' })
+      .where('asignaturaId = :id', { id })
+      .execute();
+
+    return saved;
   }
 
   async findwithcoordinador(DepartamentoId: number) {
