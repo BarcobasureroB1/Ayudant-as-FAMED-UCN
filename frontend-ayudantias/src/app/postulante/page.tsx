@@ -126,6 +126,7 @@ export const PostulanteVista = ({user, alumno, curriculum, actividadesExtracurri
         router.push('/adminDashboard');
     };
 
+    //Popup para mostrar curriculum
     const mostrarCurriculum = () => {
         return (
         <div className="text-gray-800 space-y-6">
@@ -252,6 +253,7 @@ export const PostulanteVista = ({user, alumno, curriculum, actividadesExtracurri
         );
     }
 
+    //Popup para mostrar los datos de la postulación
     const mostrarPostulacion = () => {
         if (!postulacionSeleccionada) return null;  
         return (
@@ -396,6 +398,7 @@ export const PostulanteVista = ({user, alumno, curriculum, actividadesExtracurri
             label: a.nombre,
         })) || [];
 
+    //Control de acceso: si el alumno está deshabilitado, restringir acceso
     if (user.deshabilitado === true) {
         
         return (
@@ -414,6 +417,7 @@ export const PostulanteVista = ({user, alumno, curriculum, actividadesExtracurri
         );
 
     } else if (curriculum && user.tipo === 'alumno') {
+        //Si ya se creó su curriculum, mostrar vista normal de postulante
         return (
             <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 p-4 md:p-6">
                 <div className="max-w-6xl mx-auto">
@@ -460,6 +464,7 @@ export const PostulanteVista = ({user, alumno, curriculum, actividadesExtracurri
                         </div>
                     </div>
 
+                    {/*Bloque que muestra los datos del usuario actual*/}
                     <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
                         <div className="lg:col-span-1 space-y-6">
                             <InfoCard title="Información Personal">
@@ -503,7 +508,7 @@ export const PostulanteVista = ({user, alumno, curriculum, actividadesExtracurri
                             </button>
                         </div>
 
-                        
+                        {/*Si se selecciona perfil, se muestran las postulaciones vigentes del alumno*/}
                         <div className="lg:col-span-2">
                             {vista === 'perfil' ? (
                                 <div className="space-y-6">
@@ -553,7 +558,9 @@ export const PostulanteVista = ({user, alumno, curriculum, actividadesExtracurri
                             ) : (
                                 <div title="Nueva Postulación" className="bg-white rounded-2xl shadow-lg p-6">
                                     <h3 className="text-lg font-semibold text-gray-900 mb-4">Nueva Postulación</h3>
-
+                                    {/*En caso contrario, se muestra el formulario para postular a una asignatura, las asignaturas
+                                        disponibles son: En las que el alumno tenga una nota, y las que tengan abierto el concurso de
+                                        postulación.*/}
                                     <form onSubmit={handleSubmitPostulacion} className="space-y-6">
                                         <div>
                                             <label className="block text-sm font-medium text-gray-700 mb-2">
@@ -762,6 +769,7 @@ export const PostulanteVista = ({user, alumno, curriculum, actividadesExtracurri
         );
     }
 
+    //Si el usuario crea un curriculum y es admin o encargado de ayudantías, mostrar vista exclusiva para ellos. 
     if (curriculum && (user.tipo === 'admin' || user.tipo === 'encargado_ayudantias' )) {
         return (
             <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 p-4 md:p-6">
@@ -817,7 +825,7 @@ export const PostulanteVista = ({user, alumno, curriculum, actividadesExtracurri
                             </div>
                         </div>
                     </div>
-
+                    {/*Bloque que muestra los datos del usuario actual*/}
                     <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 text-gray-500">
                         <div className="lg:col-span-1 space-y-6">
                             <InfoCard title="Información Personal">
@@ -865,9 +873,8 @@ export const PostulanteVista = ({user, alumno, curriculum, actividadesExtracurri
                             </button>
                         </div>
                         
-
-
                         <div className="lg:col-span-2">
+                            {/*Si se selecciona perfil, se muestran las postulaciones vigentes del usuario*/}
                             {vista === 'perfil' ? (
                                 <div className="space-y-6">
                                     <InfoCard title="Postulaciones Activas">
@@ -916,6 +923,9 @@ export const PostulanteVista = ({user, alumno, curriculum, actividadesExtracurri
                                 </div>
                             ) : (
                                 <InfoCard title="Nueva Postulación">
+                                    {/*En caso contrario, se muestra el formulario para postular a una asignatura, en el caso de admin
+                                        y encargado de ayudantías, se muestran todas las asignaturas sin importar si tienen nota o si
+                                        el concurso de postulación está abierto.*/}
                                     <form onSubmit={handleSubmitPostulacion} className="space-y-6">
                                         <div>
                                             <label className="block text-sm font-medium text-gray-700 mb-2">
@@ -1150,6 +1160,8 @@ export const PostulanteVista = ({user, alumno, curriculum, actividadesExtracurri
         crearCurriculum.mutate(form);
     };
 
+    /*En caso de no tener un curriculum creado, se muestra un formulario obligatorio para crearlo. Se deben tener datos del usuario en 
+    la tabla de alumnos para guardar el curriculum, en caso contrario, la vista no se actualizará.*/
     return (
         <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 p-4 md:p-6">
             <div className="max-w-4xl mx-auto">
@@ -1643,6 +1655,7 @@ export default function PostulantePage() {
 
     const router = useRouter();
 
+    //Control de acceso: si hay error o no hay user, redirigir a login
     useEffect(() => {
         if (isError || !user) {
             router.push("/login");
