@@ -20,7 +20,7 @@ export default function LoginPage() {
         router.push("/dashboard");
     },
     (error) => {
-        setErrorMsg(error.message || "rut o contraseña incorrectos");
+        setErrorMsg("Rut o contraseña incorrectos");
     });
 
     const submit = (e:SyntheticEvent) => {

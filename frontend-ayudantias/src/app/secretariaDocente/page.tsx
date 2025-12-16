@@ -43,7 +43,7 @@ export default function SecretariaDocentePage() {
     // Efecto para inicializar la secretaria o pedir selección
     useEffect(() => {
         if (user) {
-            if (user.tipo === 'admin') {
+            if (user.tipo === 'admin' || user.tipo === 'encargado_ayudantias') {
                 if (!rutSecretariaSeleccionada) {
                     setModalSecAbierto(true);
                 }
@@ -205,7 +205,7 @@ export default function SecretariaDocentePage() {
 
                 {/* PARTE INFERIOR: BARRA DE SUPERVISIÓN (Si es admin) */}
                 {/* Se renderiza justo debajo del bloque anterior, dentro del mismo card */}
-                {user.tipo === 'admin' && (
+                {(user.tipo === 'admin' || user.tipo === 'encargado_ayudantias') && (
                     <div className="bg-indigo-50 border-t border-indigo-100 px-6 py-3 flex flex-col sm:flex-row justify-between items-center gap-3 animate-in slide-in-from-top-2">
                         <div className="flex items-center gap-3">
                             <div className="bg-white p-1.5 rounded-md shadow-sm text-indigo-600 border border-indigo-100">
