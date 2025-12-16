@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { CreateUsuarioDto } from './dto/create-usuario.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Usuario } from './entities/usuario.entity';
-import { Repository } from 'typeorm';
+import { Repository, In } from 'typeorm';
 import { Alumno } from '../alumno/entities/alumno.entity';
 
 
@@ -60,9 +60,13 @@ async create(createUsuarioDto: CreateUsuarioDto) {
   }
 
   async findcoordinadores() {
-    // Devolver todos los usuarios cuyo `tipo` es 'coordinador',
+    // Devolver todos los usuarios cuyo `tipo` es 'coordinador', 'coordinador_secretariaDocente' o 'coordinador_directorDepto',
     // incluso si todavía no tienen filas en la tabla `coordinador`.
-    return await this.usuarioRepository.find({ where: { tipo: 'coordinador' } });
+    return await this.usuarioRepository.find({ 
+      where: { 
+        tipo: In(['coordinador', 'coordinador_secretariaDocente', 'coordinador_directorDepto']) 
+      } 
+    });
   }
   async cambiartipo(rut_usuario: string, nuevo_tipo: string) {
     const usuario = await this.usuarioRepository.findOneBy({ rut: rut_usuario  });
