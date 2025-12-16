@@ -14,5 +14,6 @@ import { EmailModule } from '../email/email.module';
   imports: [TypeOrmModule.forFeature([Postulacion, Asignatura, Usuario, Coordinador, Ayudantia, Alumno, AsignaturaAlumno]), EmailModule],
   controllers: [PostulacionController],
   providers: [PostulacionService],
+  exports: [PostulacionService],
 })
 export class PostulacionModule {}

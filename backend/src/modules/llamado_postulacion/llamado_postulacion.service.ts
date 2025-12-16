@@ -139,20 +139,11 @@ export class LlamadoPostulacionService {
       throw new Error('Llamado no encontrado');
     }
 
+    console.log(`[cambiarEstado] Cerrando llamado ID ${id} para asignatura ID ${entity.asignatura?.id}`);
+
     // Cambiar estado del llamado
     entity.estado = 'cerrado';
-    await this.llamadoPostulacionRepository.save(entity);
-
-    // Actualizar las postulaciones vinculadas a esta asignatura: es_actual = false
-    if (entity.asignatura?.id) {
-      await this.postulacionRepository
-        .createQueryBuilder('p')
-        .update(Postulacion)
-        .set({ es_actual: false })
-        .where('p.asignatura = :asignaturaId', { asignaturaId: entity.asignatura.id })
-        .andWhere('p.es_actual = true')
-        .execute();
-    }
+    
 
     return entity;
   }

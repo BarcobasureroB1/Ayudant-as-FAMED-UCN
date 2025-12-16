@@ -275,6 +275,7 @@ export class PostulacionService {
         'p.puntuacion_etapa1 AS puntuacion_etapa1',
         'p.puntuacion_etapa2 AS puntuacion_etapa2',
         'p.motivo_descarte AS motivo_descarte',
+        'p.cancelada_por_usuario AS cancelada_por_usuario',
         'p.fecha_descarte AS fecha_descarte',
         'p.rechazada_por_jefatura AS rechazada_por_jefatura',
         'coord_usuario.rut AS coordinador_rut',
@@ -283,6 +284,7 @@ export class PostulacionService {
       ])
       .where('asignatura.id IN (:...ids)', { ids: asignaturaIds })
       .andWhere('p.es_actual = :actual', { actual: true })
+      .andWhere('p.cancelada_por_usuario = :cancelada', { cancelada: false })
       .getRawMany();
   }
 
@@ -308,6 +310,7 @@ export class PostulacionService {
         'p.bloque AS bloque',
         'p.puntuacion_etapa1 AS puntuacion_etapa1',
         'p.puntuacion_etapa2 AS puntuacion_etapa2',
+        'p.cancelada_por_usuario AS cancelada_por_usuario',
         'p.motivo_descarte AS motivo_descarte',
         'p.fecha_descarte AS fecha_descarte',
         'p.rechazada_por_jefatura AS rechazada_por_jefatura',
@@ -317,6 +320,8 @@ export class PostulacionService {
       ])
       .where('asignatura.id IN (:...ids)', { ids: asignaturaIds })
       .andWhere('p.es_actual = :actual', { actual: true })
+      .andWhere('p.cancelada_por_usuario = :cancelada', { cancelada: false })
+      .andWhere('coord_usuario.rut = :rutCoordinador', { rutCoordinador })
       .getRawMany();
   }
 
