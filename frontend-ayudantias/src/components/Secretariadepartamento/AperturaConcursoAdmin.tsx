@@ -665,46 +665,7 @@ export default function AperturaConcursoAdmin({ asignaturas = [], rutSecretaria 
     }
 
 
-    cerrarConcurso(idAConfirmar, {
-      onSuccess: async () => {
-        
-        let id_concurso: number | null = null;
-
-        try {
-          const resp = await api.get(`llamado-postulacion/${idAConfirmar}`);
-          const data = resp.data;
-          if (Array.isArray(data) && data.length > 0) id_concurso = data[0].id ?? null;
-          else if (data && typeof data === "object" && data.id) id_concurso = data.id;
-          
-        } catch (err) {
-          console.error(err);
-          setMensajePopup("Concurso cerrado, pero ocurrió un error al buscar el afiche.");
-          setMostrarPopup(true);
-          return;
-        }
-
-        if(id_concurso){
-          cancelarAfiche.mutate(id_concurso, {
-            onSuccess: () => {
-              setMensajePopup("Concurso cerrado y afiche cancelado correctamente.");
-              setMostrarPopup(true);
-              setAficheExists((prev) => ({ ...prev, [Number(idAConfirmar)]: false }));
-            },
-            onError: () => {
-              setMensajePopup("Concurso cerrado pero error al cancelar afiche (intenta manualmente).");
-              setMostrarPopup(true);
-            },
-          });
-        } else {
-            setMensajePopup("Concurso cerrado, pero no se encontró un afiche activo para cancelar.");
-            setMostrarPopup(true);
-        }
-      },
-      onError: () => {
-        setMensajePopup("Error al cerrar el concurso. Intenta nuevamente.");
-        setMostrarPopup(true);
-      },
-    });
+    cerrarConcurso(idAConfirmar);
 
     setMostrarConfirmacion(false);
     setIdAConfirmar(null);
