@@ -1,11 +1,11 @@
 "use client";
 
 import React, { useState, useMemo } from "react";
-import { useUsuarios } from "@/hooks/useUsuarios";
+import { useAlumnos } from "@/hooks/useAlumnoProfile";
 import { useDeshabilitarUsuario, useHabilitarUsuario } from "@/hooks/useUsuarios";
 
 export default function AdministrarEstudiantes() {
-    const { data: alumnos, isLoading, isError } = useUsuarios();
+    const { data: alumnos, isLoading, isError } = useAlumnos();
     const deshabilitar = useDeshabilitarUsuario();
     const habilitar = useHabilitarUsuario();
 
@@ -137,10 +137,10 @@ export default function AdministrarEstudiantes() {
                     <tbody>
                         {alumnosPaginados.map((est: any, index: number) => (
                             <tr
-                                key={`${est.rut || "sin-rut"}-${index}`}
+                                key={`${est.rut_alumno || "sin-rut"}-${index}`}
                                 className="border-b hover:bg-gray-50 transition"
                             >
-                                <td className="py-3 px-4">{est.rut}</td>
+                                <td className="py-3 px-4">{est.rut_alumno}</td>
                                 <td className="py-3 px-4">
                                     {est.nombres} {est.apellidos}
                                 </td>
@@ -148,14 +148,14 @@ export default function AdministrarEstudiantes() {
                                 <td className="py-3 px-4 text-center">
                                     {!est.deshabilitado ? (
                                         <button
-                                            onClick={() => deshabilitar.mutate(est.rut)}
+                                            onClick={() => deshabilitar.mutate(est.rut_alumno)}
                                             className="bg-red-600 hover:bg-red-700 text-white py-2 px-4 rounded-lg transition"
                                         >
                                             Deshabilitar
                                         </button>
                                     ) : (
                                         <button
-                                            onClick={() => habilitar.mutate(est.rut)}
+                                            onClick={() => habilitar.mutate(est.rut_alumno)}
                                             className="bg-green-600 hover:bg-green-700 text-white py-2 px-4 rounded-lg transition"
                                         >
                                             Habilitar

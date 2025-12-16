@@ -112,7 +112,7 @@ export default function AdministrarUsuarios({
     const confirmarCambio = async () => {
         if (!pending) return;
 
-        if (pending.nuevoTipo !== "alumno") {
+        if (pending.nuevoTipo !== "alumno" && pending.nuevoTipo !== "admin" && pending.nuevoTipo !== "encargado_ayudantias") {
             cambiarTipo.mutate({
                 rut_usuario: pending.rut,
                 nuevo_tipo: pending.nuevoTipo,
@@ -381,7 +381,7 @@ export default function AdministrarUsuarios({
             {showAlumnoPopup && (
                 <div className="fixed inset-0 bg-black/50 flex justify-center items-center text-black overflow-auto p-4">
                     <div className="bg-white p-6 rounded-xl w-[420px]">
-                        <h3 className="text-lg font-semibold mb-4">Crear un perfil de alumno para el cambio:</h3>
+                        <h3 className="text-lg font-semibold mb-4">Es necesario tener datos de alumno para el cambio. Crea un perfil para el alumno:</h3>
 
                         <div className="flex flex-col gap-3 overflow-auto p-4 max-h-[60vh]">
 

@@ -45,6 +45,7 @@ export function useDeshabilitarUsuario(){
         },
         onSuccess: (_data) => {
             clienteQuery.invalidateQueries({queryKey:['usuarios']});
+            clienteQuery.invalidateQueries({queryKey:['alumnos']});
         }                        
     });
 
@@ -58,6 +59,7 @@ export function useHabilitarUsuario(){
         },
         onSuccess: (_data) => {
             clienteQuery.invalidateQueries({queryKey:['usuarios']});
+            clienteQuery.invalidateQueries({queryKey:['alumnos']});
         }                        
     });
 

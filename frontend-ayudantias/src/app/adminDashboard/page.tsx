@@ -73,8 +73,8 @@ export const AdminDashboard = ({user, usuarios}:UserProps) => {
 
     const dashboardItems = [
         {
-            title: "Gestión de Postulantes",
-            description: "Ver y gestionar postulaciónes",
+            title: "Tu perfil de postulante",
+            description: "Ver y gestionar tu perfil",
             icon: "👥",
             path: "/postulante",
             color: "blue" as const

@@ -220,6 +220,8 @@ export function useEvaluarPostulacion() {
     },
     onSuccess: () => {
       clienteQuery.invalidateQueries({queryKey: ["postulantesCoordinador"]});
+      clienteQuery.invalidateQueries({queryKey: ["postulacionesCoordinador"]});
+      clienteQuery.invalidateQueries({queryKey: ["ayudantesCoordinador"]});
     },
   });
 }
@@ -238,6 +240,9 @@ export function useDescartarPostulacion() {
     },
     onSuccess: () => {
       clienteQuery.invalidateQueries({queryKey: ["postulantesCoordinador"]});
+      clienteQuery.invalidateQueries({queryKey: ["postulaciones"]});
+      clienteQuery.invalidateQueries({queryKey: ["postulacionesCoordinador"]});
+      clienteQuery.invalidateQueries({queryKey: ["ayudantesCoordinador"]});
     },
   });
 }
@@ -260,7 +265,7 @@ export function useEvaluarAyudanteFinal() {
 
 export function usePostulacionesCoordinador() {
   return useQuery<PostulanteCoordinador[], Error>({
-    queryKey: ["postulacionesCoordinadora"],
+    queryKey: ["postulacionesCoordinador"],
     queryFn: async () => {
       const respuesta = await api.get("postulacion/coord/in/ador/a"); 
       return respuesta.data;
@@ -270,7 +275,7 @@ export function usePostulacionesCoordinador() {
 
 export function useAyudantesCoordinador() {
   return useQuery<AyudanteCoordinador[], Error>({
-    queryKey: ["ayudantesCoordinadora"],
+    queryKey: ["ayudantesCoordinador"],
     queryFn: async () => {
       const respuesta = await api.get("ayudantia/coord/ina/dor/a");
       return respuesta.data;
