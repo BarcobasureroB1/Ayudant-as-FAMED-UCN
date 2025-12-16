@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException, UnauthorizedException } from '@nestjs/common';
+import { Injectable, NotFoundException, UnauthorizedException, BadRequestException, ConflictException } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { UsuarioService } from '../usuario/usuario.service';
 import * as bcryptjs from 'bcryptjs';
@@ -40,11 +40,11 @@ export class AuthService {
 
   async Register(registerDto: RegisterDto) {
     if (!this.comprobarrut(registerDto.rut)) {
-      throw new Error('RUT inválido');
+      throw new BadRequestException('RUT inválido');
     }
     const usuarioExists = await this.usuarioService.findforLogin(registerDto.rut);
     if (usuarioExists) {
-      throw new Error('El usuario ya existe');
+      throw new ConflictException('El usuario ya existe');
     }
     
     const hashedPassword = await bcryptjs.hash(registerDto.password, 10);
@@ -57,7 +57,7 @@ export class AuthService {
     
     if (!alumnoExists && registerDto.tipo === 'alumno') {
       newUser.tipo = registerDto.tipo;
-      throw new Error('El usuario no tiene data de alumno registrado');
+      throw new BadRequestException('El usuario no tiene data de alumno registrado');
     }
     else {
       newUser.tipo = registerDto.tipo;
@@ -84,7 +84,7 @@ export class AuthService {
   async enviarRecuperacionContrasena(rut: string) {
     const usuario = await this.usuarioService.findforLogin(rut);
     if (!usuario) {
-      throw new Error('Usuario no encontrado');
+      throw new NotFoundException('Usuario no encontrado');
     }
 
     // Generar token de recuperación válido por 1 hora
@@ -96,13 +96,13 @@ export class AuthService {
     // Buscar correo del alumno si existe
     const alumno = await this.alumnoService.findByRut(rut);
     if (alumno?.correo !== usuario.correo) {
-      throw new Error('el correo proporcionado no está asociado a ningún usuario');
+      throw new BadRequestException('el correo proporcionado no está asociado a ningún usuario');
     }
     const correo = alumno?.correo ?? usuario.correo;
     
     
     if (!correo) {
-      throw new Error('No se encontró correo para este usuario');
+      throw new NotFoundException('No se encontró correo para este usuario');
     }
 
     const enlaceRecuperacion = `${process.env.FRONTEND_URL || 'http://localhost:8080'}/reset-password?token=${resetToken}`;
@@ -129,7 +129,7 @@ export class AuthService {
     const usuario = await this.usuarioService.findforLogin(rut);
 
     if (!usuario) {
-      throw new Error('Usuario no encontrado');
+      throw new NotFoundException('Usuario no encontrado');
     }
 
     const hashedPassword = await bcryptjs.hash(nuevaContrasena, 10);
