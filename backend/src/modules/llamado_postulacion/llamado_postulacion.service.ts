@@ -143,20 +143,7 @@ export class LlamadoPostulacionService {
 
     // Cambiar estado del llamado
     entity.estado = 'cerrado';
-    await this.llamadoPostulacionRepository.save(entity);
-
-    // Actualizar las postulaciones vinculadas a esta asignatura: es_actual = false
-    if (entity.asignatura?.id) {
-      const result = await this.postulacionRepository
-        .createQueryBuilder()
-        .update(Postulacion)
-        .set({ es_actual: false })
-        .where('asignaturaId = :asignaturaId', { asignaturaId: entity.asignatura.id })
-        .andWhere('es_actual = true')
-        .execute();
-      
-      console.log(`[cambiarEstado] Postulaciones actualizadas: ${result.affected} filas afectadas para asignatura ID ${entity.asignatura.id}`);
-    }
+    
 
     return entity;
   }

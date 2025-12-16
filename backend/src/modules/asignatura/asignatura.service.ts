@@ -11,6 +11,7 @@ import { UsuarioService } from '../usuario/usuario.service';
 import { AlumnoService } from '../alumno/alumno.service';
 import { Alumno } from '../alumno/entities/alumno.entity';
 import { LlamadoPostulacion } from '../llamado_postulacion/entities/llamado_postulacion.entity';
+import { Postulacion } from '../postulacion/entities/postulacion.entity';
 
 
 @Injectable()
@@ -28,6 +29,8 @@ export class AsignaturaService {
     private readonly asignaturaAlumnoRepository: Repository<AsignaturaAlumno>,
     @InjectRepository(LlamadoPostulacion)
     private readonly llamadoPostulacionRepository: Repository<LlamadoPostulacion>,
+    @InjectRepository(Postulacion)
+    private readonly postulacionRepository: Repository<Postulacion>,
   ) {}
   async create(createAsignaturaDto: CreateAsignaturaDto) {
     const departamento = await this.depa.findOne({ where: { nombre: createAsignaturaDto.Departamento } });
@@ -164,6 +167,15 @@ export class AsignaturaService {
       .update(LlamadoPostulacion)
       .set({ estado: 'cerrado' })
       .where('id_asignatura = :id', { id })
+      .execute();
+
+    // Marcar postulaciones de esta asignatura como no actuales
+    await this.postulacionRepository
+      .createQueryBuilder()
+      .update(Postulacion)
+      .set({ es_actual: false })
+      .where('asignaturaId = :id', { id })
+      .andWhere('es_actual = true')
       .execute();
 
     return saved;
