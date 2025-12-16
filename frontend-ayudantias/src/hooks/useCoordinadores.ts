@@ -257,6 +257,7 @@ export function useEvaluarAyudanteFinal() {
       });
     },
     onSuccess: () => {
+      clienteQuery.invalidateQueries({queryKey: ["ayudantesCoordinador"]});
       clienteQuery.invalidateQueries({queryKey: ["ayudantesActivos"]});
     }
 

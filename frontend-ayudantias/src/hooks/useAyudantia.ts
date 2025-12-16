@@ -44,6 +44,7 @@ interface CrearAyudantíaData
     rut_coordinador_otro: string;
     periodo: string;
     remunerada: string;
+    tipo_ayudantia: string;
 }
 
 export function useCrearAyudantia() {
@@ -54,6 +55,8 @@ export function useCrearAyudantia() {
             return respuesta.data;
         },
         onSuccess: (_data) => {
+            clienteQuery.invalidateQueries({ queryKey: ['ayudantiasGlobales'] });
+            clienteQuery.invalidateQueries({ queryKey: ['postulacionesCoordinador'] });
             clienteQuery.invalidateQueries({ queryKey: ['ayudantias'] });
             clienteQuery.invalidateQueries({queryKey: ['postulantes']});
         },

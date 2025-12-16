@@ -78,30 +78,6 @@ export const CoordinadorAdmin = ({adminUser}:{adminUser:User}) => {
             />
 
             <div className="space-y-6">
-                {/*rutSeleccionado && coordinadorActual && (
-                    <div className="bg-blue-600 text-white p-4 rounded-xl shadow-md flex flex-col sm:flex-row justify-between items-center gap-4 animate-in slide-in-from-top-4">
-                        <div className="flex items-center gap-3">
-                            <div className="bg-white/20 p-2 rounded-lg">
-                                <Users className="w-5 h-5 text-white" />
-                            </div>
-                            <div>
-                                <p className="text-xs text-blue-100 uppercase font-semibold tracking-wider">Modo Supervisión</p>
-                                <h2 className="text-lg font-bold leading-none">
-                                    {coordinadorActual.nombres} {coordinadorActual.apellidos}
-                                </h2>
-                            </div>
-                        </div>
-                        
-                        <button 
-                            onClick={() => setModalAbierto(true)}
-                            className="flex items-center gap-2 bg-white text-blue-700 px-4 py-2 rounded-lg text-sm font-semibold hover:bg-blue-50 transition-colors shadow-sm"
-                        >
-                            <RefreshCw className="w-4 h-4" />
-                            Cambiar Coordinador
-                        </button>
-                    </div>
-                )*/}
-
                 {rutSeleccionado ? (
                     <div className="animate-in fade-in duration-500">
                         <CoordinadorDashboard 
