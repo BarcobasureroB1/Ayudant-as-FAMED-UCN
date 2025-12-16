@@ -191,7 +191,6 @@ export const DirectorCoordinacionVista = ({ postulantes, ayudantes, loading }: D
                 id_postulacion: idPostulacionDescartar, motivo_descarte: motivo,
                 fecha_descarte: new Date().toISOString().split('T')[0], rechazada_por_jefatura: true
             });
-            setIdPostulacionDescartar(null);
         }
     };
 

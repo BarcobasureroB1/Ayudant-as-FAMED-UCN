@@ -10,7 +10,9 @@ import {
     useDescartarPostulacion,
     useEvaluarAyudanteFinal,
     PostulanteCoordinador,
-    AyudanteCoordinador
+    AyudanteCoordinador,
+    PostulanteCoordinadorData,
+    AyudanteActivoData
 } from '@/hooks/useCoordinadores';
 import { useTodasAsignaturas } from '@/hooks/useAsignaturas';
 import {ModalDescarte} from '@/components/Coordinador/ModalDescarte';
@@ -24,8 +26,8 @@ import { Filter, Search, Eye } from 'lucide-react';
 
 interface CoordinadorDashboardProps {
     user: User;
-    postulantes: PostulanteCoordinador[] | undefined;
-    ayudantes: AyudanteCoordinador[] | undefined;
+    postulantes: PostulanteCoordinador[] | PostulanteCoordinadorData[] | undefined;
+    ayudantes: AyudanteCoordinador[] | AyudanteActivoData[] | undefined;
     loading: boolean;
     adminBar?: React.ReactNode;
 }
@@ -195,7 +197,6 @@ export const CoordinadorDashboard = ({ user,postulantes, ayudantes, loading, adm
                 fecha_descarte: new Date().toISOString().split('T')[0],
                 rechazada_por_jefatura: true
             });
-            setIdPostulacionDescartar(null);
         }
     };
     const handleConfirmarEvaluacionPost = async (puntajeTotal: number) => {
