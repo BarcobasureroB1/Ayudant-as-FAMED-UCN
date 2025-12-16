@@ -47,7 +47,7 @@ export default function SecretariaDocentePage() {
                 if (!rutSecretariaSeleccionada) {
                     setModalSecAbierto(true);
                 }
-            } else if (user.tipo === 'secretaria_docente' || user.tipo === 'secretaria') {
+            } else if (user.tipo === 'secretaria_docente' || user.tipo === 'secretaria' || user.tipo === 'coordinador_secretariaDocente') {
                 setRutSecretariaSeleccionada(user.rut);
                 setNombreSecretariaSeleccionada(`${user.nombres} ${user.apellidos}`);
             }
