@@ -1,32 +1,31 @@
 "use client";
 
-import React, { SyntheticEvent, useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { useUserProfile, User} from '@/hooks/useUserProfile';
-import { useAuth } from '@/context/AuthContext';
 import Cookies from 'js-cookie';
+import { 
+    Building2, // Icono para Depto
+    LogOut, 
+    ChevronLeft, 
+    FileBadge, // Para Constancias
+    Users, 
+    GraduationCap, // Para Concursos
+    LayoutDashboard,
+    ScrollText
+} from 'lucide-react'; 
 
+import { useUserProfile, User } from '@/hooks/useUserProfile';
+import { useAuth } from '@/context/AuthContext';
 import { AlumnoData, useAlumnos } from '@/hooks/useAlumnoProfile';
-
-import AperturaConcursoAdmin from '@/components/Secretariadepartamento/AperturaConcursoAdmin';
-import AperturaConcursoSecreDepto from '@/components/Secretariadepartamento/AperturaConcursoSecreDepto';
-
-import { useTodasAsignaturas, useAsignaturasPorDepartamento, useAsignaturasCoordinadores, useAsignaturasCoordinadoresPorDepartamento } from '@/hooks/useAsignaturas';
+import { useTodasAsignaturas, useAsignaturasCoordinadores } from '@/hooks/useAsignaturas';
 import { CoordinadorData, useCoordinadoresTodos } from '@/hooks/useCoordinadores';
-import GestionCoordinadores from '@/components/Secretariadepartamento/GestionCoordinadores';
+
+// Componentes internos
+import AperturaConcursoAdmin from '@/components/Secretariadepartamento/AperturaConcursoAdmin';
+import GenerarConstanciaAdmin from '@/components/Secretariadepartamento/GenerarConstanciaAdmin';
 import GestionCoordinadoresAdmin from '@/components/Secretariadepartamento/GestionCoordinadoresAdmin';
 
-import GenerarConstanciaAdmin from '@/components/Secretariadepartamento/GenerarConstanciaAdmin';
-
-
-const InfoCard = ({ title, children, className = "" }: { title: string; children: React.ReactNode; className?: string }) => (
-    <div className={`bg-white rounded-xl shadow-sm border border-gray-200 p-6 ${className}`}>
-        <h3 className="text-lg font-semibold text-gray-800 mb-4 pb-2 border-b border-gray-100">{title}</h3>
-        {children}
-    </div>
-);
-
-interface UserProps {
+interface DashboardProps {
     user: User;
     asignaturas: any[];
     asignaturasCoordinadores: any[];
@@ -34,209 +33,205 @@ interface UserProps {
     coordinadoresTodos: CoordinadorData[];
 }
 
-export const SecretariaDeptoDashboard = ({ user, asignaturas, asignaturasCoordinadores, alumnos, coordinadoresTodos }: UserProps) => {
+export const SecretariaDeptoDashboard = ({ user, asignaturas, asignaturasCoordinadores, alumnos, coordinadoresTodos }: DashboardProps) => {
     const router = useRouter();
-
     const { setToken, setUsertipo } = useAuth();
 
     type Vista = 'Concurso' | 'Constancia' | 'Coordinador';
     const [vista, setVista] = useState<Vista>('Concurso');
-    const isConcurso = vista === 'Concurso';
-    const isConstancia = vista === 'Constancia';
-    const isCoordinador = vista === 'Coordinador';
 
     const handleBackToAdmin = () => {
         router.push('/adminDashboard');
     };
 
     const logout = () => {
-            setToken(null);
-            setUsertipo(null);
-            Cookies.remove('token');
-            Cookies.remove('tipoUser');
-            router.push('/login');
-            router.refresh();
-        }
+        setToken(null);
+        setUsertipo(null);
+        Cookies.remove('token');
+        Cookies.remove('tipoUser');
+        router.push('/login');
+        router.refresh();
+    };
+
+    // Helper para clases de botones activos (Estilo Cápsula)
+    const getTabClass = (isActive: boolean) => 
+        `flex items-center gap-2 px-5 py-2.5 rounded-lg text-sm font-semibold transition-all duration-200 whitespace-nowrap ${
+            isActive 
+            ? 'bg-indigo-50 text-indigo-700 shadow-sm ring-1 ring-indigo-200' 
+            : 'text-gray-500 hover:text-gray-700 hover:bg-gray-50'
+        }`;
 
     return (
-        <div className="min-h-screen bg-gray-50 p-6">
-            <div className="bg-white rounded-lg shadow-sm p-6 mb-6 border border-gray-200">
-                <div className="flex justify-between items-center">
-                    <div>
-                        {(user.tipo === 'admin' || user.tipo === 'encargado_ayudantias') && (
-                            <button 
-                                onClick={handleBackToAdmin}
-                                className="flex items-center text-blue-600 hover:text-blue-800 mb-2 transition-colors"
-                            >
-                                <span className="mr-2">←</span>
-                                Volver al Panel Principal
-                            </button>
-                        )}
-                        <h1 className="text-2xl font-bold text-gray-800">
-                            Secretaría de Departamento
-                        </h1>
-                        <p className="text-gray-600 mt-1">
-                            Bienvenido, {user.nombres} {user.apellidos}
-                        </p>
-                    </div>
-                    <div className="text-right">
-                        <p className="text-sm text-gray-600">RUT: {user.rut}</p>
-                    </div>
-                    <div className="flex items-center gap-3">
-                        <div className="flex bg-gray-100 rounded-lg p-1">
-                            <button 
-                                onClick={() => setVista('Concurso')} 
-                                className={`py-2 px-4 rounded-lg transition-all duration-200 ${
-                                isConcurso 
-                                ? 'bg-white text-blue-600 shadow-sm' 
-                                : 'text-gray-600 hover:text-gray-900'
-                                }`}
-                            >
-                                Abrir concurso de postulacion
-                            </button>
-                            <button 
-                                onClick={() => setVista('Constancia')} 
-                                className={`py-2 px-4 rounded-lg transition-all duration-200 ${
-                                isConstancia 
-                                ? 'bg-white text-blue-600 shadow-sm' 
-                                : 'text-gray-600 hover:text-gray-900'
-                                }`}
-                            >
-                                Generar constancia
-                            </button>
-                            <button 
-                                onClick={() => setVista('Coordinador')} 
-                                className={`py-2 px-4 rounded-lg transition-all duration-200 ${
-                                isCoordinador 
-                                ? 'bg-white text-blue-600 shadow-sm' 
-                                : 'text-gray-600 hover:text-gray-900'
-                                }`}
-                            >
-                                Gestionar coordinadores
-                            </button>
+        <div className="min-h-screen bg-slate-50 font-sans pb-12">
+            
+            {/* 1. NAVBAR STICKY */}
+            <nav className="bg-white border-b border-gray-200 sticky top-0 z-30 shadow-sm h-16">
+                <div className="max-w-[98%] mx-auto px-4 h-full">
+                    <div className="flex justify-between h-full items-center">
+                        
+                        {/* IZQUIERDA: LOGO Y TÍTULO */}
+                        <div className="flex items-center gap-3">
+                            <div className="bg-indigo-600 p-2 rounded-lg">
+                                {/* Icono de Edificio para Depto */}
+                                <Building2 className="w-6 h-6 text-white" />
+                            </div>
+                            <span className="text-xl font-bold text-gray-900 tracking-tight hidden md:block">
+                                {user.tipo === 'admin' ? 'Portal Administración' : 'Secretaría de Departamento'}
+                            </span>
+                        </div>
+
+                        {/* DERECHA: DATOS USUARIO Y LOGOUT */}
+                        <div className="flex items-center gap-5">
+                            <div className="text-right hidden md:block">
+                                <p className="text-sm font-bold text-gray-900">
+                                    {user.nombres.split(' ')[0]} {user.apellidos.split(' ')[0]}
+                                </p>
+                                <p className="text-xs text-gray-500 uppercase font-semibold">
+                                    {user.tipo === 'admin' ? 'Administrador' : 'Secretaría Depto.'}
+                                </p>
                             </div>
                             <button 
-                            onClick={logout} 
-                            className="bg-gray-800 hover:bg-black text-white font-semibold py-2 px-4 rounded-lg transition duration-200 flex items-center gap-2"
+                                onClick={logout} 
+                                className="p-2 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-all" 
+                                title="Cerrar Sesión"
                             >
-                            <span>Cerrar Sesión</span>
+                                <LogOut className="w-5 h-5" />
                             </button>
                         </div>
                     </div>
                 </div>
-                <div className="flex justify-center">
-                    <div className="w-full max-w-7xl px-4 sm:px-6 lg:px-12">
-                            {vista === 'Concurso' ? (
-                                <div className="space-y-6">
-                                    {user.tipo === 'admin' && (
-                                        <AperturaConcursoAdmin
-                                        rutSecretaria={user.rut} 
-                                        asignaturas={asignaturas}
-                                    />
-                                    )}
-                                    {user.tipo === 'encargado_ayudantias' && (
-                                        <AperturaConcursoAdmin
-                                        rutSecretaria={user.rut} 
-                                        asignaturas={asignaturas}
-                                    />
-                                    )}
-                                    {user.tipo ==='secretaria_depto' && (
-                                        <AperturaConcursoAdmin
-                                        rutSecretaria={user.rut} 
-                                        asignaturas={asignaturas}
-                                    />
-                                    )}
-                                </div>
-                                
-                            ): vista === 'Constancia' ? (
-                                <div className="space-y-6">
-                                    {user.tipo === 'admin' && (
-                                        <GenerarConstanciaAdmin 
-                                        alumnos={alumnos}
-                                    />
-                                    )}
-                                    {user.tipo === 'encargado_ayudantias' && (
-                                        <GenerarConstanciaAdmin 
-                                        alumnos={alumnos}
-                                    />
-                                    )}
-                                    {user.tipo === 'secretaria_depto' && (
-                                        <GenerarConstanciaAdmin 
-                                        alumnos={alumnos}
-                                    />
-                                    )}
-                                </div>
-                            ): vista ==='Coordinador' ? (
-                                <div className="space-y-6">
-                                    {user.tipo === 'admin' && (
-                                        <GestionCoordinadoresAdmin
-                                        asignaturas={asignaturasCoordinadores}
-                                        coordinadoresTodos={coordinadoresTodos}
-                                    />
-                                    )}
-                                    {user.tipo === 'encargado_ayudantias' && (
-                                        <GestionCoordinadoresAdmin
-                                        asignaturas={asignaturasCoordinadores}
-                                        coordinadoresTodos={coordinadoresTodos}
-                                    />
-                                    )}
-                                    {user.tipo ==='secretaria_depto' && (
-                                        <GestionCoordinadoresAdmin
-                                        asignaturas={asignaturasCoordinadores}
-                                        coordinadoresTodos={coordinadoresTodos}
-                                        />
-                                    )}
-                                    
-                                </div>
-                            ) : null}
+            </nav>
+
+            {/* 2. CONTENEDOR PRINCIPAL */}
+            <div className="max-w-[98%] mx-auto px-4 py-6">
+                
+                {/* HEADER: TÍTULO Y TABS */}
+                <div className="flex flex-col xl:flex-row justify-between items-end mb-6 gap-6">
+                    <div>
+                        {(user.tipo === 'admin' || user.tipo === 'encargado_ayudantias') && (
+                            <button 
+                                onClick={handleBackToAdmin}
+                                className="flex items-center text-sm font-semibold text-gray-500 hover:text-indigo-600 mb-2 transition-colors"
+                            >
+                                <ChevronLeft className="w-4 h-4 mr-1" /> Volver al Panel
+                            </button>
+                        )}
+                        <h1 className="text-3xl font-bold text-gray-900 leading-tight">Secretaría de Departamento</h1>
+                        <p className="text-gray-500 text-base mt-1">Administración de concursos, coordinadores y constancias.</p>
+                    </div>
+
+                    {/* TABS DE NAVEGACIÓN */}
+                    <div className="bg-white p-1.5 rounded-xl shadow-sm border border-gray-200 inline-flex overflow-x-auto max-w-full">
+                        <button onClick={() => setVista('Concurso')} className={getTabClass(vista === 'Concurso')}>
+                            <GraduationCap className="w-4 h-4" /> Concursos
+                        </button>
+                        <button onClick={() => setVista('Constancia')} className={getTabClass(vista === 'Constancia')}>
+                            <ScrollText className="w-4 h-4" /> Constancias
+                        </button>
+                        <button onClick={() => setVista('Coordinador')} className={getTabClass(vista === 'Coordinador')}>
+                            <Users className="w-4 h-4" /> Coordinadores
+                        </button>
+                    </div>
+                </div>
+
+                {/* 3. ÁREA DE CONTENIDO (TARJETA BLANCA GRANDE) */}
+                <div className="animate-in fade-in slide-in-from-bottom-2 duration-500">
+                    <div className="bg-white rounded-2xl shadow-sm border border-gray-200 p-6 md:p-8 min-h-[600px]">
+                        
+                        {vista === 'Concurso' && (
+                            <AperturaConcursoAdmin
+                                rutSecretaria={user.rut} 
+                                asignaturas={asignaturas}
+                                asignaturasConCoordinadores={asignaturasCoordinadores}
+                            />
+                        )}
+                        
+                        {vista === 'Constancia' && (
+                            <GenerarConstanciaAdmin 
+                                alumnos={alumnos}
+                            />
+                        )}
+
+                        {vista === 'Coordinador' && (
+                            <GestionCoordinadoresAdmin
+                                asignaturas={asignaturasCoordinadores}
+                                coordinadoresTodos={coordinadoresTodos}
+                            />
+                        )}
 
                     </div>
                 </div>
+            </div>
         </div>
     );
 };
 
+// --- COMPONENTE PAGE (Lógica de carga y redirección) ---
 export default function SecretariaDeptoPage() {
     const { data: user, isLoading: cargauser, isError } = useUserProfile();
+    const router = useRouter();
+
+    // Hooks de datos
     const { data: asignaturas, isLoading: cargaAsignaturas, isError: errorAsignaturas } = useTodasAsignaturas();
     const { data: asignaturasCoordinadores, isLoading: cargaAsignaturasCoordinadores, isError: errorAsignaturasCoordinadores } = useAsignaturasCoordinadores();
     const { data: alumnos, isLoading: cargaAlumnos, isError: errorAlumnos } = useAlumnos();
     const { data: coordinadoresTodos, isLoading: cargaCoordinadoresTodos, isError: errorCoordinadoresTodos } = useCoordinadoresTodos();
-    const router = useRouter();
 
     useEffect(() => {
-        if (isError || !user ) {
+        if (isError || (!cargauser && !user)) {
             router.push("/login");
         }
-    }, [isError, user, router]);
+    }, [isError, user, router, cargauser]);
 
+    // Redirección si falla la carga de datos críticos
     useEffect(() => {
         if (errorAsignaturasCoordinadores || errorAsignaturas || errorAlumnos || errorCoordinadoresTodos) {
-            router.push("/login");
+            // Opcional: Podrías mostrar un toast de error antes de redirigir
+            console.error("Error cargando datos departamentales");
         }
-    }, [errorAsignaturas, errorAsignaturasCoordinadores, errorAlumnos, errorCoordinadoresTodos, router]);
+    }, [errorAsignaturas, errorAsignaturasCoordinadores, errorAlumnos, errorCoordinadoresTodos]);
 
-    if (cargauser || cargaAsignaturas || cargaAsignaturasCoordinadores || cargaAlumnos || cargaCoordinadoresTodos) {
+    const isLoadingAll = cargauser || cargaAsignaturas || cargaAsignaturasCoordinadores || cargaAlumnos || cargaCoordinadoresTodos;
+    const hasError = isError || (!cargauser && !user) || errorAsignaturas || errorAsignaturasCoordinadores || errorAlumnos || errorCoordinadoresTodos;
+
+    if (isLoadingAll) {
         return (
-            <div className="min-h-screen flex items-center justify-center">
+            <div className="min-h-screen flex items-center justify-center bg-slate-50">
                 <div className="text-center">
-                    <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-gray-900 mx-auto"></div>
-                    <p className="mt-4 text-gray-600">Cargando...</p>
+                    <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-indigo-600 mx-auto"></div>
+                    <p className="mt-4 text-gray-600 font-medium">Cargando panel...</p>
                 </div>
             </div>
         );
     }
 
-    if (isError || !user || errorAsignaturas || errorAsignaturasCoordinadores || errorAlumnos || errorCoordinadoresTodos) {
+    if (hasError) {
         return (
-            <div className="min-h-screen flex items-center justify-center">
+            <div className="min-h-screen flex items-center justify-center bg-slate-50">
                 <div className="text-center">
-                    <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-gray-900 mx-auto"></div>
-                    <p className="mt-4 text-gray-600">Ocurrió un error al buscar los datos. Redirigiendo al login...</p>
+                    <div className="bg-red-50 p-4 rounded-full inline-flex mb-4">
+                        <LogOut className="w-8 h-8 text-red-500" />
+                    </div>
+                    <p className="text-gray-800 font-bold mb-2 text-lg">Error de carga</p>
+                    <p className="text-base text-gray-500 mb-4">No se pudieron obtener los datos necesarios.</p>
+                    <button 
+                        onClick={() => window.location.reload()} 
+                        className="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700"
+                    >
+                        Reintentar
+                    </button>
                 </div>
             </div>
         );
     }
 
-    return <SecretariaDeptoDashboard user={user} asignaturas={asignaturas} asignaturasCoordinadores={asignaturasCoordinadores} alumnos={alumnos} coordinadoresTodos={coordinadoresTodos} />;
+    return (
+        <SecretariaDeptoDashboard 
+            user={user} 
+            asignaturas={asignaturas} 
+            asignaturasCoordinadores={asignaturasCoordinadores} 
+            alumnos={alumnos} 
+            coordinadoresTodos={coordinadoresTodos} 
+        />
+    );
 }

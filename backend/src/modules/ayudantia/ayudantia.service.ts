@@ -131,7 +131,9 @@ export class AyudantiaService {
   async findAyudantiasByCoordinadorRut(rut: string) {
     const asignaturaIds = await this.getAsignaturaIdsForCoordinador(rut);
     if (asignaturaIds.length === 0) return [];
-    const raws = await this.getAyudantiasByAsignaturas(asignaturaIds);
+    
+    const raws = await this.getAyudantiasByAsignaturasAndCoordinador(asignaturaIds, rut);
+    
     return this.mapAyudantias(raws);
   }
 
@@ -201,6 +203,34 @@ export class AyudantiaService {
       .getRawMany();
   }
 
+  private async getAyudantiasByAsignaturasAndCoordinador(asignaturaIds: number[], rutCoordinador: string) {
+    return await this.ayudantiaRepository
+      .createQueryBuilder('ayudantia')
+      .leftJoin('ayudantia.alumno', 'alumno')
+      .leftJoin(Alumno, 'alumno_data', 'alumno_data.rut_alumno = alumno.rut')
+      .leftJoin('ayudantia.asignatura', 'asignatura')
+      .innerJoin('asignatura.coordinador', 'coord', 'coord.actual = :actual', { actual: true })
+      .innerJoin('coord.usuario', 'coord_usuario', 'coord_usuario.rut = :rut', { rut: rutCoordinador })
+      .select([
+        'ayudantia.id AS id',
+        'alumno.rut AS alumno_rut',
+        'alumno.nombres AS alumno_nombres',
+        'alumno.apellidos AS alumno_apellidos',
+        'alumno_data.correo AS alumno_correo',
+        'alumno_data.nivel AS alumno_nivel',
+        'alumno_data.promedio AS alumno_promedio',
+        'alumno_data.nombre_carrera AS alumno_nombre_carrera',
+        'asignatura.nombre AS asignatura_nombre',
+        'ayudantia.periodo AS periodo',
+        'ayudantia.evaluacion AS evaluacion',
+        'coord_usuario.rut AS coordinador_rut',
+        'coord_usuario.nombres AS coordinador_nombres',
+        'coord_usuario.apellidos AS coordinador_apellidos',
+      ])
+      .where('asignatura.id IN (:...ids)', { ids: asignaturaIds })
+      .getRawMany();
+  }
+
   // Mapea crudo a formato público
   private mapAyudantias(rows: any[]) {
     return rows.map((r) => ({
@@ -234,6 +264,7 @@ export class AyudantiaService {
     const raws = await this.getAyudantiasByAsignaturas(asignaturaIds);
     return this.mapAyudantias(raws);
   }
+  
   async findAll() {
     return this.ayudantiaRepository.find({
       relations: ['alumno', 'asignatura', 'coordinador'],
@@ -250,6 +281,4 @@ export class AyudantiaService {
     return this.ayudantiaRepository.save(ayudantia);
   }
 
-
-  
 }
