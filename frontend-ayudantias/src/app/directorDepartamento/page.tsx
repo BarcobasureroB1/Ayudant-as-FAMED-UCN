@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation';
 import { useUserProfile, User} from '@/hooks/useUserProfile';
 import { useAuth } from '@/context/AuthContext';
 import Cookies from 'js-cookie';
-
+//Se utilizan distintos componentes para las funciones del director de departamento.
 import AutorizarConcursos from '@/components/FuncionesEncargado/AutorizarConcursos';
 import { DirectorCoordinacionVista } from '@/components/Director/DirectorCoordinacionVista';
 import { useSolicitudesDeConcurso } from '@/hooks/useAsignaturas';
@@ -144,6 +144,7 @@ export const DirectorDeptoDashboard = ({ user }: UserProps) => {
     );
 };
 
+//página principal del director de departamento, verifica si los datos del usuario están cargados y si no redirige al login.
 export default function DirectorDeptoPage() {
     const { data: user, isLoading: cargauser, isError } = useUserProfile();
 

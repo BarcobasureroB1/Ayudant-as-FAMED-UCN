@@ -19,6 +19,7 @@ const InfoCard = ({ title, children, className = "" }: { title: string; children
     </div>
 );
 
+//Formulario que actualiza los datos de una postulación existente, sólo reemplaza los campos de una postulación.
 export default function FormularioEditarPostulacion({
   postulacion,
   opcionesAsignaturas,
@@ -173,26 +174,6 @@ export default function FormularioEditarPostulacion({
               </div>
             )}
           </div>
-          
-          
-          {/*<div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              Correo del profesor
-            </label>
-            <input
-              name="correo_profe"
-              type="email"
-              value={formPostulacion.correo_profe}
-              onChange={(e) =>
-                setFormPostulacion({
-                  ...formPostulacion,
-                  [e.target.name]: e.target.value,
-                })
-              }
-              className="w-full px-4 py-3 border border-gray-300 text-black rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
-              required
-            />
-          </div>*/}
 
           <div className="border-t border-gray-200 pt-6">
             <h4 className="text-lg font-semibold text-gray-900 mb-4">

@@ -64,6 +64,8 @@ export const AdminDashboard = ({user, usuarios}:UserProps) => {
         router.refresh();
     }
 
+    //Botones que redirigen a las distintas funciones de ambos tipos de usuario.
+
     const dashboardCoordinador = [
         {
             title: "Coordinador",
@@ -124,6 +126,7 @@ export const AdminDashboard = ({user, usuarios}:UserProps) => {
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                {/*Se muestran las funciones de ambos tipos de usuario*/}
                 {user.tipo === 'coordinador_secretariaDocente' && (
                     <>
                         {dashboardCoordinador.map((item, index) => (
@@ -148,7 +151,7 @@ export const AdminDashboard = ({user, usuarios}:UserProps) => {
                         ))} 
                     </>
                 )}
-
+                {/*Se muestran las funciones de ambos tipos de usuario*/}
                 {user.tipo === 'coordinador_directorDepto' && (
                     <>
                         {dashboardCoordinador.map((item, index) => (
@@ -180,6 +183,7 @@ export const AdminDashboard = ({user, usuarios}:UserProps) => {
     );
 };
 
+//página principal del para los usuarios con doble tipo, verifica si los datos del usuario están cargados y si no redirige al login.
 export default function AdminPage()
 {
     const { data: user, isLoading: cargauser, isError } = useUserProfile();

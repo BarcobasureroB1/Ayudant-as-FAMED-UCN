@@ -70,7 +70,7 @@ export const AdminDashboard = ({user, usuarios}:UserProps) => {
         router.push('/login');
         router.refresh();
     }
-
+    //Botones que redirigen a las distintas funciones del admin.
     const dashboardItems = [
         {
             title: "Tu perfil de postulante",
@@ -150,7 +150,7 @@ export const AdminDashboard = ({user, usuarios}:UserProps) => {
                             color="purple"
                             onClick={() => setMostrarCambiarTipo(true)}
                         />
-                        
+                        {/*Condicional que garantiza que sólo el encargado de ayudantías vea su función exclusiva*/}
                         {user.tipo === 'encargado_ayudantias' && (
                             <DashboardCard
                             title="Autorizar Concursos"
@@ -174,6 +174,7 @@ export const AdminDashboard = ({user, usuarios}:UserProps) => {
                     </>
                 )}
 
+                {/*Componentes que se muestran al activar sus botones*/}
                 {mostrarCambiarTipo && (
                     <div className="col-span-1 md:col-span-2 lg:col-span-3">
                         <CambiarTipoDeUsuario 
@@ -199,6 +200,7 @@ export const AdminDashboard = ({user, usuarios}:UserProps) => {
     );
 };
 
+//página principal del admin, verifica si los datos del usuario están cargados y si no redirige al login.
 export default function AdminPage()
 {
     const { data: user, isLoading: cargauser, isError } = useUserProfile();

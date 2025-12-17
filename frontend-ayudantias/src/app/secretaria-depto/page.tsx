@@ -126,6 +126,7 @@ export const SecretariaDeptoDashboard = ({ user, asignaturas, asignaturasCoordin
                 </div>
                 <div className="flex justify-center">
                     <div className="w-full max-w-7xl px-4 sm:px-6 lg:px-12">
+                        {/*Renderizado condicional basado en la vista seleccionada, se le entregan los datos necesarios para que funcione cada componente.*/}
                             {vista === 'Concurso' ? (
                                 <div className="space-y-6">
                                     {user.tipo === 'admin' && (
@@ -196,6 +197,7 @@ export const SecretariaDeptoDashboard = ({ user, asignaturas, asignaturasCoordin
     );
 };
 
+//página principal del secretaria de departamento, verifica si los datos del usuario están cargados y si no redirige al login.
 export default function SecretariaDeptoPage() {
     const { data: user, isLoading: cargauser, isError } = useUserProfile();
     const { data: asignaturas, isLoading: cargaAsignaturas, isError: errorAsignaturas } = useTodasAsignaturas();
