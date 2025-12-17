@@ -9,103 +9,235 @@ import {
   TextInputProps,
   Platform,
   ActivityIndicator,
-  useColorScheme
+  SafeAreaView,
+  KeyboardAvoidingView,
+  Modal,
+  FlatList,
+  Pressable,
+  Switch 
 } from 'react-native';
 import { ThemedText } from '@/components/themed-text';
 import { ThemedView } from '@/components/themed-view';
 import { Stack, useRouter, useLocalSearchParams } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
-import RNPickerSelect from 'react-native-picker-select';
 import { useQueryClient } from '@tanstack/react-query';
-
 import { usePostulacionesPorAlumno, useEditarPostulacion, EditarPostulacion } from '@/hooks/usePostulacion';
 import { useAsignaturasDisponiblesPostulacion, useTodasAsignaturas } from '@/hooks/useAsignaturas';
 import { useUserProfile } from '@/hooks/useUserProfile';
+import { useThemeColors } from '@/hooks/useThemeColors';
 
-
-interface FormInputProps {
+// --- COMPONENTE INPUT ---
+interface ModernInputProps extends TextInputProps {
   label: string;
-  value: string;
-  onChangeText: (text: string) => void;
-  placeholder?: string;
-  keyboardType?: 'default' | 'email-address' | 'numeric' | 'phone-pad';
-  multiline?: boolean;
-  numberOfLines?: number;
-  disabled?: boolean;
-  autoCapitalize?: TextInputProps['autoCapitalize'];
+  icon: keyof typeof Ionicons.glyphMap;
+  showCharCount?: boolean;
+  maxLength?: number;
 }
 
-const FormInput: React.FC<FormInputProps & { styles: any }> = ({
+const ModernInput: React.FC<ModernInputProps & { styles: any, colors: any }> = ({
   label,
-  value,
-  onChangeText,
+  icon,
   styles,
+  colors,
+  showCharCount,
+  maxLength,
+  value,
   ...props
 }) => (
-  <View style={styles.inputContainer}>
-    <ThemedText style={styles.inputLabel}>{label}</ThemedText>
-    <TextInput
-      style={[styles.input, props.multiline && styles.textArea, props.disabled && styles.disabledText]}
-      value={value}
-      onChangeText={onChangeText}
-      placeholderTextColor="#999"
-      autoCapitalize="none"
-      {...props}
-    />
+  <View style={styles.inputGroup}>
+    <ThemedText style={styles.label}>{label}</ThemedText>
+    <View style={[styles.inputContainer, props.multiline && styles.textAreaContainer]}>
+      <Ionicons name={icon} size={20} color={colors.primary} style={[styles.inputIcon, props.multiline && { marginTop: 12 }]} />
+      <TextInput
+        style={[styles.input, props.multiline && styles.textArea]}
+        placeholderTextColor={colors.textPlaceholder}
+        value={value}
+        maxLength={maxLength}
+        {...props}
+      />
+    </View>
+    {showCharCount && maxLength && (
+      <ThemedText style={[styles.charCount, (value?.length || 0) >= maxLength ? { color: colors.error } : {}]}>
+        {value?.length || 0} / {maxLength}
+      </ThemedText>
+    )}
   </View>
 );
 
-const FormPicker = ({ label, value, onValueChange, items, placeholder, disabled, styles, pickerSelectStyles, pickerProps }: any) => (
-  <View style={styles.inputContainer}>
-    <ThemedText style={styles.inputLabel}>{label}</ThemedText>
-    <RNPickerSelect
-      onValueChange={onValueChange}
-      items={items}
-      value={value}
-      placeholder={{ label: placeholder || 'Seleccione un valor...', value: null }}
-      style={pickerSelectStyles}
-      useNativeAndroidPickerStyle={false}
-      disabled={disabled}
-      pickerProps={pickerProps}
-      Icon={() => {
-        return <Ionicons name="chevron-down" size={20} color="gray" style={styles.pickerIcon} />;
-      }}
-    />
-  </View>
-);
+// --- COMPONENTE SELECTOR ---
+interface Option {
+  label: string;
+  value: string;
+}
+
+interface ModernSelectProps {
+  label: string;
+  icon: keyof typeof Ionicons.glyphMap;
+  value: string | undefined;
+  onChange: (value: string) => void;
+  options: Option[];
+  placeholder?: string;
+  searchable?: boolean;
+  styles: any;
+  colors: any;
+}
+
+const ModernSelect: React.FC<ModernSelectProps> = ({ 
+  label, icon, value, onChange, options, placeholder, searchable, styles, colors 
+}) => {
+  const [modalVisible, setModalVisible] = useState(false);
+  const [searchText, setSearchText] = useState('');
+
+  const selectedLabel = options.find(op => op.value === value)?.label;
+
+  const filteredOptions = useMemo(() => {
+    if (!searchable || !searchText) return options;
+    return options.filter(op => op.label.toLowerCase().includes(searchText.toLowerCase()));
+  }, [options, searchText, searchable]);
+
+  const handleSelect = (val: string) => {
+    onChange(val);
+    setModalVisible(false);
+    setSearchText('');
+  };
+
+  return (
+    <View style={styles.inputGroup}>
+      <ThemedText style={styles.label}>{label}</ThemedText>
+      
+      <TouchableOpacity 
+        style={styles.inputContainer} 
+        onPress={() => setModalVisible(true)}
+        activeOpacity={0.7}
+      >
+        <Ionicons name={icon} size={20} color={colors.primary} style={styles.inputIcon} />
+        <ThemedText 
+          style={[styles.inputText, !selectedLabel && { color: colors.textPlaceholder }]}
+          numberOfLines={1} 
+          ellipsizeMode="tail"
+        >
+          {selectedLabel || placeholder || "Seleccionar..."}
+        </ThemedText>
+        <Ionicons name="chevron-down" size={20} color={colors.textPlaceholder} />
+      </TouchableOpacity>
+
+      <Modal
+        visible={modalVisible}
+        transparent={true}
+        animationType="fade"
+        onRequestClose={() => setModalVisible(false)}
+      >
+        <Pressable style={styles.modalOverlay} onPress={() => setModalVisible(false)}>
+          <View style={[styles.modalContent, { backgroundColor: colors.background }]}>
+            <View style={styles.modalHeader}>
+              <ThemedText type="defaultSemiBold" style={{ fontSize: 18 }}>
+                {label}
+              </ThemedText>
+              <TouchableOpacity onPress={() => setModalVisible(false)}>
+                <Ionicons name="close-circle" size={24} color={colors.textPlaceholder} />
+              </TouchableOpacity>
+            </View>
+
+            {searchable && (
+              <View style={[styles.searchContainer, { backgroundColor: colors.inputBackground, borderColor: colors.inputBorder }]}>
+                <Ionicons name="search" size={18} color={colors.textPlaceholder} style={{ marginRight: 8 }} />
+                <TextInput 
+                  style={[styles.searchInput, { color: colors.text }]}
+                  placeholder="Buscar..."
+                  placeholderTextColor={colors.textPlaceholder}
+                  value={searchText}
+                  onChangeText={setSearchText}
+                  autoFocus={false} 
+                />
+              </View>
+            )}
+
+            <FlatList
+              data={filteredOptions}
+              keyExtractor={(item) => item.value}
+              showsVerticalScrollIndicator={true}
+              style={{ maxHeight: 300 }}
+              contentContainerStyle={{ paddingBottom: 20 }}
+              renderItem={({ item }) => (
+                <TouchableOpacity 
+                  style={[
+                    styles.optionItem, 
+                    item.value === value && { backgroundColor: colors.primary + '15' }
+                  ]}
+                  onPress={() => handleSelect(item.value)}
+                >
+                  <ThemedText style={[
+                    styles.optionText, 
+                    item.value === value && { color: colors.primary, fontWeight: 'bold' }
+                  ]}>
+                    {item.label}
+                  </ThemedText>
+                  {item.value === value && (
+                    <Ionicons name="checkmark" size={20} color={colors.primary} />
+                  )}
+                </TouchableOpacity>
+              )}
+              ListEmptyComponent={
+                <View style={{ padding: 20, alignItems: 'center' }}>
+                   <ThemedText style={{ color: colors.textPlaceholder }}>No se encontraron resultados</ThemedText>
+                </View>
+              }
+            />
+          </View>
+        </Pressable>
+      </Modal>
+    </View>
+  );
+};
 
 
-export default function EditarPostulacionScreen(){
+// --- PANTALLA PRINCIPAL ---
+
+export default function EditarPostulacionScreen() {
   const router = useRouter();
   const clienteQuery = useQueryClient();
   const { id } = useLocalSearchParams();
-  const colorScheme = useColorScheme() ?? 'light';
-
+  
+  const colors = useThemeColors();
+  const styles = useMemo(() => getStyles(colors), [colors]);
 
   const { data: user } = useUserProfile();
   const { data: postulaciones, isLoading: cargaPostulaciones } = usePostulacionesPorAlumno(user?.rut);
   const { data: asignaturasTodas, isLoading: cargaAsignaturas } = useTodasAsignaturas();
-  const { data: asignaturasDisponibles, isLoading: cargaAsigDisp } =useAsignaturasDisponiblesPostulacion(user?.rut);
+  const { data: asignaturasDisponibles, isLoading: cargaAsigDisp } = useAsignaturasDisponiblesPostulacion(user?.rut);
 
   const { mutateAsync: editarPostulacion, isPending } = useEditarPostulacion();
 
   const [form, setForm] = useState<EditarPostulacion | null>(null);
+  const [incluirCorreoProfe, setIncluirCorreoProfe] = useState(false);
 
   useEffect(() => {
     if (postulaciones && Array.isArray(postulaciones) && id) {
       const postulacionAEditar = postulaciones.find(p => p.id.toString() === id);
       if (postulacionAEditar) {
         setForm(postulacionAEditar);
+        if (postulacionAEditar.correo_profe && postulacionAEditar.correo_profe.trim() !== '') {
+            setIncluirCorreoProfe(true);
+        } else {
+            setIncluirCorreoProfe(false);
+        }
       }
     }
   }, [postulaciones, id]);
 
   const listaAsignaturas = user?.tipo === 'admin' ? asignaturasTodas : asignaturasDisponibles;
-
-  const opcionesAsignaturas = listaAsignaturas?.map((a: {id: any, nombre: string}) => ({
-    label: a.nombre,
-    value: a.id.toString(),
-  })) || [];
+  
+  const opcionesAsignaturas = useMemo(() => {
+    const base = listaAsignaturas?.map((a: { id: any, nombre: string }) => ({
+      label: a.nombre,
+      value: a.id.toString(),
+    })) || [];
+    
+    if (form && form.id_asignatura && !base.find((op: any) => op.value === form.id_asignatura.toString())) {
+       base.push({ label: form.nombre_asignatura || "Asignatura Actual", value: form.id_asignatura.toString() });
+    }
+    return base;
+  }, [listaAsignaturas, form]);
 
   const opcionesDias = [
     { label: 'Lunes', value: 'Lunes' }, { label: 'Martes', value: 'Martes' },
@@ -122,297 +254,413 @@ export default function EditarPostulacionScreen(){
 
   const handleChange = (name: keyof EditarPostulacion, value: string) => {
     if (!form) return;
-    setForm(prev => prev ? ({
-      ...prev,
-      [name]: value,
-    }) : null);
+    setForm(prev => prev ? ({ ...prev, [name]: value }) : null);
+  };
+
+  const handleSwitchChange = (val: boolean) => {
+    setIncluirCorreoProfe(val);
+    if (!val && form) {
+        handleChange('correo_profe', "");
+    }
   };
 
   const handleSubmit = async () => {
-    if (!form) return Alert.alert("Error", "No se han cargado los datos del formulario.");
+    if (!form) return Alert.alert("Error", "No se han cargado los datos.");
     
+    if (!form.descripcion_carta || form.descripcion_carta.length > 700) {
+        return Alert.alert("Error", "La carta de interés es obligatoria y debe tener máximo 700 caracteres.");
+    }
+
+    if (incluirCorreoProfe && (!form.correo_profe || form.correo_profe.trim() === "")) {
+        return Alert.alert("Atención", "Has activado la recomendación, debes ingresar el correo del profesor.");
+    }
+
+    const datosAEnviar = {
+        ...form,
+        correo_profe: incluirCorreoProfe ? form.correo_profe : ""
+    };
+
     try {
-      await editarPostulacion(form);
+      await editarPostulacion(datosAEnviar);
       Alert.alert("Éxito", "Postulación actualizada correctamente.");
       await clienteQuery.invalidateQueries({ queryKey: ['postulaciones', user?.rut] });
-      
       router.back();
-
     } catch (error: any) {
       Alert.alert("Error", `No se pudo guardar: ${error.message}`);
     }
   };
 
-  const themeColors = useMemo(() => ({
-      background: colorScheme === 'dark' ? '#000' : '#f0f2f5', // Un gris claro para el fondo
-      text: colorScheme === 'dark' ? '#fff' : '#000',
-      textLabel: colorScheme === 'dark' ? '#eee' : '#333',
-      textPlaceholder: colorScheme === 'dark' ? '#888' : '#999',
-      inputBackground: colorScheme === 'dark' ? '#1c1c1e' : '#fff',
-      borderColor: colorScheme === 'dark' ? '#444' : '#ccc',
-      disabledText: colorScheme === 'dark' ? '#555' : '#999',
-      buttonBackText: colorScheme === 'dark' ? '#fff' : '#333',
-      buttonBackBackground: colorScheme === 'dark' ? '#2c2c2e' : '#f0f0f0',
-      buttonBackBorder: colorScheme === 'dark' ? '#444' : '#ddd',
-    }), [colorScheme]);
-
-
-    const styles = useMemo(() => StyleSheet.create({
-    container: {
-      flex: 1,
-      backgroundColor: themeColors.background,
-    },
-    loadingContainer: {
-      flex: 1,
-      justifyContent: 'center',
-      alignItems: 'center',
-      backgroundColor: themeColors.background,
-    },
-    scrollContent: {
-      padding: 20,
-      paddingBottom: 60,
-    },
-    formContainer: {
-      gap: 16,
-    },
-    title: {
-      textAlign: 'center',
-      fontSize: 24,
-      marginBottom: 24,
-    },
-    sectionTitle: {
-      fontSize: 18,
-      fontWeight: '600',
-      marginTop: 16,
-      borderTopWidth: 1,
-      borderTopColor: themeColors.borderColor,
-      paddingTop: 16,
-    },
-    inputContainer: {
-      marginBottom: 4,
-    },
-    inputLabel: {
-      fontSize: 14,
-      fontWeight: '600',
-      marginBottom: 6,
-      color: themeColors.textLabel,
-    },
-    input: {
-      borderWidth: 1,
-      borderColor: themeColors.borderColor,
-      borderRadius: 8,
-      paddingHorizontal: 14,
-      paddingVertical: 12,
-      fontSize: 16,
-      backgroundColor: themeColors.inputBackground,
-      color: themeColors.text,
-    },
-    disabledText: {
-      fontSize: 16,
-      color: themeColors.disabledText,
-      fontStyle: 'italic',
-      paddingVertical: 12,
-      paddingHorizontal: 4,
-    },
-    textArea: {
-      height: 120,
-      textAlignVertical: 'top',
-    },
-    row: {
-      flexDirection: 'row',
-      gap: 12,
-    },
-    col: {
-      flex: 1,
-    },
-    button: {
-      flexDirection: 'row',
-      alignItems: 'center',
-      justifyContent: 'center',
-      paddingVertical: 14,
-      borderRadius: 10,
-      gap: 10,
-    },
-    buttonText: {
-      color: '#fff',
-      fontSize: 16,
-      fontWeight: '600',
-    },
-    buttonRow: {
-      flexDirection: 'row',
-      gap: 12,
-      marginTop: 24,
-    },
-    buttonBack: {
-      flex: 1,
-      backgroundColor: themeColors.buttonBackBackground,
-      borderWidth: 1,
-      borderColor: themeColors.buttonBackBorder,
-    },
-    buttonTextBack: {
-      color: themeColors.buttonBackText,
-      fontSize: 16,
-      fontWeight: '600',
-    },
-    buttonSubmit: {
-      flex: 2,
-      backgroundColor: '#007bff',
-    },
-    pickerIcon: {
-      top: Platform.OS === 'ios' ? 0 : 16,
-      right: 10,
-    },
-  }), [themeColors]);
-
-
-  const dynamicPickerProps = {
-    itemStyle: { color: 'black' }
-  };
-
-  const pickerSelectStyles = useMemo(() => StyleSheet.create({
-    inputIOS: {
-      fontSize: 16,
-      paddingVertical: 12,
-      paddingHorizontal: 14,
-      borderWidth: 1,
-      borderColor: themeColors.borderColor,
-      borderRadius: 8,
-      backgroundColor: themeColors.inputBackground,
-      color: themeColors.text,
-    },
-    inputAndroid: {
-      fontSize: 16,
-      paddingVertical: 12,
-      paddingHorizontal: 14,
-      borderWidth: 1,
-      borderColor: themeColors.borderColor,
-      borderRadius: 8,
-      backgroundColor: themeColors.inputBackground,
-      color: themeColors.text,
-    },
-    placeholder: {
-      color: themeColors.textPlaceholder,
-    },
-  }), [themeColors]);
-
-
   if (cargaPostulaciones || cargaAsignaturas || !form) {
     return (
-      <ThemedView style={styles.loadingContainer}>
-        <ActivityIndicator size="large" color="#007bff" />
+      <ThemedView style={[styles.container, { justifyContent: 'center', alignItems: 'center' }]}>
+        <ActivityIndicator size="large" color={colors.primary} />
       </ThemedView>
     );
   }
 
-    
-
   return (
-    <ThemedView style={styles.container}>
-      <Stack.Screen options={{title: 'Editar Postulación' }}/>
-      <ScrollView
-        contentContainerStyle={styles.scrollContent}
-        keyboardShouldPersistTaps="handled"
-      >
-        <ThemedText type="title" style={styles.title}>Editar Postulación</ThemedText>
-        <View style={styles.formContainer}>
-          <FormPicker
-            label="Asignatura"
-            items={opcionesAsignaturas}
-            styles={styles}
-            pickerSelectStyles={pickerSelectStyles}
-            pickerProps={dynamicPickerProps}
-            placeholder="Seleccione una asignatura"
-            value={form.id_asignatura?.toString()}
-            onValueChange={(value: string) => {
-              if (value === null)
-              {
-                return;
-              }
-              const opcionSeleccionada = opcionesAsignaturas.find(opt => opt.value === value)?.label || "";
-              handleChange('id_asignatura', value);
-              handleChange('nombre_asignatura', opcionSeleccionada);
-            }}
-          />
+    <SafeAreaView style={styles.container}>
+      <Stack.Screen options={{ headerShown: false }} />
+      
+      <View style={styles.header}>
+        <TouchableOpacity onPress={() => router.back()} style={styles.backButton}>
+          <Ionicons name="arrow-back" size={24} color={colors.text} />
+        </TouchableOpacity>
+        <ThemedText type="subtitle" style={styles.headerTitle}>Editar Postulación</ThemedText>
+        <TouchableOpacity onPress={handleSubmit} disabled={isPending}>
+             {isPending ? <ActivityIndicator color={colors.primary} /> : <ThemedText style={{color: colors.primary, fontWeight: 'bold'}}>Guardar</ThemedText>}
+        </TouchableOpacity>
+      </View>
 
-          <FormInput
-            label="Carta de Interés"
-            value={form.descripcion_carta}
-            styles={styles}
-            onChangeText={(t) => handleChange('descripcion_carta', t)}
-            multiline
-            numberOfLines={6}
-          />
+      <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : 'height'} style={{ flex: 1 }}>
+        <ScrollView contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
+          
+          <ThemedText style={styles.subtitle}>
+            Actualiza los detalles de tu postulación para <ThemedText type="defaultSemiBold">{form.nombre_asignatura}</ThemedText>.
+          </ThemedText>
 
-          <ThemedText type="subtitle" style={styles.sectionTitle}>Plan de Trabajo</ThemedText>
-          <FormInput
-            label="Correo del Profesor (para recomendación)"
-            value={form.correo_profe}
-            styles={styles}
-            onChangeText={(t) => handleChange('correo_profe', t)}
-            keyboardType="email-address"
-          />
+          {/* DETALLES */}
+          <View style={styles.card}>
+            <View style={styles.cardHeader}>
+              <Ionicons name="document-text-outline" size={20} color={colors.primary} />
+              <ThemedText type="defaultSemiBold">Detalles Principales</ThemedText>
+            </View>
 
-          <FormInput
-            label="Actividad Propuesta"
-            styles={styles}
-            value={form.actividad}
-            onChangeText={(t) => handleChange('actividad', t)}
-          />
-          <FormInput
-            label="Metodologia"
-            styles={styles}
-            value={form.metodologia}
-            onChangeText={(t) => handleChange('metodologia', t)}
-          />
-          <View style={styles.row}>
-            <View style={styles.col}>
-              <FormPicker
-                label="Día Preferente"
-                items={opcionesDias}
-                styles={styles}
-                pickerSelectStyles={pickerSelectStyles}
-                pickerProps={dynamicPickerProps}
-                placeholder="Seleccione un día"
-                value={form.dia}
-                onValueChange={(value) => handleChange('dia', value)}
+            <ModernSelect
+              label="Asignatura"
+              icon="school-outline"
+              value={form.id_asignatura?.toString()}
+              options={opcionesAsignaturas}
+              onChange={(val) => {
+                 const label = opcionesAsignaturas.find((op:any) => op.value === val)?.label || "";
+                 handleChange('id_asignatura', val);
+                 handleChange('nombre_asignatura', label);
+              }}
+              searchable={true}
+              placeholder="Seleccionar Asignatura..."
+              styles={styles}
+              colors={colors}
+            />
+
+            <ModernInput
+              label="Carta de Interés"
+              icon="create-outline"
+              value={form.descripcion_carta}
+              onChangeText={(t) => handleChange('descripcion_carta', t)}
+              placeholder="Explica tu motivación..."
+              multiline
+              numberOfLines={6}
+              styles={styles}
+              colors={colors}
+              maxLength={700}
+              showCharCount={true}
+            />
+          </View>
+
+          {/* PLAN DE TRABAJO */}
+          <View style={styles.card}>
+            <View style={styles.cardHeader}>
+               <Ionicons name="briefcase-outline" size={20} color={colors.primary} />
+               <ThemedText type="defaultSemiBold">Plan de Trabajo</ThemedText>
+            </View>
+            
+            <ModernInput
+              label="Actividad Propuesta"
+              icon="bulb-outline"
+              value={form.actividad}
+              onChangeText={(t) => handleChange('actividad', t)}
+              placeholder="Ej: Apoyo en laboratorios"
+              styles={styles}
+              colors={colors}
+            />
+
+            <ModernInput
+              label="Metodología"
+              icon="construct-outline"
+              value={form.metodologia}
+              onChangeText={(t) => handleChange('metodologia', t)}
+              placeholder="Ej: Aprendizaje basado en problemas"
+              styles={styles}
+              colors={colors}
+            />
+
+            {/* SWITCH CORREO */}
+            <View style={styles.switchRow}>
+              <View style={{ flex: 1, flexDirection: 'row', alignItems: 'center', gap: 10 }}>
+                <View style={[styles.iconBox, { backgroundColor: '#8b5cf6' + '20' }]}>
+                  <Ionicons name="mail-open-outline" size={20} color="#8b5cf6" />
+                </View>
+                <View>
+                  <ThemedText style={styles.switchTitle}>Carta de Recomendación</ThemedText>
+                  <ThemedText style={styles.switchSub}>Incluir correo del profesor</ThemedText>
+                </View>
+              </View>
+              <Switch
+                trackColor={{ false: colors.inputBorder, true: colors.primary }}
+                thumbColor={'#fff'}
+                onValueChange={handleSwitchChange}
+                value={incluirCorreoProfe}
               />
             </View>
 
-            <View style={styles.col}>
-              <FormPicker
-                label="Bloque Horario"
-                items={opcionesBloques}
-                styles={styles}
-                pickerSelectStyles={pickerSelectStyles}
-                pickerProps={dynamicPickerProps}
-                placeholder="Seleccione un bloque"
-                value={form.bloque}
-                onValueChange={(value) => handleChange('bloque', value)}
-              />
+            {/* INPUT CONDICIONAL */}
+            {incluirCorreoProfe && (
+                <View style={{ marginTop: 16 }}>
+                    <ModernInput
+                        label="Correo Profesor (Recomendación)"
+                        icon="mail-outline"
+                        value={form.correo_profe}
+                        onChangeText={(t) => handleChange('correo_profe', t)}
+                        placeholder="profesor@institucion.cl"
+                        keyboardType="email-address"
+                        styles={styles}
+                        colors={colors}
+                    />
+                </View>
+            )}
+          </View>
+
+          {/* HORARIO */}
+          <View style={styles.card}>
+            <View style={styles.cardHeader}>
+               <Ionicons name="time-outline" size={20} color={colors.primary} />
+               <ThemedText type="defaultSemiBold">Horario Preferente</ThemedText>
+            </View>
+            
+            <View style={styles.row}>
+                <View style={styles.col}>
+                    <ModernSelect
+                        label="Día"
+                        icon="calendar-outline"
+                        value={form.dia}
+                        options={opcionesDias}
+                        onChange={(v) => handleChange('dia', v)}
+                        styles={styles}
+                        colors={colors}
+                    />
+                </View>
+                <View style={styles.col}>
+                     <ModernSelect
+                        label="Bloque"
+                        icon="time-outline"
+                        value={form.bloque}
+                        options={opcionesBloques}
+                        onChange={(v) => handleChange('bloque', v)}
+                        styles={styles}
+                        colors={colors}
+                    />
+                </View>
             </View>
           </View>
 
-          <View style={styles.buttonRow}>
-            <TouchableOpacity
-              style={[styles.button, styles.buttonBack]}
-              onPress={() => router.back()}
-            >
-              <ThemedText style={styles.buttonTextBack}>Cancelar</ThemedText>
-            </TouchableOpacity>
+          <View style={styles.footerSpace} />
 
-            <TouchableOpacity
-              style={[styles.button, styles.buttonSubmit]}
-              onPress={handleSubmit}
-              disabled={isPending}
-            >
-              <ThemedText style={styles.buttonText}>
-                {isPending ? "Guardando..." : "Guardar Cambios"}
-              </ThemedText>
-              <Ionicons name="save-outline" size={18} color="#fff"/>
-            </TouchableOpacity>
-          </View>
-        </View>
-      </ScrollView>
-    </ThemedView>
+        </ScrollView>
+      </KeyboardAvoidingView>
+    </SafeAreaView>
   );
 }
+
+const getStyles = (colors: ReturnType<typeof useThemeColors>) => StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: colors.background,
+  },
+  header: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    paddingHorizontal: 20,
+    paddingVertical: 16,
+    borderBottomWidth: 1,
+    borderBottomColor: colors.inputBorder,
+    backgroundColor: colors.background,
+  },
+  backButton: {
+    padding: 4,
+  },
+  headerTitle: {
+    fontSize: 18,
+    fontWeight: '700',
+  },
+  scrollContent: {
+    padding: 20,
+  },
+  subtitle: {
+    textAlign: 'left',
+    fontSize: 15,
+    color: colors.textLabel,
+    marginBottom: 20,
+    lineHeight: 22,
+  },
+  
+  // Cards
+  card: {
+    backgroundColor: colors.card,
+    borderRadius: 16,
+    padding: 16,
+    marginBottom: 20,
+    borderWidth: 1,
+    borderColor: colors.inputBorder,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.05,
+    shadowRadius: 4,
+    elevation: 2,
+  },
+  cardHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 10,
+    marginBottom: 16,
+    paddingBottom: 10,
+    borderBottomWidth: 1,
+    borderBottomColor: colors.inputBorder,
+  },
+  
+  inputGroup: {
+    marginBottom: 16,
+  },
+  label: {
+    fontSize: 13,
+    fontWeight: '600',
+    marginBottom: 8,
+    color: colors.textLabel,
+    marginLeft: 4,
+  },
+  inputContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: colors.inputBackground,
+    borderWidth: 1,
+    borderColor: colors.inputBorder,
+    borderRadius: 12,
+    paddingHorizontal: 12,
+    minHeight: 50,
+  },
+  inputText: {
+    flex: 1,
+    fontSize: 16,
+    color: colors.text,
+    paddingVertical: 12,
+  },
+  textAreaContainer: {
+    alignItems: 'flex-start',
+    paddingVertical: 10,
+  },
+  inputIcon: {
+    marginRight: 10,
+  },
+  input: {
+    flex: 1,
+    fontSize: 16,
+    color: colors.text,
+    paddingVertical: 10,
+  },
+  textArea: {
+    minHeight: 100,
+    textAlignVertical: 'top',
+  },
+  charCount: {
+    textAlign: 'right',
+    fontSize: 11,
+    color: colors.textPlaceholder,
+    marginTop: 4,
+    marginRight: 4,
+  },
+
+  switchRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    backgroundColor: colors.inputBackground,
+    padding: 12,
+    borderRadius: 12,
+    marginTop: 8,
+    borderWidth: 1,
+    borderColor: colors.inputBorder,
+  },
+  iconBox: {
+    width: 36,
+    height: 36,
+    borderRadius: 10,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  switchTitle: {
+    fontSize: 14,
+    fontWeight: '600',
+    color: colors.text,
+  },
+  switchSub: {
+    fontSize: 12,
+    color: colors.textPlaceholder,
+  },
+  
+  // --- Estilos para el Modal del Selector ---
+  modalOverlay: {
+    flex: 1,
+    backgroundColor: 'rgba(0,0,0,0.5)',
+    justifyContent: 'center',
+    alignItems: 'center',
+    padding: 20,
+  },
+  modalContent: {
+    width: '100%',
+    maxHeight: '70%',
+    borderRadius: 16,
+    padding: 20,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.2,
+    shadowRadius: 10,
+    elevation: 10,
+  },
+  modalHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 16,
+    paddingBottom: 10,
+    borderBottomWidth: 1,
+    borderColor: '#eee',
+  },
+  searchContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    borderWidth: 1,
+    borderRadius: 8,
+    paddingHorizontal: 10,
+    height: 40,
+    marginBottom: 10,
+  },
+  searchInput: {
+    flex: 1,
+    fontSize: 14,
+  },
+  optionItem: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    paddingVertical: 14,
+    paddingHorizontal: 8,
+    borderBottomWidth: 1,
+    borderBottomColor: 'rgba(0,0,0,0.05)',
+  },
+  optionText: {
+    fontSize: 16,
+    color: colors.text,
+  },
+
+  // Grid helpers
+  row: {
+    flexDirection: 'row',
+    gap: 12,
+  },
+  col: {
+    flex: 1,
+  },
+  footerSpace: {
+    height: 40,
+  },
+});
