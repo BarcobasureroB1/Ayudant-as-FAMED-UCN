@@ -93,7 +93,7 @@ export class AuthService {
       { expiresIn: '1h' }
     );
 
-    // Buscar correo del alumno si existe
+   
     
     const correo = usuario.correo;
     
