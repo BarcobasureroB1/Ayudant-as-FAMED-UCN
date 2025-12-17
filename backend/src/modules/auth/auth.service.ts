@@ -93,12 +93,9 @@ export class AuthService {
       { expiresIn: '1h' }
     );
 
-    // Buscar correo del alumno si existe
-    const alumno = await this.alumnoService.findByRut(rut);
-    if (alumno?.correo !== usuario.correo) {
-      throw new BadRequestException('el correo proporcionado no está asociado a ningún usuario');
-    }
-    const correo = alumno?.correo ?? usuario.correo;
+   
+    
+    const correo = usuario.correo;
     
     
     if (!correo) {
