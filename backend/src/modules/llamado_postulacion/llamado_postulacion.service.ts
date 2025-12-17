@@ -67,7 +67,8 @@ export class LlamadoPostulacionService {
     if (!usuarios || usuarios.length !== coordinadoresArray.length) {
       throw new NotFoundException('Alguno de los coordinadores no existe');
     }
-    const nonCoordinators = usuarios.filter((u) => String(u.tipo).toLowerCase() !== 'coordinador');
+    const validCoordinatorTypes = ['coordinador', 'coordinador_secretariadocente', 'coordinador_directordepto'];
+    const nonCoordinators = usuarios.filter((u) => !validCoordinatorTypes.includes(String(u.tipo).toLowerCase()));
     if (nonCoordinators.length > 0) {
       throw new BadRequestException('Uno o más usuarios proporcionados no son coordinadores');
     }
