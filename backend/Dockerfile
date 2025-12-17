@@ -23,6 +23,7 @@ WORKDIR /app
 # Copiamos solo lo necesario para ejecutar
 COPY --from=builder /app/package*.json ./
 COPY --from=builder /app/dist ./dist
+COPY --from=builder /app/data ./data
 
 # Instalamos solo dependencias necesarias en producción
 RUN npm install --legacy-peer-deps

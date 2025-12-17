@@ -1,0 +1,368 @@
+"PERIODO","DEPARTAMENTO","CURSO","NOMBRE","PARALELO","NRC","TIPO","RUT_PROFESOR","PRIMER_NOMBRE","SEGUNDO_NOMBRE","APELLIDOPATERNO","APELLIDOMATERNO","CORREO_INSTITUCIONAL"
+202520,Depto. De Ciencias Biomédicas,DCBI-00233,Anatomía y Embriología II,L1,21326,LAB,88060571,CRISTIAN,,GALLEGUILLOS,VEGA,
+202520,Depto. De Ciencias Biomédicas,DCBI-00233,Anatomía y Embriología II,C1,20730,CAT,88060571,CRISTIAN,,GALLEGUILLOS,VEGA,
+202520,Depto. De Ciencias Biomédicas,DCBI-00423,Bases Farmacológicas en Enfermería,C1,20729,CAT,13224698K,ANDREA,,PEDRERO,CISTERNA,apedrero@ucn.cl
+202520,Depto. De Ciencias Biomédicas,DCBI-00423,Bases Farmacológicas en Enfermería,T1,21376,TAL,13224698K,ANDREA,,PEDRERO,CISTERNA,apedrero@ucn.cl
+202520,Depto. De Ciencias Biomédicas,DCBI-00402,Biomecánica,C1,20727,CAT,175123334,FERNANDO,SAAD,MARGARIÑOS,SELAIVE,fernando.magarinos@ucn.cl
+202520,Depto. De Ciencias Biomédicas,DCBI-00402,Biomecánica,T1,21360,TAL,175123334,FERNANDO,SAAD,MARGARIÑOS,SELAIVE,fernando.magarinos@ucn.cl
+202520,Depto. De Ciencias Biomédicas,DCBI-00402,Biomecánica,A1,21361,AYU,175123334,FERNANDO,SAAD,MARGARIÑOS,SELAIVE,fernando.magarinos@ucn.cl
+202520,Depto. De Ciencias Biomédicas,DCBI-00402,Biomecánica,T4,23668,TAL,192582172,MONTSERRAT,DEL PILAR,CASTRO,TAPIA,montserrat.castro@ce.ucn.cl
+202520,Depto. De Ciencias Biomédicas,DCBI-00402,Biomecánica,T5,23669,TAL,195943184,FRANCISCA,CAROLINA,PALOMINO,PULGAR,francisca.palomino@ucn.cl
+202520,Depto. De Ciencias Biomédicas,DCBI-00402,Biomecánica,T3,23667,TAL,197708301,ALVARO,ANTONIO,GUAJARDO,PARRA,alvaro.guajardo@ce.ucn.cl
+202520,Depto. De Ciencias Biomédicas,DCBI-00402,Biomecánica,T2,23666,TAL,189227140,NICOLAS,ALEJANDRO,MOLINA,AVILES,nicolas.molina@ucn.cl
+202520,Depto. De Ciencias Biomédicas,DCBI-00405,Ciencias de los Alimentos,C1,20725,CAT,155640596,PAULA,ALEJANDRA,GONZALEZ,CATALAN,paula.gonzalez@ce.ucn.cl
+202520,Depto. De Ciencias Biomédicas,DCBI-00405,Ciencias de los Alimentos,T1,21364,TAL,155640596,PAULA,ALEJANDRA,GONZALEZ,CATALAN,paula.gonzalez@ce.ucn.cl
+202520,Depto. De Ciencias Biomédicas,DCBI-00405,Ciencias de los Alimentos,L1,21363,LAB,155640596,PAULA,ALEJANDRA,GONZALEZ,CATALAN,paula.gonzalez@ce.ucn.cl
+202520,Depto. De Ciencias Biomédicas,DCBI-00204,Estructura y Función Cardiorrespiratoria y Metabólica,C1,20726,CAT,132647135,ANDREA,ALEJANDRA,PASTEN,ZAMORANO,andrea.pasten@ucn.cl
+202520,Depto. De Ciencias Biomédicas,DCBI-00204,Estructura y Función Cardiorrespiratoria y Metabólica,T3,23664,TAL,189227140,NICOLAS,ALEJANDRO,MOLINA,AVILES,nicolas.molina@ucn.cl
+202520,Depto. De Ciencias Biomédicas,DCBI-00204,Estructura y Función Cardiorrespiratoria y Metabólica,T4,23665,TAL,195943184,FRANCISCA,CAROLINA,PALOMINO,PULGAR,francisca.palomino@ucn.cl
+202520,Depto. De Ciencias Biomédicas,DCBI-00204,Estructura y Función Cardiorrespiratoria y Metabólica,T2,23663,TAL,192582172,MONTSERRAT,DEL PILAR,CASTRO,TAPIA,montserrat.castro@ce.ucn.cl
+202520,Depto. De Ciencias Biomédicas,DCBI-00204,Estructura y Función Cardiorrespiratoria y Metabólica,T1,21028,TAL,170155815,MARIA,XIMENA,HERRERA,MARTINEZ,
+202520,Depto. De Ciencias Biomédicas,DCBI-00204,Estructura y Función Cardiorrespiratoria y Metabólica,L1,21029,LAB,132647135,ANDREA,ALEJANDRA,PASTEN,ZAMORANO,andrea.pasten@ucn.cl
+202520,Depto. De Ciencias Biomédicas,DCBI-00406,Evaluación Nutricional del Adulto y Adulto Mayor,CL1,21366,CLI,183842757,ANTONIA,,GLADIC,BUJES,antonia.gladic@ucn.cl
+202520,Depto. De Ciencias Biomédicas,DCBI-00406,Evaluación Nutricional del Adulto y Adulto Mayor,T1,21365,TAL,183842757,ANTONIA,,GLADIC,BUJES,antonia.gladic@ucn.cl
+202520,Depto. De Ciencias Biomédicas,DCBI-00406,Evaluación Nutricional del Adulto y Adulto Mayor,C1,20713,CAT,183842757,ANTONIA,,GLADIC,BUJES,antonia.gladic@ucn.cl
+202520,Depto. De Ciencias Biomédicas,DCBI-00201,Fisiología,C1,20710,CAT,86558572,FLORIA,CARLA,PANCETTI,VACCARI,pancetti@ucn.cl
+202520,Depto. De Ciencias Biomédicas,DCBI-00201,Fisiología,L4,23959,LAB,86558572,FLORIA,CARLA,PANCETTI,VACCARI,pancetti@ucn.cl
+202520,Depto. De Ciencias Biomédicas,DCBI-00201,Fisiología,L3,23958,LAB,86558572,FLORIA,CARLA,PANCETTI,VACCARI,pancetti@ucn.cl
+202520,Depto. De Ciencias Biomédicas,DCBI-00201,Fisiología,T2,23670,TAL,86558572,FLORIA,CARLA,PANCETTI,VACCARI,pancetti@ucn.cl
+202520,Depto. De Ciencias Biomédicas,DCBI-00201,Fisiología,L2,20770,LAB,86558572,FLORIA,CARLA,PANCETTI,VACCARI,pancetti@ucn.cl
+202520,Depto. De Ciencias Biomédicas,DCBI-00201,Fisiología,L1,20769,LAB,86558572,FLORIA,CARLA,PANCETTI,VACCARI,pancetti@ucn.cl
+202520,Depto. De Ciencias Biomédicas,DCBI-00201,Fisiología,T1,20767,TAL,86558572,FLORIA,CARLA,PANCETTI,VACCARI,pancetti@ucn.cl
+202520,Depto. De Ciencias Biomédicas,DCBI-00407,Fisiopatología Aplicada II,C1,20712,CAT,183842757,ANTONIA,,GLADIC,BUJES,antonia.gladic@ucn.cl
+202520,Depto. De Ciencias Biomédicas,DCBI-00407,Fisiopatología Aplicada II,T1,21367,TAL,183842757,ANTONIA,,GLADIC,BUJES,antonia.gladic@ucn.cl
+202520,Depto. De Ciencias Biomédicas,DCBI-00433,Función Normal y Patológica II,T3,23685,TAL,93977289,CARLOS,LUIS,VERGARA,GALLEGUILLOS,carlos.vergara@ce.ucn.cl
+202520,Depto. De Ciencias Biomédicas,DCBI-00433,Función Normal y Patológica II,C1,20733,CAT,104544509,CARLOS,GUSTAVO,BRESKY,RUIZ,bresky@ucn.cl
+202520,Depto. De Ciencias Biomédicas,DCBI-00433,Función Normal y Patológica II,T4,23686,TAL,172938728,MARIA,FERNANDA,SEGOVIA,OLIVARES,maria.segovia01@ce.ucn.cl
+202520,Depto. De Ciencias Biomédicas,DCBI-00433,Función Normal y Patológica II,T1,21374,TAL,104544509,CARLOS,GUSTAVO,BRESKY,RUIZ,bresky@ucn.cl
+202520,Depto. De Ciencias Biomédicas,DCBI-00433,Función Normal y Patológica II,L1,21373,LAB,104544509,CARLOS,GUSTAVO,BRESKY,RUIZ,bresky@ucn.cl
+202520,Depto. De Ciencias Biomédicas,DCBI-00433,Función Normal y Patológica II,T2,23684,TAL,150556570,DIEGO,OYVIND,ROJAS,GONZALEZ,diego@ucn.cl                            
+202520,Depto. De Ciencias Biomédicas,DCBI-00234,Histología II,C1,20732,CAT,115307428,JUAN,ANDRES,MADARIAGA,GATICA,madariaga@ucn.cl
+202520,Depto. De Ciencias Biomédicas,DCBI-00234,Histología II,T1,21378,TAL,115307428,JUAN,ANDRES,MADARIAGA,GATICA,madariaga@ucn.cl
+202520,Depto. De Ciencias Biomédicas,DCBI-00234,Histología II,L1,21377,LAB,115307428,JUAN,ANDRES,MADARIAGA,GATICA,madariaga@ucn.cl
+202520,Depto. De Ciencias Biomédicas,DCBI-00202,Integrado I,T1,20711,TAL,163889633,RUBEN,ALEJANDRO,MUNIZAGA,RAMIREZ,rmunizaga@ucn.cl
+202520,Depto. De Ciencias Biomédicas,DCBI-00408,Integrado II,T1,20722,TAL,165118138,GIANNELLA,VANESSA,LEONELLI,NEIRA,gleonelli@ucn.cl
+202520,Depto. De Ciencias Biomédicas,DCBI-00434,Microbiología y Parasitología,L1,21103,LAB,96851987,CECILIA,,BORQUEZ,ROMERO,cborquez@ucn.cl
+202520,Depto. De Ciencias Biomédicas,DCBI-00434,Microbiología y Parasitología,C1,20734,CAT,96851987,CECILIA,,BORQUEZ,ROMERO,cborquez@ucn.cl
+202520,Depto. De Ciencias Biomédicas,DCBI-00223,Módulo Integrador I,T1,21375,TAL,16687338K,VALENTINA,FERNANDA,RIVAS,GUAJARDO,valentina.guajardo@ucn.cl
+202520,Depto. De Ciencias Biomédicas,DCBI-00424,Módulo Integrador II,T1,20728,TAL,16687338K,VALENTINA,FERNANDA,RIVAS,GUAJARDO,valentina.guajardo@ucn.cl
+202520,Depto. De Ciencias Biomédicas,DCBI-00601,Nutrición y Actividad Física,C1,20723,CAT,142196220,ANDRES,ROLANDO,PEDREROS,LOBOS,apedreros@ucn.cl
+202520,Depto. De Ciencias Biomédicas,DCBI-00601,Nutrición y Actividad Física,T1,21368,TAL,142196220,ANDRES,ROLANDO,PEDREROS,LOBOS,apedreros@ucn.cl
+202520,Depto. De Ciencias Biomédicas,DCBI-00601,Nutrición y Actividad Física,CL1,21369,CLI,142196220,ANDRES,ROLANDO,PEDREROS,LOBOS,apedreros@ucn.cl
+202520,Depto. De Ciencias Biomédicas,DCBI-00235,Procesos Biológicos II,C1,20731,CAT,117708705,ERWIN,ADALI,DE LA FUENTE,ORTEGA,edelafuente@ucn.cl
+202520,Depto. De Ciencias Biomédicas,DCBI-00235,Procesos Biológicos II,L1,21372,LAB,117708705,ERWIN,ADALI,DE LA FUENTE,ORTEGA,edelafuente@ucn.cl
+202520,Depto. De Ciencias Biomédicas,DCBI-00203,Procesos Digestivos,T3,23689,TAL,133156003,LORENA,ANDREA,ORTEGA,PAIVA,lorena.ortega@ucn.cl
+202520,Depto. De Ciencias Biomédicas,DCBI-00203,Procesos Digestivos,T2,23688,TAL,13224698K,ANDREA,,PEDRERO,CISTERNA,apedrero@ucn.cl
+202520,Depto. De Ciencias Biomédicas,DCBI-00203,Procesos Digestivos,T1,21362,TAL,96851987,CECILIA,,BORQUEZ,ROMERO,cborquez@ucn.cl
+202520,Depto. De Ciencias Biomédicas,DCBI-00203,Procesos Digestivos,C1,20709,CAT,96851987,CECILIA,,BORQUEZ,ROMERO,cborquez@ucn.cl
+202520,Depto. De Ciencias Biomédicas,DCBI-00801,Seminario de Investigación II,T1,20724,TAL,163889633,RUBEN,ALEJANDRO,MUNIZAGA,RAMIREZ,rmunizaga@ucn.cl
+202520,Depto. De Ciencias Biomédicas,DCBI-00801,Seminario de Investigación II,TE1,21370,TER,163889633,RUBEN,ALEJANDRO,MUNIZAGA,RAMIREZ,rmunizaga@ucn.cl
+202520,Depto. De Clínicas,DCCL-00201,Actividad Física y Salud,L1,21316,LAB,176444665,GABRIEL,IGNACIO,FERNANDEZ,MARIN,gabriel.fernandez@ucn.cl
+202520,Depto. De Clínicas,DCCL-00201,Actividad Física y Salud,T1,21317,TAL,176444665,GABRIEL,IGNACIO,FERNANDEZ,MARIN,gabriel.fernandez@ucn.cl
+202520,Depto. De Clínicas,DCCL-00201,Actividad Física y Salud,C1,20744,CAT,176444665,GABRIEL,IGNACIO,FERNANDEZ,MARIN,gabriel.fernandez@ucn.cl
+202520,Depto. De Clínicas,DCCL-00604,Análisis Químico y Sensorial de Alimentos II,L1,21268,LAB,,,,,,
+202520,Depto. De Clínicas,DCCL-00604,Análisis Químico y Sensorial de Alimentos II,L2,23582,LAB,150553938,VIVIANA,LORETO,ARIAS,ARAYA,vlarias@ucn.cl
+202520,Depto. De Clínicas,DCCL-00604,Análisis Químico y Sensorial de Alimentos II,C1,20758,CAT,171117496,JUAN,MANUEL,SERIN,LOPEZ,jserin@ucn.cl
+202520,Depto. De Clínicas,DCCL-00633,Clínica del Adulto II,E,21099,CLI,158354152,CRISTIAN,EDUARDO,RODRIGUEZ,CONCHA,cristian.rodriguez@ucn.cl
+202520,Depto. De Clínicas,DCCL-00633,Clínica del Adulto II,L,21098,LAB,158354152,CRISTIAN,EDUARDO,RODRIGUEZ,CONCHA,cristian.rodriguez@ucn.cl
+202520,Depto. De Clínicas,DCCL-00633,Clínica del Adulto II,C,20739,CAT,158354152,CRISTIAN,EDUARDO,RODRIGUEZ,CONCHA,cristian.rodriguez@ucn.cl
+202520,Depto. De Clínicas,DCCL-00834,Clínica del Adulto IV,E,21093,CLI,,,,,,
+202520,Depto. De Clínicas,DCCL-00834,Clínica del Adulto IV,C,20741,CAT,77782915,CARLOS,FERNANDO,SOTO,VIDAL,cfsoto@ucn.cl
+202520,Depto. De Clínicas,DCCL-00834,Clínica del Adulto IV,L,21092,LAB,,,,,,
+202520,Depto. De Clínicas,DCCL-00007,Cuidados de Enfermería Asociados a la Prevención y Control de Infecciones,T1,24031,TAL,163073412,RUBEN,CARLOS,POLANCO,HUERTA,rpolanco@ucn.cl
+202520,Depto. De Clínicas,DCCL-00007,Cuidados de Enfermería Asociados a la Prevención y Control de Infecciones,C1,24030,CAT,163073412,RUBEN,CARLOS,POLANCO,HUERTA,rpolanco@ucn.cl
+202520,Depto. De Clínicas,DCCL-00423,Cuidados de Enfermería del Adulto y Adulto Mayor,E2,23418,CLI,145284619,VIVIAN,JEANNETTE,BINVIGNAT,FLORES,vbinvignat@ucn.cl
+202520,Depto. De Clínicas,DCCL-00423,Cuidados de Enfermería del Adulto y Adulto Mayor,T,21108,TAL,145284619,VIVIAN,JEANNETTE,BINVIGNAT,FLORES,vbinvignat@ucn.cl
+202520,Depto. De Clínicas,DCCL-00423,Cuidados de Enfermería del Adulto y Adulto Mayor,L,21107,LAB,145284619,VIVIAN,JEANNETTE,BINVIGNAT,FLORES,vbinvignat@ucn.cl
+202520,Depto. De Clínicas,DCCL-00423,Cuidados de Enfermería del Adulto y Adulto Mayor,E1,21105,CLI,145284619,VIVIAN,JEANNETTE,BINVIGNAT,FLORES,vbinvignat@ucn.cl
+202520,Depto. De Clínicas,DCCL-00423,Cuidados de Enfermería del Adulto y Adulto Mayor,A,21104,AYU,145284619,VIVIAN,JEANNETTE,BINVIGNAT,FLORES,vbinvignat@ucn.cl
+202520,Depto. De Clínicas,DCCL-00423,Cuidados de Enfermería del Adulto y Adulto Mayor,C,20764,CAT,145284619,VIVIAN,JEANNETTE,BINVIGNAT,FLORES,vbinvignat@ucn.cl
+202520,Depto. De Clínicas,DCCL-01033,Derecho y Práctica Médica,T,21096,TAL,153589453,MELANIE,MURIEL,FRERES,HELLEBAUT,melanie.freres@ucn.cl
+202520,Depto. De Clínicas,DCCL-01033,Derecho y Práctica Médica,C,20876,CAT,153589453,MELANIE,MURIEL,FRERES,HELLEBAUT,melanie.freres@ucn.cl
+202520,Depto. De Clínicas,DCCL-00402,Desarrollo Sensoriomotor,E1,21318,CLI,103615321,MONICA,,SCARAMELLI,MELO,mscaramelli@ucn.cl
+202520,Depto. De Clínicas,DCCL-00402,Desarrollo Sensoriomotor,T1,21319,TAL,103615321,MONICA,,SCARAMELLI,MELO,mscaramelli@ucn.cl
+202520,Depto. De Clínicas,DCCL-00402,Desarrollo Sensoriomotor,C1,20748,CAT,103615321,MONICA,,SCARAMELLI,MELO,mscaramelli@ucn.cl
+202520,Depto. De Clínicas,DCCL-00801,Dietoterapia Materno Infanto-Juvenil,E1,21271,CLI,18300235K,VALERIA,PATRICIA,FUENTES,ALFARO,valeria.fuentes@ce.ucn.cl
+202520,Depto. De Clínicas,DCCL-00801,Dietoterapia Materno Infanto-Juvenil,L1,21269,LAB,18300235K,VALERIA,PATRICIA,FUENTES,ALFARO,valeria.fuentes@ce.ucn.cl
+202520,Depto. De Clínicas,DCCL-00801,Dietoterapia Materno Infanto-Juvenil,C1,20755,CAT,18300235K,VALERIA,PATRICIA,FUENTES,ALFARO,valeria.fuentes@ce.ucn.cl
+202520,Depto. De Clínicas,DCCL-00801,Dietoterapia Materno Infanto-Juvenil,T1,21270,TAL,18300235K,VALERIA,PATRICIA,FUENTES,ALFARO,valeria.fuentes@ce.ucn.cl
+202520,Depto. De Clínicas,DCCL-00607,Dietoterapia del Adulto y Adulto Mayor,T1,21264,TAL,171649986,ANDREA,CONSTANZA,MUÑOZ,FUENTES,amunozf@ucn.cl
+202520,Depto. De Clínicas,DCCL-00607,Dietoterapia del Adulto y Adulto Mayor,L1,21263,LAB,171649986,ANDREA,CONSTANZA,MUÑOZ,FUENTES,amunozf@ucn.cl
+202520,Depto. De Clínicas,DCCL-00607,Dietoterapia del Adulto y Adulto Mayor,C1,20761,CAT,171649986,ANDREA,CONSTANZA,MUÑOZ,FUENTES,amunozf@ucn.cl
+202520,Depto. De Clínicas,DCCL-00607,Dietoterapia del Adulto y Adulto Mayor,E1,21265,CLI,171649986,ANDREA,CONSTANZA,MUÑOZ,FUENTES,amunozf@ucn.cl
+202520,Depto. De Clínicas,DCCL-00424,Enfermería y Autocuidado en Salud Mental,C,20765,CAT,162035223,SANDRA,ANDREA,ALFARO,ROJAS,sandra.alfaro@ce.ucn.cl
+202520,Depto. De Clínicas,DCCL-00424,Enfermería y Autocuidado en Salud Mental,T1,21388,TAL,170259874,NATALIA,ALEJANDRA,MOLINA,ROSALES,natalia.molina@ce.ucn.cl
+202520,Depto. De Clínicas,DCCL-00424,Enfermería y Autocuidado en Salud Mental,T2,23033,TAL,162035223,SANDRA,ANDREA,ALFARO,ROJAS,sandra.alfaro@ce.ucn.cl
+202520,Depto. De Clínicas,DCCL-00424,Enfermería y Autocuidado en Salud Mental,E2,23420,CLI,,,,,,
+202520,Depto. De Clínicas,DCCL-00424,Enfermería y Autocuidado en Salud Mental,T3,23034,TAL,189234562,BASTHIAN,ANTONIO,CORTES,RIVERA,basthian.cortes@ce.ucn.cl
+202520,Depto. De Clínicas,DCCL-00424,Enfermería y Autocuidado en Salud Mental,E,21389,CLI,,,,,,
+202520,Depto. De Clínicas,DCCL-00600,Entrenamiento Físico y Rehabilitación,T1,21343,TAL,145915287,RODRIGO,ALEJANDRO,GONZALEZ,GUAMAN,rgonzalezg@ucn.cl
+202520,Depto. De Clínicas,DCCL-00600,Entrenamiento Físico y Rehabilitación,C1,20752,CAT,145915287,RODRIGO,ALEJANDRO,GONZALEZ,GUAMAN,rgonzalezg@ucn.cl
+202520,Depto. De Clínicas,DCCL-00600,Entrenamiento Físico y Rehabilitación,TE1,21344,TER,145915287,RODRIGO,ALEJANDRO,GONZALEZ,GUAMAN,rgonzalezg@ucn.cl
+202520,Depto. De Clínicas,DCCL-00605,Evaluación Nutricional Materno Infanto-Juvenil,T1,21266,TAL,165118138,GIANNELLA,VANESSA,LEONELLI,NEIRA,gleonelli@ucn.cl
+202520,Depto. De Clínicas,DCCL-00605,Evaluación Nutricional Materno Infanto-Juvenil,C1,20757,CAT,165118138,GIANNELLA,VANESSA,LEONELLI,NEIRA,gleonelli@ucn.cl
+202520,Depto. De Clínicas,DCCL-00605,Evaluación Nutricional Materno Infanto-Juvenil,E1,21267,CLI,165118138,GIANNELLA,VANESSA,LEONELLI,NEIRA,gleonelli@ucn.cl
+202520,Depto. De Clínicas,DCCL-00223,Fundamentos de Enfermería,C,20763,CAT,126194080,ANA,MARIA,GONZALEZ,GERALDO,amgonzalez@ucn.cl
+202520,Depto. De Clínicas,DCCL-00223,Fundamentos de Enfermería,L,21101,LAB,126194080,ANA,MARIA,GONZALEZ,GERALDO,amgonzalez@ucn.cl
+202520,Depto. De Clínicas,DCCL-00223,Fundamentos de Enfermería,T1,21102,TAL,126194080,ANA,MARIA,GONZALEZ,GERALDO,amgonzalez@ucn.cl
+202520,Depto. De Clínicas,DCCL-00223,Fundamentos de Enfermería,A,21100,AYU,,,,,,
+202520,Depto. De Clínicas,DCCL-00223,Fundamentos de Enfermería,T3,23415,TAL,126194080,ANA,MARIA,GONZALEZ,GERALDO,amgonzalez@ucn.cl
+202520,Depto. De Clínicas,DCCL-00223,Fundamentos de Enfermería,T4,23417,TAL,126194080,ANA,MARIA,GONZALEZ,GERALDO,amgonzalez@ucn.cl
+202520,Depto. De Clínicas,DCCL-00223,Fundamentos de Enfermería,T5,23466,TAL,126194080,ANA,MARIA,GONZALEZ,GERALDO,amgonzalez@ucn.cl
+202520,Depto. De Clínicas,DCCL-00223,Fundamentos de Enfermería,T2,23414,TAL,126194080,ANA,MARIA,GONZALEZ,GERALDO,amgonzalez@ucn.cl
+202520,Depto. De Clínicas,DCCL-10272,Gestión del Cuidado en Enfermería en el Paciente Crítico Adulto,T1,23439,TAL,163073412,RUBEN,CARLOS,POLANCO,HUERTA,rpolanco@ucn.cl
+202520,Depto. De Clínicas,DCCL-10272,Gestión del Cuidado en Enfermería en el Paciente Crítico Adulto,C1,23438,CAT,163073412,RUBEN,CARLOS,POLANCO,HUERTA,rpolanco@ucn.cl
+202520,Depto. De Clínicas,DCCL-00836,Integración Clínica,T,21337,TAL,185017818,CATALINA,ALICIA,ZAMORANO,SAAVEDRA,
+202520,Depto. De Clínicas,DCCL-00606,Integrado III,T1,20760,TAL,171649986,ANDREA,CONSTANZA,MUÑOZ,FUENTES,amunozf@ucn.cl
+202520,Depto. De Clínicas,DCCL-00802,Integrado IV,T,20759,TAL,138759105,CLAUDIA,ALEJANDRA,BUGUENO,ARAYA,cbugueno@ucn.cl
+202520,Depto. De Clínicas,DCCL-01133,Internado Cirugía,T4,22246,TAL,,,,,,
+202520,Depto. De Clínicas,DCCL-01133,Internado Cirugía,E5,22371,CLI,173095643,LORENA,ALICIA,SANCHEZ,ORMAZABAL,lorena.sanchez@ucn.cl
+202520,Depto. De Clínicas,DCCL-01133,Internado Cirugía,E4,22245,CLI,173095643,LORENA,ALICIA,SANCHEZ,ORMAZABAL,lorena.sanchez@ucn.cl
+202520,Depto. De Clínicas,DCCL-01133,Internado Cirugía,E1,22048,CLI,173095643,LORENA,ALICIA,SANCHEZ,ORMAZABAL,lorena.sanchez@ucn.cl
+202520,Depto. De Clínicas,DCCL-01133,Internado Cirugía,E2,22003,CLI,173095643,LORENA,ALICIA,SANCHEZ,ORMAZABAL,lorena.sanchez@ucn.cl
+202520,Depto. De Clínicas,DCCL-01133,Internado Cirugía,E3,21639,CLI,173095643,LORENA,ALICIA,SANCHEZ,ORMAZABAL,lorena.sanchez@ucn.cl
+202520,Depto. De Clínicas,DCCL-01133,Internado Cirugía,T3,22244,TAL,,,,,,
+202520,Depto. De Clínicas,DCCL-01133,Internado Cirugía,T2,22004,TAL,,,,,,
+202520,Depto. De Clínicas,DCCL-01133,Internado Cirugía,T1,21640,TAL,,,,,,
+202520,Depto. De Clínicas,DCCL-01133,Internado Cirugía,E7,22375,CLI,173095643,LORENA,ALICIA,SANCHEZ,ORMAZABAL,lorena.sanchez@ucn.cl
+202520,Depto. De Clínicas,DCCL-01133,Internado Cirugía,T7,22376,TAL,,,,,,
+202520,Depto. De Clínicas,DCCL-01133,Internado Cirugía,T5,22372,TAL,,,,,,
+202520,Depto. De Clínicas,DCCL-09103,Internado Clínico Adulto y Adulto Mayor,E1,20893,CLI,168931344,VALESKA,MARIANCHY,GUZMAN,GONZALEZ,valeska.guzman@ucn.cl
+202520,Depto. De Clínicas,DCCL-09101,Internado Clínico Materno-Infantil,E1,20892,CLI,138759105,CLAUDIA,ALEJANDRA,BUGUENO,ARAYA,cbugueno@ucn.cl
+202520,Depto. De Clínicas,DCCL-01333,Internado Especialidad Básica Electiva,E2,22018,CLI,92472795,MARCELA,,MAUREIRA,LEIVA,maureira@ucn.cl
+202520,Depto. De Clínicas,DCCL-01333,Internado Especialidad Básica Electiva,T1,21115,TAL,,,,,,
+202520,Depto. De Clínicas,DCCL-01333,Internado Especialidad Básica Electiva,E1,22047,CLI,92472795,MARCELA,,MAUREIRA,LEIVA,maureira@ucn.cl
+202520,Depto. De Clínicas,DCCL-01333,Internado Especialidad Básica Electiva,T2,22019,TAL,,,,,,
+202520,Depto. De Clínicas,DCCL-01334,Internado Especialidad Libre,E2,22020,CLI,92472795,MARCELA,,MAUREIRA,LEIVA,maureira@ucn.cl
+202520,Depto. De Clínicas,DCCL-01334,Internado Especialidad Libre,T2,22021,TAL,,,,,,
+202520,Depto. De Clínicas,DCCL-01334,Internado Especialidad Libre,E1,21116,CLI,92472795,MARCELA,,MAUREIRA,LEIVA,maureira@ucn.cl
+202520,Depto. De Clínicas,DCCL-01334,Internado Especialidad Libre,T1,21117,TAL,,,,,,
+202520,Depto. De Clínicas,DCCL-01335,Internado Especialidades Obligatorios,E1,21118,CLI,105928351,MAURICIO,,MAUREIRA,ALFARO,mmaureiraa@ucn.cl
+202520,Depto. De Clínicas,DCCL-01335,Internado Especialidades Obligatorios,E2,22022,CLI,105928351,MAURICIO,,MAUREIRA,ALFARO,mmaureiraa@ucn.cl
+202520,Depto. De Clínicas,DCCL-01335,Internado Especialidades Obligatorios,T1,21119,TAL,,,,,,
+202520,Depto. De Clínicas,DCCL-01335,Internado Especialidades Obligatorios,T2,22023,TAL,,,,,,
+202520,Depto. De Clínicas,DCCL-01134,Internado Medicina Interna,E6,22011,CLI,16661466K,KARINA,LORETO ALEJANDRA,OSORIO,JERIA,karina.osorio@ce.ucn.cl
+202520,Depto. De Clínicas,DCCL-01134,Internado Medicina Interna,E2,21996,CLI,185805387,KARINA,SOLEDAD,CORTES,CACERES,karina.cortes@ce.ucn.cl
+202520,Depto. De Clínicas,DCCL-01134,Internado Medicina Interna,E5,22009,CLI,185805387,KARINA,SOLEDAD,CORTES,CACERES,karina.cortes@ce.ucn.cl
+202520,Depto. De Clínicas,DCCL-01134,Internado Medicina Interna,E3,21998,CLI,16661466K,KARINA,LORETO ALEJANDRA,OSORIO,JERIA,karina.osorio@ce.ucn.cl
+202520,Depto. De Clínicas,DCCL-01134,Internado Medicina Interna,T5,22010,TAL,,,,,,
+202520,Depto. De Clínicas,DCCL-01134,Internado Medicina Interna,T1,21638,TAL,,,,,,
+202520,Depto. De Clínicas,DCCL-01134,Internado Medicina Interna,T2,21997,TAL,,,,,,
+202520,Depto. De Clínicas,DCCL-01134,Internado Medicina Interna,E4,22005,CLI,135194883,CLAUDIA,ALEJANDRA,BARRIA,ALBERDI,
+202520,Depto. De Clínicas,DCCL-01134,Internado Medicina Interna,E1,21637,CLI,135194883,CLAUDIA,ALEJANDRA,BARRIA,ALBERDI,
+202520,Depto. De Clínicas,DCCL-01134,Internado Medicina Interna,T3,21999,TAL,,,,,,
+202520,Depto. De Clínicas,DCCL-01134,Internado Medicina Interna,T4,22006,TAL,,,,,,
+202520,Depto. De Clínicas,DCCL-01134,Internado Medicina Interna,T6,22013,TAL,,,,,,
+202520,Depto. De Clínicas,DCCL-91020,Internado Nivel Secundario Hospital,E1,20900,CLI,173308051,JOAN,MANUEL,LOPEZ,DUARTE,joan.lopez@ucn.cl
+202520,Depto. De Clínicas,DCCL-91020,Internado Nivel Secundario Hospital,E2,23152,CLI,173308051,JOAN,MANUEL,LOPEZ,DUARTE,joan.lopez@ucn.cl
+202520,Depto. De Clínicas,DCCL-01233,Internado Obstetricia y Ginecología,T3,22015,TAL,,,,,,
+202520,Depto. De Clínicas,DCCL-01233,Internado Obstetricia y Ginecología,T5,22374,TAL,,,,,,
+202520,Depto. De Clínicas,DCCL-01233,Internado Obstetricia y Ginecología,E2,22000,CLI,76356157,FABIAN,ENRIQUE,CORTES,ROCO,
+202520,Depto. De Clínicas,DCCL-01233,Internado Obstetricia y Ginecología,E5,22373,CLI,76356157,FABIAN,ENRIQUE,CORTES,ROCO,
+202520,Depto. De Clínicas,DCCL-01233,Internado Obstetricia y Ginecología,E1,21633,CLI,97815712,ROBERTO,,HENRIQUEZ,ANDREU,
+202520,Depto. De Clínicas,DCCL-01233,Internado Obstetricia y Ginecología,E3,22014,CLI,97815712,ROBERTO,,HENRIQUEZ,ANDREU,
+202520,Depto. De Clínicas,DCCL-01233,Internado Obstetricia y Ginecología,E4,22016,CLI,90533835,CESAR,EDGARDO,LORCA,ESPINOZA,cesar.lorca@ucn.cl
+202520,Depto. De Clínicas,DCCL-01233,Internado Obstetricia y Ginecología,E6,22369,CLI,90533835,CESAR,EDGARDO,LORCA,ESPINOZA,cesar.lorca@ucn.cl
+202520,Depto. De Clínicas,DCCL-01233,Internado Obstetricia y Ginecología,T2,22001,TAL,,,,,,
+202520,Depto. De Clínicas,DCCL-01233,Internado Obstetricia y Ginecología,T4,22017,TAL,,,,,,
+202520,Depto. De Clínicas,DCCL-01233,Internado Obstetricia y Ginecología,T6,22370,TAL,,,,,,
+202520,Depto. De Clínicas,DCCL-01233,Internado Obstetricia y Ginecología,T1,21634,TAL,,,,,,
+202520,Depto. De Clínicas,DCCL-01234,Internado Pediatría,E2,22046,CLI,171747163,CINTHIA,VALENTINA,CARVAJAL,SIRVENT,cinthia.carvajal@ce.ucn.cl
+202520,Depto. De Clínicas,DCCL-01234,Internado Pediatría,T1,21636,TAL,,,,,,
+202520,Depto. De Clínicas,DCCL-01234,Internado Pediatría,T2,22002,TAL,,,,,,
+202520,Depto. De Clínicas,DCCL-01234,Internado Pediatría,E1,21635,CLI,171747163,CINTHIA,VALENTINA,CARVAJAL,SIRVENT,cinthia.carvajal@ce.ucn.cl
+202520,Depto. De Clínicas,DCCL-01023,Internado Profesional Nivel Secundario Terciario,S,23437,SUP,126194080,ANA,MARIA,GONZALEZ,GERALDO,amgonzalez@ucn.cl
+202520,Depto. De Clínicas,DCCL-01023,Internado Profesional Nivel Secundario Terciario,E,23436,CLI,126194080,ANA,MARIA,GONZALEZ,GERALDO,amgonzalez@ucn.cl
+202520,Depto. De Clínicas,DCCL-01023,Internado Profesional Nivel Secundario Terciario,S1,21866,SUP,126194080,ANA,MARIA,GONZALEZ,GERALDO,amgonzalez@ucn.cl
+202520,Depto. De Clínicas,DCCL-01023,Internado Profesional Nivel Secundario Terciario,E1,21865,CLI,126194080,ANA,MARIA,GONZALEZ,GERALDO,amgonzalez@ucn.cl
+202520,Depto. De Clínicas,DCCL-91030,Internado Rehabilitación,E2,23153,CLI,150355648,ANDREA,JOSE,CHINGA,ANDREANI,achinga@ucn.cl
+202520,Depto. De Clínicas,DCCL-91030,Internado Rehabilitación,E1,20901,CLI,150355648,ANDREA,JOSE,CHINGA,ANDREANI,achinga@ucn.cl
+202520,Depto. De Clínicas,DCCL-91010,Internado de Especialidades Kinésicas,E2,23132,CLI,150355648,ANDREA,JOSE,CHINGA,ANDREANI,achinga@ucn.cl
+202520,Depto. De Clínicas,DCCL-91010,Internado de Especialidades Kinésicas,E1,20899,CLI,150355648,ANDREA,JOSE,CHINGA,ANDREANI,achinga@ucn.cl
+202520,Depto. De Clínicas,DCCL-00233,Introducción a la Medicina II,T,21332,TAL,84018627,OSCAR,ARMANDO,ALARCON,PEREDO,oalarcon@ucn.cl
+202520,Depto. De Clínicas,DCCL-00233,Introducción a la Medicina II,T3,23639,TAL,84018627,OSCAR,ARMANDO,ALARCON,PEREDO,oalarcon@ucn.cl
+202520,Depto. De Clínicas,DCCL-00233,Introducción a la Medicina II,T2,23638,TAL,84018627,OSCAR,ARMANDO,ALARCON,PEREDO,oalarcon@ucn.cl
+202520,Depto. De Clínicas,DCCL-00233,Introducción a la Medicina II,C,20736,CAT,84018627,OSCAR,ARMANDO,ALARCON,PEREDO,oalarcon@ucn.cl
+202520,Depto. De Clínicas,DCCL-00233,Introducción a la Medicina II,T6,23642,TAL,84018627,OSCAR,ARMANDO,ALARCON,PEREDO,oalarcon@ucn.cl
+202520,Depto. De Clínicas,DCCL-00233,Introducción a la Medicina II,T5,23641,TAL,84018627,OSCAR,ARMANDO,ALARCON,PEREDO,oalarcon@ucn.cl
+202520,Depto. De Clínicas,DCCL-00233,Introducción a la Medicina II,T4,23640,TAL,84018627,OSCAR,ARMANDO,ALARCON,PEREDO,oalarcon@ucn.cl
+202520,Depto. De Clínicas,DCCL-00601,Kinesiterapia Traumatológica,T1,21323,TAL,170190378,RENE,EDUARDO,BUSTAMANTE,DE LA FUENTE,rebustamante@ucn.cl
+202520,Depto. De Clínicas,DCCL-00601,Kinesiterapia Traumatológica,E1,21322,CLI,170190378,RENE,EDUARDO,BUSTAMANTE,DE LA FUENTE,rebustamante@ucn.cl
+202520,Depto. De Clínicas,DCCL-00601,Kinesiterapia Traumatológica,C1,20753,CAT,170190378,RENE,EDUARDO,BUSTAMANTE,DE LA FUENTE,rebustamante@ucn.cl
+202520,Depto. De Clínicas,DCCL-07003,Módulo Integrado Enfermería en Salud Infantil y Adolescente Nivel Secundario y Terciario de Atención,E3,23428,CLI,170169352,CAROL,ELIZABETH,GONZALEZ,AROCA,carol.gonzalez@ce.ucn.cl
+202520,Depto. De Clínicas,DCCL-07003,Módulo Integrado Enfermería en Salud Infantil y Adolescente Nivel Secundario y Terciario de Atención,E2,23427,CLI,170169352,CAROL,ELIZABETH,GONZALEZ,AROCA,carol.gonzalez@ce.ucn.cl
+202520,Depto. De Clínicas,DCCL-07003,Módulo Integrado Enfermería en Salud Infantil y Adolescente Nivel Secundario y Terciario de Atención,C,20681,CAT,170169352,CAROL,ELIZABETH,GONZALEZ,AROCA,carol.gonzalez@ce.ucn.cl
+202520,Depto. De Clínicas,DCCL-07003,Módulo Integrado Enfermería en Salud Infantil y Adolescente Nivel Secundario y Terciario de Atención,E,21111,CLI,170169352,CAROL,ELIZABETH,GONZALEZ,AROCA,carol.gonzalez@ce.ucn.cl
+202520,Depto. De Clínicas,DCCL-07003,Módulo Integrado Enfermería en Salud Infantil y Adolescente Nivel Secundario y Terciario de Atención,A,23075,AYU,170169352,CAROL,ELIZABETH,GONZALEZ,AROCA,carol.gonzalez@ce.ucn.cl
+202520,Depto. De Clínicas,DCCL-07003,Módulo Integrado Enfermería en Salud Infantil y Adolescente Nivel Secundario y Terciario de Atención,T,21110,TAL,170169352,CAROL,ELIZABETH,GONZALEZ,AROCA,carol.gonzalez@ce.ucn.cl
+202520,Depto. De Clínicas,DCCL-00403,Módulo Integrado II: Bases de la Evaluación Kinésica,C1,20751,CAT,122143678,CAROLINA,MELANIA,NARANJO,DIAZ,cnaranjo@ucn.cl
+202520,Depto. De Clínicas,DCCL-00403,Módulo Integrado II: Bases de la Evaluación Kinésica,E1,21320,CLI,122143678,CAROLINA,MELANIA,NARANJO,DIAZ,cnaranjo@ucn.cl
+202520,Depto. De Clínicas,DCCL-00403,Módulo Integrado II: Bases de la Evaluación Kinésica,T1,21321,TAL,122143678,CAROLINA,MELANIA,NARANJO,DIAZ,cnaranjo@ucn.cl
+202520,Depto. De Clínicas,DCCL-00805,Módulo Integrado V: Intervención Pre-Clínica,C1,20754,CAT,165964985,CAROL,ANDREA,OLIVARES,QUIROGA,colivaresq@ucn.cl
+202520,Depto. De Clínicas,DCCL-00805,Módulo Integrado V: Intervención Pre-Clínica,E1,21347,CLI,165964985,CAROL,ANDREA,OLIVARES,QUIROGA,colivaresq@ucn.cl
+202520,Depto. De Clínicas,DCCL-00805,Módulo Integrado V: Intervención Pre-Clínica,T1,21348,TAL,165964985,CAROL,ANDREA,OLIVARES,QUIROGA,colivaresq@ucn.cl
+202520,Depto. De Clínicas,DCCL-07002,Módulo Integrado de Enfermería en Salud Infantil y Adolescente en el Nivel Primario de Atención,E,21780,CLI,107261869,CLAUDIA,ANDREA,VIDAL,ARANCIBIA,claudia.vidal@ce.ucn.cl
+202520,Depto. De Clínicas,DCCL-07002,Módulo Integrado de Enfermería en Salud Infantil y Adolescente en el Nivel Primario de Atención,E2,23424,CLI,107261869,CLAUDIA,ANDREA,VIDAL,ARANCIBIA,claudia.vidal@ce.ucn.cl
+202520,Depto. De Clínicas,DCCL-07002,Módulo Integrado de Enfermería en Salud Infantil y Adolescente en el Nivel Primario de Atención,A,21779,AYU,107261869,CLAUDIA,ANDREA,VIDAL,ARANCIBIA,claudia.vidal@ce.ucn.cl
+202520,Depto. De Clínicas,DCCL-07002,Módulo Integrado de Enfermería en Salud Infantil y Adolescente en el Nivel Primario de Atención,T,21778,TAL,107261869,CLAUDIA,ANDREA,VIDAL,ARANCIBIA,claudia.vidal@ce.ucn.cl
+202520,Depto. De Clínicas,DCCL-07002,Módulo Integrado de Enfermería en Salud Infantil y Adolescente en el Nivel Primario de Atención,C,21777,CAT,107261869,CLAUDIA,ANDREA,VIDAL,ARANCIBIA,claudia.vidal@ce.ucn.cl
+202520,Depto. De Clínicas,DCCL-07001,Módulo Integrado de Enfermería en Salud Materna y Neonatal,C,21773,CAT,170169352,CAROL,ELIZABETH,GONZALEZ,AROCA,carol.gonzalez@ce.ucn.cl
+202520,Depto. De Clínicas,DCCL-07001,Módulo Integrado de Enfermería en Salud Materna y Neonatal,E3,23426,CLI,170169352,CAROL,ELIZABETH,GONZALEZ,AROCA,carol.gonzalez@ce.ucn.cl
+202520,Depto. De Clínicas,DCCL-07001,Módulo Integrado de Enfermería en Salud Materna y Neonatal,E2,23425,CLI,170169352,CAROL,ELIZABETH,GONZALEZ,AROCA,carol.gonzalez@ce.ucn.cl
+202520,Depto. De Clínicas,DCCL-07001,Módulo Integrado de Enfermería en Salud Materna y Neonatal,E,21776,CLI,170169352,CAROL,ELIZABETH,GONZALEZ,AROCA,carol.gonzalez@ce.ucn.cl
+202520,Depto. De Clínicas,DCCL-07001,Módulo Integrado de Enfermería en Salud Materna y Neonatal,T,21774,TAL,170169352,CAROL,ELIZABETH,GONZALEZ,AROCA,carol.gonzalez@ce.ucn.cl
+202520,Depto. De Clínicas,DCCL-00624,Módulo Integrado de Enfermería en Salud del Adulto y Personas Mayores II,C,22873,CAT,173305737,CYNTHIA,FERNANDA,ABARCA,VIVANCO,cynthia.abarca@ucn.cl
+202520,Depto. De Clínicas,DCCL-00624,Módulo Integrado de Enfermería en Salud del Adulto y Personas Mayores II,T,22882,TAL,173305737,CYNTHIA,FERNANDA,ABARCA,VIVANCO,cynthia.abarca@ucn.cl
+202520,Depto. De Clínicas,DCCL-00624,Módulo Integrado de Enfermería en Salud del Adulto y Personas Mayores II,E2,22883,CLI,173305737,CYNTHIA,FERNANDA,ABARCA,VIVANCO,cynthia.abarca@ucn.cl
+202520,Depto. De Clínicas,DCCL-00624,Módulo Integrado de Enfermería en Salud del Adulto y Personas Mayores II,A,22884,AYU,173305737,CYNTHIA,FERNANDA,ABARCA,VIVANCO,cynthia.abarca@ucn.cl
+202520,Depto. De Clínicas,DCCL-00624,Módulo Integrado de Enfermería en Salud del Adulto y Personas Mayores II,E3,23423,CLI,173305737,CYNTHIA,FERNANDA,ABARCA,VIVANCO,cynthia.abarca@ucn.cl
+202520,Depto. De Clínicas,DCCL-00624,Módulo Integrado de Enfermería en Salud del Adulto y Personas Mayores II,E1,23422,CLI,173305737,CYNTHIA,FERNANDA,ABARCA,VIVANCO,cynthia.abarca@ucn.cl
+202520,Depto. De Clínicas,DCCL-00823,"Módulo Integrado de Enfermería en Urgencias, Emergencias y Desastres II",E,20768,CLI,163073412,RUBEN,CARLOS,POLANCO,HUERTA,rpolanco@ucn.cl
+202520,Depto. De Clínicas,DCCL-00823,"Módulo Integrado de Enfermería en Urgencias, Emergencias y Desastres II",E2,23432,CLI,163073412,RUBEN,CARLOS,POLANCO,HUERTA,rpolanco@ucn.cl
+202520,Depto. De Clínicas,DCCL-00823,"Módulo Integrado de Enfermería en Urgencias, Emergencias y Desastres II",E5,23435,CLI,163073412,RUBEN,CARLOS,POLANCO,HUERTA,rpolanco@ucn.cl
+202520,Depto. De Clínicas,DCCL-00823,"Módulo Integrado de Enfermería en Urgencias, Emergencias y Desastres II",E4,23434,CLI,163073412,RUBEN,CARLOS,POLANCO,HUERTA,rpolanco@ucn.cl
+202520,Depto. De Clínicas,DCCL-00823,"Módulo Integrado de Enfermería en Urgencias, Emergencias y Desastres II",T,21355,TAL,163073412,RUBEN,CARLOS,POLANCO,HUERTA,rpolanco@ucn.cl
+202520,Depto. De Clínicas,DCCL-00823,"Módulo Integrado de Enfermería en Urgencias, Emergencias y Desastres II",E3,23433,CLI,163073412,RUBEN,CARLOS,POLANCO,HUERTA,rpolanco@ucn.cl
+202520,Depto. De Clínicas,DCCL-00608,Neurología,T1,21350,TAL,103615321,MONICA,,SCARAMELLI,MELO,mscaramelli@ucn.cl
+202520,Depto. De Clínicas,DCCL-00608,Neurología,E1,21349,CLI,103615321,MONICA,,SCARAMELLI,MELO,mscaramelli@ucn.cl
+202520,Depto. De Clínicas,DCCL-00608,Neurología,C1,20749,CAT,103615321,MONICA,,SCARAMELLI,MELO,mscaramelli@ucn.cl
+202520,Depto. De Clínicas,DCCL-01034,Obstetricia y Ginecología,C,20742,CAT,180020926,VALENTINA,ANDREA,ARDILES,VEGA,valentina.ardiles@ce.ucn.cl
+202520,Depto. De Clínicas,DCCL-01034,Obstetricia y Ginecología,T,21094,TAL,180020926,VALENTINA,ANDREA,ARDILES,VEGA,valentina.ardiles@ce.ucn.cl
+202520,Depto. De Clínicas,DCCL-01034,Obstetricia y Ginecología,E,21095,CLI,180020926,VALENTINA,ANDREA,ARDILES,VEGA,valentina.ardiles@ce.ucn.cl
+202520,Depto. De Clínicas,DCCL-00404,Patología,T1,21122,TAL,161111449,VICTORIA,MAGDALENA,SEGOVIA,ROJAS,vsegoviag@ucn.cl
+202520,Depto. De Clínicas,DCCL-00404,Patología,C1,20750,CAT,161111449,VICTORIA,MAGDALENA,SEGOVIA,ROJAS,vsegoviag@ucn.cl
+202520,Depto. De Clínicas,DCCL-00404,Patología,T2,23187,TAL,161111449,VICTORIA,MAGDALENA,SEGOVIA,ROJAS,vsegoviag@ucn.cl
+202520,Depto. De Clínicas,DCCL-00933,Pediatría,C,21646,CAT,163644681,CAMILA,BELEN VALENTINA,MUÑOZ,LOPEZ,camila.munoz@ce.ucn.cl
+202520,Depto. De Clínicas,DCCL-00933,Pediatría,E,21647,CLI,163644681,CAMILA,BELEN VALENTINA,MUÑOZ,LOPEZ,camila.munoz@ce.ucn.cl
+202520,Depto. De Clínicas,DCCL-00835,Psicopatología II,C,20740,CAT,108649968,DANIELA,LILIANA,DE LA FUENTE,GALDAMES,delafuente@ucn.cl
+202520,Depto. De Clínicas,DCCL-00835,Psicopatología II,T,21336,TAL,108649968,DANIELA,LILIANA,DE LA FUENTE,GALDAMES,delafuente@ucn.cl
+202520,Depto. De Clínicas,DCCL-01035,Psiquiatría II,C,20743,CAT,10129174K,EMILIA,ALEJANDRA,MONSALVE,SALAZAR,emilia.monsalve@ucn.cl
+202520,Depto. De Clínicas,DCCL-01035,Psiquiatría II,T,21338,TAL,10129174K,EMILIA,ALEJANDRA,MONSALVE,SALAZAR,emilia.monsalve@ucn.cl
+202520,Depto. De Clínicas,DCCL-00808,Rehabilitación Musculoesquelética II,E1,21382,CLI,74404758,ALEJANDRO,RICARDO,JORRATT,LUNA,ajorratt@ucn.cl
+202520,Depto. De Clínicas,DCCL-00808,Rehabilitación Musculoesquelética II,C2,21380,CAT,74404758,ALEJANDRO,RICARDO,JORRATT,LUNA,ajorratt@ucn.cl
+202520,Depto. De Clínicas,DCCL-00808,Rehabilitación Musculoesquelética II,T1,21381,TAL,74404758,ALEJANDRO,RICARDO,JORRATT,LUNA,ajorratt@ucn.cl
+202520,Depto. De Clínicas,DCCL-00623,Seguridad y Calidad de los Cuidados,C,20766,CAT,173305737,CYNTHIA,FERNANDA,ABARCA,VIVANCO,cynthia.abarca@ucn.cl
+202520,Depto. De Clínicas,DCCL-00623,Seguridad y Calidad de los Cuidados,T,21097,TAL,173305737,CYNTHIA,FERNANDA,ABARCA,VIVANCO,cynthia.abarca@ucn.cl
+202520,Depto. De Clínicas,DCCL-00824,Seminario de Investigación II,A,21311,AYU,145284619,VIVIAN,JEANNETTE,BINVIGNAT,FLORES,vbinvignat@ucn.cl
+202520,Depto. De Clínicas,DCCL-00824,Seminario de Investigación II,T,21312,TER,145284619,VIVIAN,JEANNETTE,BINVIGNAT,FLORES,vbinvignat@ucn.cl
+202520,Depto. De Clínicas,DCCL-00433,Semiología,C,20737,CAT,185017818,CATALINA,ALICIA,ZAMORANO,SAAVEDRA,
+202520,Depto. De Clínicas,DCCL-00433,Semiología,L,21333,LAB,185017818,CATALINA,ALICIA,ZAMORANO,SAAVEDRA,
+202520,Depto. De Clínicas,DCCL-00433,Semiología,E,21334,CLI,185017818,CATALINA,ALICIA,ZAMORANO,SAAVEDRA,
+202520,Depto. De Clínicas,DCCL-00807,Trabajo de Grado II,S1,20746,SUP,145915287,RODRIGO,ALEJANDRO,GONZALEZ,GUAMAN,rgonzalezg@ucn.cl
+202520,Depto. De Clínicas,DCCL-00401,Técnicas Culinarias,T1,21261,TAL,155640596,PAULA,ALEJANDRA,GONZALEZ,CATALAN,paula.gonzalez@ce.ucn.cl
+202520,Depto. De Clínicas,DCCL-00401,Técnicas Culinarias,L1,21262,LAB,155640596,PAULA,ALEJANDRA,GONZALEZ,CATALAN,paula.gonzalez@ce.ucn.cl
+202520,Depto. De Clínicas,DCCL-00401,Técnicas Culinarias,C1,20756,CAT,155640596,PAULA,ALEJANDRA,GONZALEZ,CATALAN,paula.gonzalez@ce.ucn.cl
+202520,Depto. De Clínicas,DCCL-00609,Técnicas Kinésicas II: Cardiorrespiratorio,T1,21341,TAL,161111449,VICTORIA,MAGDALENA,SEGOVIA,ROJAS,vsegoviag@ucn.cl
+202520,Depto. De Clínicas,DCCL-00609,Técnicas Kinésicas II: Cardiorrespiratorio,E1,21339,CLI,161111449,VICTORIA,MAGDALENA,SEGOVIA,ROJAS,vsegoviag@ucn.cl
+202520,Depto. De Clínicas,DCCL-00609,Técnicas Kinésicas II: Cardiorrespiratorio,C1,20745,CAT,161111449,VICTORIA,MAGDALENA,SEGOVIA,ROJAS,vsegoviag@ucn.cl
+202520,Depto. De Clínicas,DCCL-00806,Técnicas Kinésicas IV: Ejercicio Terapéutico en Alteraciones del Movimiento,E1,21313,CLI,169603308,HILDA,IVANIA,ARAVENA,PAEZ,haravena@ucn.cl
+202520,Depto. De Clínicas,DCCL-00806,Técnicas Kinésicas IV: Ejercicio Terapéutico en Alteraciones del Movimiento,T1,21346,TAL,169603308,HILDA,IVANIA,ARAVENA,PAEZ,haravena@ucn.cl
+202520,Depto. De Clínicas,DCCL-00806,Técnicas Kinésicas IV: Ejercicio Terapéutico en Alteraciones del Movimiento,C1,20747,CAT,169603308,HILDA,IVANIA,ARAVENA,PAEZ,haravena@ucn.cl
+202520,Depto. De Clínicas,DCCL-00634,Ética Médica I,C,20738,CAT,77782915,CARLOS,FERNANDO,SOTO,VIDAL,cfsoto@ucn.cl
+202520,Depto. De Clínicas,DCCL-00634,Ética Médica I,T,21335,TAL,77782915,CARLOS,FERNANDO,SOTO,VIDAL,cfsoto@ucn.cl
+202520,Depto. De Salud Pública,DCSP-00601,Administración en Salud y del Rubro Alimentario,T,21131,TAL,177218669,MARIANA,JEANNETTE,ARAYA,GUERRERO,mariana.araya@ucn.cl
+202520,Depto. De Salud Pública,DCSP-00601,Administración en Salud y del Rubro Alimentario,C,20677,CAT,177218669,MARIANA,JEANNETTE,ARAYA,GUERRERO,mariana.araya@ucn.cl
+202520,Depto. De Salud Pública,DCSP-00201,Bioestadística II,C2,20668,CAT,92069478,DOMINGO,.,LANCELLOTTI,GIGANTI,dlancell@ucn.cl
+202520,Depto. De Salud Pública,DCSP-00201,Bioestadística II,T2,21106,TAL,92069478,DOMINGO,.,LANCELLOTTI,GIGANTI,dlancell@ucn.cl
+202520,Depto. De Salud Pública,DCSP-00201,Bioestadística II,C1,21627,CAT,92069478,DOMINGO,.,LANCELLOTTI,GIGANTI,dlancell@ucn.cl
+202520,Depto. De Salud Pública,DCSP-00201,Bioestadística II,T1,21628,TAL,92069478,DOMINGO,.,LANCELLOTTI,GIGANTI,dlancell@ucn.cl
+202520,Depto. De Salud Pública,DCSP-00201,Bioestadística II,T7,23053,TAL,92069478,DOMINGO,.,LANCELLOTTI,GIGANTI,dlancell@ucn.cl
+202520,Depto. De Salud Pública,DCSP-00201,Bioestadística II,T3,23049,TAL,92069478,DOMINGO,.,LANCELLOTTI,GIGANTI,dlancell@ucn.cl
+202520,Depto. De Salud Pública,DCSP-00201,Bioestadística II,T4,23050,TAL,92069478,DOMINGO,.,LANCELLOTTI,GIGANTI,dlancell@ucn.cl
+202520,Depto. De Salud Pública,DCSP-00201,Bioestadística II,T5,23051,TAL,92069478,DOMINGO,.,LANCELLOTTI,GIGANTI,dlancell@ucn.cl
+202520,Depto. De Salud Pública,DCSP-00201,Bioestadística II,T6,23052,TAL,92069478,DOMINGO,.,LANCELLOTTI,GIGANTI,dlancell@ucn.cl
+202520,Depto. De Salud Pública,DCSP-00201,Bioestadística II,C3,23048,CAT,92069478,DOMINGO,.,LANCELLOTTI,GIGANTI,dlancell@ucn.cl
+202520,Depto. De Salud Pública,DCSP-00401,Diagnóstico de Salud Participativo,C2,20673,CAT,65678071,LUISA,CLARA,VERGARA,TEJADA,lcvergara@ucn.cl
+202520,Depto. De Salud Pública,DCSP-00401,Diagnóstico de Salud Participativo,TE2,21310,TER,65678071,LUISA,CLARA,VERGARA,TEJADA,lcvergara@ucn.cl
+202520,Depto. De Salud Pública,DCSP-00401,Diagnóstico de Salud Participativo,TE1,21309,TER,80711476,PATRICIA,ELIANA,KANACRI,REINES,pkanacri@ucn.cl
+202520,Depto. De Salud Pública,DCSP-00401,Diagnóstico de Salud Participativo,TE3,21644,TER,18923290K,FRANCISCA,CONSTANZA,TORREALBA,SILVA,
+202520,Depto. De Salud Pública,DCSP-00401,Diagnóstico de Salud Participativo,C1,20672,CAT,80711476,PATRICIA,ELIANA,KANACRI,REINES,pkanacri@ucn.cl
+202520,Depto. De Salud Pública,DCSP-00401,Diagnóstico de Salud Participativo,C3,21643,CAT,18923290K,FRANCISCA,CONSTANZA,TORREALBA,SILVA,
+202520,Depto. De Salud Pública,DCSP-00533,Educación para la Salud,C1,21327,CAT,,,,,,
+202520,Depto. De Salud Pública,DCSP-00533,Educación para la Salud,T3,21328,TAL,,,,,,
+202520,Depto. De Salud Pública,DCSP-01033,Emergencias y Desastres,T3,23445,TER,98464042,MURIEL,MILLARAY,RAMIREZ,SANTANA,mramirezs@ucn.cl
+202520,Depto. De Salud Pública,DCSP-01033,Emergencias y Desastres,T7,23449,TER,98464042,MURIEL,MILLARAY,RAMIREZ,SANTANA,mramirezs@ucn.cl
+202520,Depto. De Salud Pública,DCSP-01033,Emergencias y Desastres,T6,23448,TER,98464042,MURIEL,MILLARAY,RAMIREZ,SANTANA,mramirezs@ucn.cl
+202520,Depto. De Salud Pública,DCSP-01033,Emergencias y Desastres,T1,21354,TER,98464042,MURIEL,MILLARAY,RAMIREZ,SANTANA,mramirezs@ucn.cl
+202520,Depto. De Salud Pública,DCSP-01033,Emergencias y Desastres,C,21953,CAT,98464042,MURIEL,MILLARAY,RAMIREZ,SANTANA,mramirezs@ucn.cl
+202520,Depto. De Salud Pública,DCSP-01033,Emergencias y Desastres,T2,23444,TER,98464042,MURIEL,MILLARAY,RAMIREZ,SANTANA,mramirezs@ucn.cl
+202520,Depto. De Salud Pública,DCSP-01033,Emergencias y Desastres,T4,23446,TER,98464042,MURIEL,MILLARAY,RAMIREZ,SANTANA,mramirezs@ucn.cl
+202520,Depto. De Salud Pública,DCSP-01033,Emergencias y Desastres,T5,23447,TER,98464042,MURIEL,MILLARAY,RAMIREZ,SANTANA,mramirezs@ucn.cl
+202520,Depto. De Salud Pública,DCSP-00806,Ergonomía,T,21120,TAL,124467373,DANIEL,EDUARDO,LARRAGUIBEL,SANCHEZ,dlarraguibel@ucn.cl
+202520,Depto. De Salud Pública,DCSP-00806,Ergonomía,C,20676,CAT,124467373,DANIEL,EDUARDO,LARRAGUIBEL,SANCHEZ,dlarraguibel@ucn.cl
+202520,Depto. De Salud Pública,DCSP-00806,Ergonomía,E,21121,TER,124467373,DANIEL,EDUARDO,LARRAGUIBEL,SANCHEZ,dlarraguibel@ucn.cl
+202520,Depto. De Salud Pública,DCSP-00603,Gestión de Proyectos,T3,23657,TAL,99939524,MARCELA,,CORTES,SEPULVEDA,marcortes@ucn.cl
+202520,Depto. De Salud Pública,DCSP-00603,Gestión de Proyectos,T2,23656,TAL,99939524,MARCELA,,CORTES,SEPULVEDA,marcortes@ucn.cl
+202520,Depto. De Salud Pública,DCSP-00603,Gestión de Proyectos,T1,21125,TAL,99939524,MARCELA,,CORTES,SEPULVEDA,marcortes@ucn.cl
+202520,Depto. De Salud Pública,DCSP-00603,Gestión de Proyectos,C,20675,CAT,99939524,MARCELA,,CORTES,SEPULVEDA,marcortes@ucn.cl
+202520,Depto. De Salud Pública,DCSP-00833,Gestión de Proyectos,T6,23662,TAL,99939524,MARCELA,,CORTES,SEPULVEDA,marcortes@ucn.cl
+202520,Depto. De Salud Pública,DCSP-00833,Gestión de Proyectos,T5,23661,TAL,99939524,MARCELA,,CORTES,SEPULVEDA,marcortes@ucn.cl
+202520,Depto. De Salud Pública,DCSP-00833,Gestión de Proyectos,T1,21651,TAL,99939524,MARCELA,,CORTES,SEPULVEDA,marcortes@ucn.cl
+202520,Depto. De Salud Pública,DCSP-00833,Gestión de Proyectos,T2,23658,TAL,99939524,MARCELA,,CORTES,SEPULVEDA,marcortes@ucn.cl
+202520,Depto. De Salud Pública,DCSP-00833,Gestión de Proyectos,T3,23659,TAL,99939524,MARCELA,,CORTES,SEPULVEDA,marcortes@ucn.cl
+202520,Depto. De Salud Pública,DCSP-00833,Gestión de Proyectos,T4,23660,TAL,99939524,MARCELA,,CORTES,SEPULVEDA,marcortes@ucn.cl
+202520,Depto. De Salud Pública,DCSP-00833,Gestión de Proyectos,C,21650,CAT,99939524,MARCELA,,CORTES,SEPULVEDA,marcortes@ucn.cl
+202520,Depto. De Salud Pública,DCSP-00801,Gestión del Rubro Alimentario II,T,21324,TAL,107554300,LUIS,EDGARDO,CORTES,CAROCA,ecortesc@ucn.cl
+202520,Depto. De Salud Pública,DCSP-00801,Gestión del Rubro Alimentario II,E,21325,CLI,107554300,LUIS,EDGARDO,CORTES,CAROCA,ecortesc@ucn.cl
+202520,Depto. De Salud Pública,DCSP-00801,Gestión del Rubro Alimentario II,C,20884,CAT,107554300,LUIS,EDGARDO,CORTES,CAROCA,ecortesc@ucn.cl
+202520,Depto. De Salud Pública,DCSP-00623,Gestión en Enfermería II,T1,21109,TAL,87353168,TAMARA,DEL CARMEN,FERNANDEZ,GAGO,tfernandez@ucn.cl
+202520,Depto. De Salud Pública,DCSP-00623,Gestión en Enfermería II,C,20794,CAT,87353168,TAMARA,DEL CARMEN,FERNANDEZ,GAGO,tfernandez@ucn.cl
+202520,Depto. De Salud Pública,DCSP-00623,Gestión en Enfermería II,E1,23495,CLI,87353168,TAMARA,DEL CARMEN,FERNANDEZ,GAGO,tfernandez@ucn.cl
+202520,Depto. De Salud Pública,DCSP-00623,Gestión en Enfermería II,E2,23496,CLI,87353168,TAMARA,DEL CARMEN,FERNANDEZ,GAGO,tfernandez@ucn.cl
+202520,Depto. De Salud Pública,DCSP-00623,Gestión en Enfermería II,E3,23497,CLI,87353168,TAMARA,DEL CARMEN,FERNANDEZ,GAGO,tfernandez@ucn.cl
+202520,Depto. De Salud Pública,DCSP-01433,Internado Atención Primaria de Salud,C1,21112,CLI,18485550K,GABRIELA,BEATRIZ,CISTERNA,JOFRE,gabriela.cisterna@ce.ucn.cl
+202520,Depto. De Salud Pública,DCSP-91020,Internado Atención Primaria de Salud,E2,23151,CLI,183245171,LISSETTE,YAZMIN,SANCHEZ,VILLALOBOS,lissette.sanchez@ce.ucn.cl
+202520,Depto. De Salud Pública,DCSP-01433,Internado Atención Primaria de Salud,T2,22008,TAL,18485550K,GABRIELA,BEATRIZ,CISTERNA,JOFRE,gabriela.cisterna@ce.ucn.cl
+202520,Depto. De Salud Pública,DCSP-01433,Internado Atención Primaria de Salud,C2,22007,CLI,18485550K,GABRIELA,BEATRIZ,CISTERNA,JOFRE,gabriela.cisterna@ce.ucn.cl
+202520,Depto. De Salud Pública,DCSP-91020,Internado Atención Primaria de Salud,E1,21371,CLI,183245171,LISSETTE,YAZMIN,SANCHEZ,VILLALOBOS,lissette.sanchez@ce.ucn.cl
+202520,Depto. De Salud Pública,DCSP-01433,Internado Atención Primaria de Salud,T1,21113,TAL,18485550K,GABRIELA,BEATRIZ,CISTERNA,JOFRE,gabriela.cisterna@ce.ucn.cl
+202520,Depto. De Salud Pública,DCSP-09101,Internado Comunitario Urbano,E1,21359,CLI,177218669,MARIANA,JEANNETTE,ARAYA,GUERRERO,mariana.araya@ucn.cl
+202520,Depto. De Salud Pública,DCSP-00923,Internado Profesional Nivel Primario Urbano,E1,21342,CLI,87353168,TAMARA,DEL CARMEN,FERNANDEZ,GAGO,tfernandez@ucn.cl
+202520,Depto. De Salud Pública,DCSP-01434,Internado Rural Interdisciplinario,C2,22012,CLI,16211722K,RUBEN,PATRICIO,QUEZADA,GAETE,rquezada@ucn.cl
+202520,Depto. De Salud Pública,DCSP-00924,Internado Rural Interdisciplinario,E2,23133,TER,125416632,JACQUELINE,DEL CARMEN,FLORES,AGUILA,jfloresa@ucn.cl
+202520,Depto. De Salud Pública,DCSP-91010,Internado Rural Interdisciplinario,E1,21394,CLI,165788702,JORGE,EDUARDO,ZULETA,PERINES,jzuletap@ucn.cl
+202520,Depto. De Salud Pública,DCSP-91010,Internado Rural Interdisciplinario,E2,23135,CLI,165788702,JORGE,EDUARDO,ZULETA,PERINES,jzuletap@ucn.cl
+202520,Depto. De Salud Pública,DCSP-01434,Internado Rural Interdisciplinario,C1,21114,CLI,16211722K,RUBEN,PATRICIO,QUEZADA,GAETE,rquezada@ucn.cl
+202520,Depto. De Salud Pública,DCSP-09102,Internado Rural Interdisciplinario,E,23134,CLI,65678071,LUISA,CLARA,VERGARA,TEJADA,lcvergara@ucn.cl
+202520,Depto. De Salud Pública,DCSP-01434,Internado Rural Interdisciplinario,E,23136,CLI,16211722K,RUBEN,PATRICIO,QUEZADA,GAETE,rquezada@ucn.cl
+202520,Depto. De Salud Pública,DCSP-00924,Internado Rural Interdisciplinario,C2,23130,CLI,125416632,JACQUELINE,DEL CARMEN,FLORES,AGUILA,jfloresa@ucn.cl
+202520,Depto. De Salud Pública,DCSP-00924,Internado Rural Interdisciplinario,C1,20801,CLI,125416632,JACQUELINE,DEL CARMEN,FLORES,AGUILA,jfloresa@ucn.cl
+202520,Depto. De Salud Pública,DCSP-00924,Internado Rural Interdisciplinario,E1,21641,TER,125416632,JACQUELINE,DEL CARMEN,FLORES,AGUILA,jfloresa@ucn.cl
+202520,Depto. De Salud Pública,DCSP-09104,Internado en Gestión del Rubro Alimentario,E1,21630,CLI,107554300,LUIS,EDGARDO,CORTES,CAROCA,ecortesc@ucn.cl
+202520,Depto. De Salud Pública,DCSP-00602,Investigación Cuantitativa,T2,21351,TAL,80711476,PATRICIA,ELIANA,KANACRI,REINES,pkanacri@ucn.cl
+202520,Depto. De Salud Pública,DCSP-00602,Investigación Cuantitativa,C2,20670,CAT,80711476,PATRICIA,ELIANA,KANACRI,REINES,pkanacri@ucn.cl
+202520,Depto. De Salud Pública,DCSP-00602,Investigación Cuantitativa,T1,21345,TAL,98464042,MURIEL,MILLARAY,RAMIREZ,SANTANA,mramirezs@ucn.cl
+202520,Depto. De Salud Pública,DCSP-00602,Investigación Cuantitativa,C1,20669,CAT,98464042,MURIEL,MILLARAY,RAMIREZ,SANTANA,mramirezs@ucn.cl
+202520,Depto. De Salud Pública,DCSP-00602,Investigación Cuantitativa,C3,20671,CAT,68974747,ROSA,INES,VEGA,FLORES,rvega@ucn.cl
+202520,Depto. De Salud Pública,DCSP-00602,Investigación Cuantitativa,T3,21352,TAL,68974747,ROSA,INES,VEGA,FLORES,rvega@ucn.cl
+202520,Depto. De Salud Pública,DCSP-00636,Medicina Basada en Evidencias,C,20674,CAT,82195238,FERNANDO,ANTONIO,CARVAJAL,ENCINA,fcarvajal@ucn.cl
+202520,Depto. De Salud Pública,DCSP-00636,Medicina Basada en Evidencias,T1,21353,TAL,82195238,FERNANDO,ANTONIO,CARVAJAL,ENCINA,fcarvajal@ucn.cl
+202520,Depto. De Salud Pública,DCSP-00636,Medicina Basada en Evidencias,T2,23651,TAL,82195238,FERNANDO,ANTONIO,CARVAJAL,ENCINA,fcarvajal@ucn.cl
+202520,Depto. De Salud Pública,DCSP-00636,Medicina Basada en Evidencias,T7,23883,TAL,82195238,FERNANDO,ANTONIO,CARVAJAL,ENCINA,fcarvajal@ucn.cl
+202520,Depto. De Salud Pública,DCSP-00636,Medicina Basada en Evidencias,T4,23653,TAL,82195238,FERNANDO,ANTONIO,CARVAJAL,ENCINA,fcarvajal@ucn.cl
+202520,Depto. De Salud Pública,DCSP-00636,Medicina Basada en Evidencias,T5,23654,TAL,82195238,FERNANDO,ANTONIO,CARVAJAL,ENCINA,fcarvajal@ucn.cl
+202520,Depto. De Salud Pública,DCSP-00636,Medicina Basada en Evidencias,T6,23655,TAL,82195238,FERNANDO,ANTONIO,CARVAJAL,ENCINA,fcarvajal@ucn.cl
+202520,Depto. De Salud Pública,DCSP-00636,Medicina Basada en Evidencias,T3,23652,TAL,82195238,FERNANDO,ANTONIO,CARVAJAL,ENCINA,fcarvajal@ucn.cl
+202520,Depto. De Salud Pública,DCSP-00624,Módulo Integrado de Enfermería en Salud Familiar y Comunitaria I,E2,23524,CLI,68974747,ROSA,INES,VEGA,FLORES,rvega@ucn.cl
+202520,Depto. De Salud Pública,DCSP-00624,Módulo Integrado de Enfermería en Salud Familiar y Comunitaria I,E3,23525,CLI,68974747,ROSA,INES,VEGA,FLORES,rvega@ucn.cl
+202520,Depto. De Salud Pública,DCSP-00624,Módulo Integrado de Enfermería en Salud Familiar y Comunitaria I,E1,21331,CLI,171143608,FERNANDA,MARGOTT,VELIZ,ARDILES,fernanda.veliz@ce.ucn.cl
+202520,Depto. De Salud Pública,DCSP-00624,Módulo Integrado de Enfermería en Salud Familiar y Comunitaria I,C1,21329,CAT,68974747,ROSA,INES,VEGA,FLORES,rvega@ucn.cl
+202520,Depto. De Salud Pública,DCSP-00624,Módulo Integrado de Enfermería en Salud Familiar y Comunitaria I,T1,21330,TAL,68974747,ROSA,INES,VEGA,FLORES,rvega@ucn.cl
+202520,Depto. De Salud Pública,DCSP-00802,Nutrición Comunitaria,E1,20678,CLI,18923290K,FRANCISCA,CONSTANZA,TORREALBA,SILVA,
+202520,Depto. De Salud Pública,DCSP-00802,Nutrición Comunitaria,T1,21315,TAL,18923290K,FRANCISCA,CONSTANZA,TORREALBA,SILVA,
+202520,Depto. De Salud Pública,DCSP-00637,Salud Ambiental,T2,23431,TAL,82912304,JAIME,HERNANDO,BRAVO,SANTANDER,
+202520,Depto. De Salud Pública,DCSP-00637,Salud Ambiental,T3,23440,TAL,8376774K,MAURICIO,,CASTILLO,MONTES,mcmontes@ucn.cl
+202520,Depto. De Salud Pública,DCSP-00637,Salud Ambiental,T6,23443,TAL,8376774K,MAURICIO,,CASTILLO,MONTES,mcmontes@ucn.cl
+202520,Depto. De Salud Pública,DCSP-00637,Salud Ambiental,T1,21314,TAL,8376774K,MAURICIO,,CASTILLO,MONTES,mcmontes@ucn.cl
+202520,Depto. De Salud Pública,DCSP-00637,Salud Ambiental,T4,23441,TAL,8376774K,MAURICIO,,CASTILLO,MONTES,mcmontes@ucn.cl
+202520,Depto. De Salud Pública,DCSP-00637,Salud Ambiental,T5,23442,TAL,8376774K,MAURICIO,,CASTILLO,MONTES,mcmontes@ucn.cl
+202520,Depto. De Salud Pública,DCSP-00637,Salud Ambiental,C1,21954,CAT,8376774K,MAURICIO,,CASTILLO,MONTES,mcmontes@ucn.cl
+202520,Depto. De Salud Pública,DCSP-00202,Seguridad Social y Sistema de Salud,T3,21124,TAL,153806748,PAMELA,SOLANGE,SEPULVEDA,OYARCE,psepulvedao@ucn.cl
+202520,Depto. De Salud Pública,DCSP-00202,Seguridad Social y Sistema de Salud,C2,20667,CAT,153806748,PAMELA,SOLANGE,SEPULVEDA,OYARCE,psepulvedao@ucn.cl
+202520,Depto. De Salud Pública,DCSP-00202,Seguridad Social y Sistema de Salud,T6,23416,TAL,80711476,PATRICIA,ELIANA,KANACRI,REINES,pkanacri@ucn.cl
+202520,Depto. De Salud Pública,DCSP-00202,Seguridad Social y Sistema de Salud,T5,21649,TAL,80711476,PATRICIA,ELIANA,KANACRI,REINES,pkanacri@ucn.cl
+202520,Depto. De Salud Pública,DCSP-00202,Seguridad Social y Sistema de Salud,C3,21648,CAT,80711476,PATRICIA,ELIANA,KANACRI,REINES,pkanacri@ucn.cl
+202520,Depto. De Salud Pública,DCSP-00202,Seguridad Social y Sistema de Salud,T2,23409,TAL,8376774K,MAURICIO,,CASTILLO,MONTES,mcmontes@ucn.cl
+202520,Depto. De Salud Pública,DCSP-00202,Seguridad Social y Sistema de Salud,T4,23410,TAL,153806748,PAMELA,SOLANGE,SEPULVEDA,OYARCE,psepulvedao@ucn.cl
+202520,Depto. De Salud Pública,DCSP-00202,Seguridad Social y Sistema de Salud,C1,20666,CAT,8376774K,MAURICIO,,CASTILLO,MONTES,mcmontes@ucn.cl
+202520,Depto. De Salud Pública,DCSP-00202,Seguridad Social y Sistema de Salud,T1,21123,TAL,8376774K,MAURICIO,,CASTILLO,MONTES,mcmontes@ucn.cl
