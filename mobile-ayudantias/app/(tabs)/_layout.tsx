@@ -53,18 +53,6 @@ export default function TabLayout() {
   const {data: asignaturasTodas, isLoading: cargaAsigTodas } = useTodasAsignaturas();
   const cancelarPostulacion = useCancelarPostulacion();
 
-  /*useEffect(() => {
-    if (!cargauser && !cargaCurriculum && !cargaAlumno)
-    {
-      if (!curriculum)
-      {
-        router.replace('/crear-curriculum');
-      } else {
-        setAppReady(true);
-      }
-    }
-  }, [cargauser, cargaCurriculum, cargaAlumno, curriculum, router]);*/
-
   useEffect(() => {
 
     if (cargauser)
@@ -72,9 +60,9 @@ export default function TabLayout() {
       return;
     }
 
-    console.log("ruuut: ", user.rut);
     if (!user || !user.rut)
     {
+      console.log("Usuario no detectado, redirigiendo al login...");
       setToken(null);
       setUsertipo(null);
       router.replace('/(auth)/login');
@@ -82,6 +70,7 @@ export default function TabLayout() {
       return;
     }
 
+    console.log("ruuut: ", user.rut);
     if (cargaCurriculum)
     {
       return;
@@ -94,7 +83,7 @@ export default function TabLayout() {
       return;
     }
 
-    if (
+    /*if (
       cargaAlumno ||
       cargaExtra ||
       cargaCientifica ||
@@ -106,11 +95,11 @@ export default function TabLayout() {
       cargaAsigTodas
     ) {
       return;
-    }
+    }*/
 
     setAppReady(true);
 
-  }, [cargauser, user, cargaAlumno, cargaCurriculum, curriculum, router, cargaExtra, cargaCientifica, cargaCursos, cargaAyudantias, cargaAyuAnteriores, cargaPostulaciones, cargaAsigDisp, cargaAsigTodas,setToken, setUsertipo, isError]);
+  }, [cargauser, user, cargaAlumno, cargaCurriculum, curriculum, router, /*cargaExtra, cargaCientifica, cargaCursos, cargaAyudantias, cargaAyuAnteriores, cargaPostulaciones, cargaAsigDisp, cargaAsigTodas*/,setToken, setUsertipo, isError]);
 
   if (!appReady)
   {
@@ -130,6 +119,13 @@ export default function TabLayout() {
     asignaturasDisponibles,
     asignaturasTodas,
     cancelarPostulacion,
+    loadingGlobal: {
+    postulaciones: cargaPostulaciones,
+    asignaturas: cargaAsigDisp || cargaAsigTodas,
+    ayudantias: cargaAyudantias || cargaAyuAnteriores,
+    curriculum: cargaCurriculum, 
+    extra: cargaExtra || cargaCientifica || cargaCursos
+  }
   };
 
   return (
@@ -153,7 +149,7 @@ export default function TabLayout() {
         <Tabs.Screen
           name="index" // archivo index.tsx
           options={{
-            title: 'Mi Perfil', // texto que verá el usuario
+            title: 'Home', // texto que verá el usuario
             tabBarIcon: ({ color }) => <TabBarIcon name="person-circle-outline" color={color} />,
           }}
         />

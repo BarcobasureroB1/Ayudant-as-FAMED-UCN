@@ -20,7 +20,7 @@ const darkColors = {
   card: '#1F2937',       
   text: '#F9FAFB',       
   textLabel: '#D1D5DB',  
-  textPlaceholder: '#6B7280', 
+  textPlaceholder: '#8690a5ff', 
   icon: '#9CA3AF',        
   inputBackground: '#374151', 
   inputBorder: '#4B5563', 

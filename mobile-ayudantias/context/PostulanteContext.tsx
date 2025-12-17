@@ -13,6 +13,14 @@ import { AyudantiasAnteriores } from '@/hooks/useAyudantia';
 import { Asignatura } from '@/hooks/useAsignaturas';
 import { UseMutationResult } from '@tanstack/react-query';
 
+export interface LoadingGlobalState {
+    postulaciones: boolean;
+    asignaturas: boolean;
+    ayudantias: boolean;
+    curriculum: boolean;
+    extra: boolean;
+}
+
 export interface PostulanteContextType{
     user?: User;
     alumno?: AlumnoData;
@@ -25,6 +33,8 @@ export interface PostulanteContextType{
     ayudantiasAnteriores?: AyudantiasAnteriores[];
     asignaturasDisponibles?: Asignatura[];
     asignaturasTodas?: Asignatura[];
+    
+    loadingGlobal: LoadingGlobalState;
 
     cancelarPostulacion: UseMutationResult<any, Error, { id: number; }, unknown>;
 }

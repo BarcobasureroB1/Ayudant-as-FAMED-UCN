@@ -6,6 +6,7 @@ export interface User
     rut: string;
     nombres: string;
     apellidos: string;
+    correo: string;
     tipo: 'admin' | 'postulante' | 'secretaria de departamento' | string; //despues añadir mas roles
 }
 
