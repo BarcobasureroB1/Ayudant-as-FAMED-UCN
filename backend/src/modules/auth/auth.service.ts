@@ -25,7 +25,7 @@ export class AuthService {
    if (!passwordIsValid) {
      throw new UnauthorizedException('Credenciales inválidas: contraseña incorrecta');
    }
-   const payload = { rut: usuario.rut, nombres: usuario.nombres, apellidos: usuario.apellidos, tipo : usuario.tipo, deshabilitado: usuario.deshabilitado };
+   const payload = { rut: usuario.rut, nombres: usuario.nombres, apellidos: usuario.apellidos, tipo : usuario.tipo, deshabilitado: usuario.deshabilitado,correo : usuario.correo };
    const access_token = this.jwtService.sign(payload);
    return {
      access_token,
