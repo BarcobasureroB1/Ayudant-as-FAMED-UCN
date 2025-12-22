@@ -118,6 +118,15 @@ export default function LoginPage() {
                         {errores.password ? <Text style={styles.errorText}>{errores.password}</Text> : null}
                     </View>
 
+                    {/* ENLACE FORGOT PASSWORD */}
+                    <View style={{ alignItems: 'flex-end', marginBottom: 16 }}>
+                        <Link href="/(auth)/forgot-password" asChild>
+                            <TouchableOpacity>
+                                <Text style={styles.forgotPasswordText}>¿Olvidaste tu contraseña?</Text>
+                            </TouchableOpacity>
+                        </Link>
+                    </View>
+
                     <TouchableOpacity
                         style={[styles.button, loginMutation.isPending ? styles.buttonDisabled : null]}
                         onPress={enviar}
@@ -254,6 +263,11 @@ const getStyles = (colors: ReturnType<typeof useThemeColors>) => StyleSheet.crea
     switchButtonText: {
         color: colors.primary, 
         textAlign: 'center',
+        fontSize: 14,
+        fontWeight: '500',
+    },
+    forgotPasswordText: {
+        color: colors.primary,
         fontSize: 14,
         fontWeight: '500',
     },

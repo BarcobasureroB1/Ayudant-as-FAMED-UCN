@@ -3,44 +3,49 @@
 import React, { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import Cookies from "js-cookie";
-import { Briefcase, RefreshCw } from 'lucide-react'; 
+import { 
+    Briefcase, 
+    RefreshCw, 
+    LogOut, 
+    ChevronLeft, 
+    Users, 
+    FileText, 
+    Files, 
+    GraduationCap,
+    LayoutDashboard 
+} from 'lucide-react'; 
 
 import { useAuth } from "@/context/AuthContext";
-import { useUserProfile } from "@/hooks/useUserProfile";
+import { useUserProfile, User } from "@/hooks/useUserProfile";
 import { useSecretariaDocente } from "@/hooks/useUsuarios"; 
+import { useVerActasDeSecretario } from "@/hooks/useActas";
 
 import AdministrarEstudiantes from "@/components/SecretariaDocente/AdministrarEstudiantes";
 import GenerarActa from "@/components/SecretariaDocente/generarActas";
-import { useVerActasDeSecretario } from "@/hooks/useActas";
 import VerActas from "@/components/SecretariaDocente/revisarActas";
 import GenerarAyudantia from "@/components/SecretariaDocente/GenerarAyudantia";
 import { ModalSeleccionarSecretariaAdmin } from "@/components/SecretariaDocente/ModalSeleccionarSecretariaAdmin";
 
-export default function SecretariaDocentePage() {
+interface UserProps {
+    user: User;
+}
+
+// --- COMPONENTE DASHBOARD (Copia exacta del estilo Director) ---
+export const SecretariaDocenteDashboard = ({ user }: UserProps) => {
     const router = useRouter();
     const { setToken, setUsertipo } = useAuth();
 
     type Vista = "estudiantes" | "acta" | "actas" | "ayudantias";
     const [vista, setVista] = useState<Vista>("estudiantes");
 
-    const { data: user, isLoading, isError } = useUserProfile();
-    
-    // --- LÓGICA DE SELECCIÓN DE SECRETARIA (ESTADO GLOBAL) ---
+    // --- LÓGICA DE SELECCIÓN DE SECRETARIA (Mantenida) ---
     const { data: listaSecretarias, isLoading: cargaSecretarias } = useSecretariaDocente();
     const [rutSecretariaSeleccionada, setRutSecretariaSeleccionada] = useState<string>("");
     const [nombreSecretariaSeleccionada, setNombreSecretariaSeleccionada] = useState<string>("");
     const [modalSecAbierto, setModalSecAbierto] = useState(false);
 
-    // Las actas dependen de la secretaria seleccionada
     const { data: actas } = useVerActasDeSecretario(rutSecretariaSeleccionada);
 
-    useEffect(() => {
-        if (isError || !user) {
-            router.push("/login");
-        }
-    }, [isError, user, router]);
-
-    // Efecto para inicializar la secretaria o pedir selección
     useEffect(() => {
         if (user) {
             if (user.tipo === 'admin' || user.tipo === 'encargado_ayudantias') {
@@ -85,20 +90,55 @@ export default function SecretariaDocentePage() {
         router.refresh();
     };
 
-    if (isLoading || !user) {
-        return (
-            <div className="min-h-screen flex items-center justify-center">
-                <div className="text-center">
-                    <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-gray-900 mx-auto"></div>
-                    <p className="mt-4 text-gray-600">Cargando...</p>
-                </div>
-            </div>
-        );
-    }
+    // Helper para clases de botones activos (Estilo Director)
+    const getTabClass = (isActive: boolean) => 
+        `flex items-center gap-2 px-5 py-2.5 rounded-lg text-base font-semibold transition-all duration-200 whitespace-nowrap ${
+            isActive 
+            ? 'bg-indigo-50 text-indigo-700 shadow-sm ring-1 ring-indigo-200' 
+            : 'text-gray-500 hover:text-gray-700 hover:bg-gray-50'
+        }`;
 
     return (
-        <div className="min-h-screen bg-gray-50 p-6">
+        <div className="min-h-screen bg-slate-50 font-sans pb-12">
             
+            <nav className="bg-white border-b border-gray-200 sticky top-0 z-30 shadow-sm h-16">
+                <div className="max-w-[98%] mx-auto px-4 h-full">
+                    <div className="flex justify-between h-full items-center">
+                        
+                        {/* IZQUIERDA: LOGO Y TÍTULO */}
+                        <div className="flex items-center gap-3">
+                            <div className="bg-indigo-600 p-2 rounded-lg">
+                                <Briefcase className="w-6 h-6 text-white" />
+                            </div>
+                            <span className="text-xl font-bold text-gray-900 tracking-tight hidden md:block">
+                                {/* Condición para el título principal */}
+                                {user.tipo === 'admin' ? 'Portal Administración' : 'Portal Secretaría Docente'}
+                            </span>
+                        </div>
+
+                        {/* DERECHA: DATOS USUARIO Y LOGOUT */}
+                        <div className="flex items-center gap-5">
+                            <div className="text-right hidden md:block">
+                                <p className="text-sm font-bold text-gray-900">
+                                    {user.nombres.split(' ')[0]} {user.apellidos.split(' ')[0]}
+                                </p>
+                                <p className="text-xs text-gray-500 uppercase font-semibold">
+                                    {/* Condición para el cargo/rol */}
+                                    {user.tipo === 'admin' ? 'Administrador' : 'Secretaría Docente'}
+                                </p>
+                            </div>
+                            <button 
+                                onClick={logout} 
+                                className="p-2 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-all" 
+                                title="Cerrar Sesión"
+                            >
+                                <LogOut className="w-5 h-5" />
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </nav>
+
             {/* Modal de Selección Global */}
             <ModalSeleccionarSecretariaAdmin 
                 abierto={modalSecAbierto}
@@ -108,160 +148,128 @@ export default function SecretariaDocentePage() {
                 isLoading={cargaSecretarias}
             />
 
-            {/* --- ENCABEZADO PRINCIPAL UNIFICADO --- */}
-            <div className="bg-white rounded-xl shadow-sm mb-6 border border-gray-200 overflow-hidden">
+            {/* Contenedor Principal Expandido (max-w-[98%]) */}
+            <div className="max-w-[98%] mx-auto px-4 py-6">
                 
-                {/* PARTE SUPERIOR: Título (Izq) y Pestañas + Logout (Der) */}
-                <div className="p-6 flex flex-col xl:flex-row justify-between items-center gap-6">
-                    
-                    {/* IZQUIERDA: Botones de volver y Títulos */}
-                    <div className="w-full xl:w-auto flex flex-col items-start">
-                        {(user.tipo === 'admin' || user.tipo === 'encargado_ayudantias') && (
+                {/* Header Actions & Title */}
+                <div className="flex flex-col xl:flex-row justify-between items-end mb-6 gap-6">
+                    <div>
+                        {(user.tipo === 'admin' || user.tipo === 'encargado_ayudantias' || user.tipo === 'coordinador_secretariaDocente') && (
                             <button 
-                                onClick={handleBackToAdmin}
-                                className="flex items-center text-blue-600 hover:text-blue-800 mb-2 transition-colors text-sm font-medium"
+                                onClick={user.tipo === 'coordinador_secretariaDocente' ? handleBackToDobleTipo : handleBackToAdmin}
+                                className="flex items-center text-sm font-semibold text-gray-500 hover:text-indigo-600 mb-2 transition-colors"
                             >
-                                <span className="mr-2">←</span> Volver al Panel Principal
+                                <ChevronLeft className="w-4 h-4 mr-1" /> Volver al Panel
                             </button>
                         )}
-                        {user.tipo === 'coordinador_secretariaDocente' && (
-                            <button 
-                                onClick={handleBackToDobleTipo}
-                                className="flex items-center text-blue-600 hover:text-blue-800 mb-2 transition-colors text-sm font-medium"
-                            >
-                                <span className="mr-2">←</span> Volver al Panel Principal
-                            </button>
-                        )}
-                        <h1 className="text-2xl font-bold text-gray-800 leading-tight">
-                            Secretaría Docente
-                        </h1>
-                        <p className="text-gray-500 text-sm mt-1">
-                            Bienvenido, <span className="font-medium text-gray-700">{user.nombres} {user.apellidos}</span>
-                        </p>
-                    </div>
-                    <div className="text-right">
-                        <p className="text-sm text-gray-600">RUT: {user.rut}</p>
+                        <h1 className="text-3xl font-bold text-gray-900 leading-tight">Secretaría Docente</h1>
+                        <p className="text-gray-500 text-base mt-1">Administración centralizada de procesos académicos.</p>
                     </div>
 
-                    {/* DERECHA: Pestañas y Botón Logout */}
-                    <div className="w-full xl:w-auto flex flex-col sm:flex-row items-center gap-3 justify-end">
-
-                        {/* GRUPO DE PESTAÑAS (Restaurado a la posición "de antes") */}
-                        <div className="flex bg-gray-100/80 p-1 rounded-lg overflow-x-auto max-w-full">
-                            <button
-                                onClick={() => setVista("estudiantes")}
-                                className={`px-4 py-2 rounded-md text-sm font-medium transition-all duration-200 whitespace-nowrap ${
-                                    vista === "estudiantes"
-                                        ? "bg-white text-blue-600 shadow-sm"
-                                        : "text-gray-500 hover:text-gray-800 hover:bg-gray-200/50"
-                                }`}
-                            >
-                                Administrar estudiantes
-                            </button>
-
-                            <button
-                                onClick={() => setVista("acta")}
-                                className={`px-4 py-2 rounded-md text-sm font-medium transition-all duration-200 whitespace-nowrap ${
-                                    vista === "acta"
-                                        ? "bg-white text-blue-600 shadow-sm"
-                                        : "text-gray-500 hover:text-gray-800 hover:bg-gray-200/50"
-                                }`}
-                            >
-                                Generar acta
-                            </button>
-
-                            <button
-                                onClick={() => setVista("actas")}
-                                className={`px-4 py-2 rounded-md text-sm font-medium transition-all duration-200 whitespace-nowrap ${
-                                    vista === "actas"
-                                        ? "bg-white text-blue-600 shadow-sm"
-                                        : "text-gray-500 hover:text-gray-800 hover:bg-gray-200/50"
-                                }`}
-                            >
-                                Ver actas
-                            </button>
-
-                            <button
-                                onClick={() => setVista("ayudantias")}
-                                className={`px-4 py-2 rounded-md text-sm font-medium transition-all duration-200 whitespace-nowrap ${
-                                    vista === "ayudantias"
-                                        ? "bg-white text-blue-600 shadow-sm"
-                                        : "text-gray-500 hover:text-gray-800 hover:bg-gray-200/50"
-                                }`}
-                            >
-                                Formalizar Ayudantía
-                            </button>
-                        </div>
-
-                        {/* BOTÓN CERRAR SESIÓN */}
-                        <button
-                            onClick={logout}
-                            className="bg-gray-900 hover:bg-black text-white font-medium py-2.5 px-5 rounded-lg transition duration-200 text-sm whitespace-nowrap shadow-sm"
-                        >
-                            Cerrar Sesión
+                    {/* Main Tabs (Botones superiores) - Estilo Director */}
+                    <div className="bg-white p-1.5 rounded-xl shadow-sm border border-gray-200 inline-flex overflow-x-auto max-w-full">
+                        <button onClick={() => setVista('estudiantes')} className={getTabClass(vista === 'estudiantes')}>
+                            <Users className="w-5 h-5" /> Estudiantes
+                        </button>
+                        <button onClick={() => setVista('acta')} className={getTabClass(vista === 'acta')}>
+                            <FileText className="w-5 h-5" /> Generar Acta
+                        </button>
+                        <button onClick={() => setVista('actas')} className={getTabClass(vista === 'actas')}>
+                            <Files className="w-5 h-5" /> Ver Actas
+                        </button>
+                        <button onClick={() => setVista('ayudantias')} className={getTabClass(vista === 'ayudantias')}>
+                            <GraduationCap className="w-5 h-5" /> Ayudantías
                         </button>
                     </div>
                 </div>
 
-                {/* PARTE INFERIOR: BARRA DE SUPERVISIÓN (Si es admin) */}
-                {/* Se renderiza justo debajo del bloque anterior, dentro del mismo card */}
+                {/* Barra de Supervisión (Solo Admin) - Adaptada al estilo limpio */}
                 {(user.tipo === 'admin' || user.tipo === 'encargado_ayudantias') && (
-                    <div className="bg-indigo-50 border-t border-indigo-100 px-6 py-3 flex flex-col sm:flex-row justify-between items-center gap-3 animate-in slide-in-from-top-2">
+                    <div className="bg-indigo-50 border border-indigo-100 rounded-xl p-4 mb-6 flex flex-col sm:flex-row justify-between items-center gap-4 animate-in slide-in-from-top-2">
                         <div className="flex items-center gap-3">
-                            <div className="bg-white p-1.5 rounded-md shadow-sm text-indigo-600 border border-indigo-100">
-                                <Briefcase size={18} />
+                            <div className="bg-white p-2 rounded-lg text-indigo-600 shadow-sm border border-indigo-50">
+                                <Briefcase className="w-5 h-5" />
                             </div>
-                            <div className="text-sm">
-                                <span className="font-bold text-indigo-700 uppercase text-xs block mb-0.5">
-                                    Modo Supervisión Activo
-                                </span>
-                                <span className="text-indigo-900">
-                                    Gestionando como: 
-                                    {nombreSecretariaSeleccionada ? (
-                                        <>
-                                            <strong className="ml-1">{nombreSecretariaSeleccionada}</strong>
-                                            <span className="text-indigo-700/70 ml-1 font-normal">(Rut: {rutSecretariaSeleccionada})</span>
-                                        </>
-                                    ) : (
-                                        <span className="italic text-indigo-400 ml-1"> Seleccione Secretaria...</span>
-                                    )}
-                                </span>
+                            <div>
+                                <p className="text-xs font-bold text-indigo-700 uppercase tracking-wide">Modo Supervisión Activo</p>
+                                <p className="text-sm text-indigo-900">
+                                    Gestionando vista de: <span className="font-bold">{nombreSecretariaSeleccionada || "Seleccione..."}</span>
+                                </p>
                             </div>
                         </div>
                         
                         <button 
                             onClick={() => setModalSecAbierto(true)}
-                            className="flex items-center gap-2 bg-white text-indigo-600 px-3 py-1.5 rounded-md text-xs font-bold border border-indigo-200 hover:bg-indigo-600 hover:text-white transition-all shadow-sm"
+                            className="flex items-center gap-2 bg-white text-indigo-700 px-4 py-2 rounded-lg text-xs font-bold border border-indigo-200 hover:bg-indigo-600 hover:text-white hover:border-indigo-600 transition-all shadow-sm"
                         >
-                            <RefreshCw size={14} /> 
-                            Cambiar usuario
+                            <RefreshCw className="w-4 h-4" /> 
+                            Cambiar Usuario
                         </button>
                     </div>
                 )}
-            </div>
 
-            {/* --- CONTENIDO PRINCIPAL --- */}
-            <div className="flex justify-center">
-                <div className="w-full max-w-[95rem] px-0 sm:px-4">
+                {/* Content Area - Tarjeta Blanca Grande (Estilo Director) */}
+                <div className="animate-in fade-in slide-in-from-bottom-2 duration-500">
+                    <div className="bg-white rounded-2xl shadow-sm border border-gray-200 p-6 md:p-8 min-h-[600px]">
+                        {vista === "estudiantes" && <AdministrarEstudiantes />}
 
-                    {vista === "estudiantes" && <AdministrarEstudiantes />}
+                        {vista === "acta" && (
+                            <GenerarActa rutSecretario={rutSecretariaSeleccionada} />
+                        )}
 
-                    {vista === "acta" && (
-                        <GenerarActa rutSecretario={rutSecretariaSeleccionada} />
-                    )}
-
-                    {vista === "actas" && (
-                        <VerActas actas={actas} />
-                    )}
-                    
-                    {vista === "ayudantias" && (
-                        <GenerarAyudantia 
-                            rutSecretaria={rutSecretariaSeleccionada} 
-                            onBack={() => setVista("estudiantes")} 
-                        />
-                    )}
+                        {vista === "actas" && (
+                            <VerActas actas={actas} />
+                        )}
+                        
+                        {vista === "ayudantias" && (
+                            <GenerarAyudantia 
+                                rutSecretaria={rutSecretariaSeleccionada} 
+                                onBack={() => setVista("estudiantes")} 
+                            />
+                        )}
+                    </div>
                 </div>
             </div>
         </div>
     );
+};
+
+
+// --- COMPONENTE PRINCIPAL (Page Logic) ---
+export default function SecretariaDocentePage() {
+    const { data: user, isLoading, isError } = useUserProfile();
+    const router = useRouter();
+
+    useEffect(() => {
+        if (isError || (!isLoading && !user)) {
+            router.push("/login");
+        }
+    }, [isError, user, router, isLoading]);
+
+    if (isLoading) {
+        return (
+            <div className="min-h-screen flex items-center justify-center bg-gray-50">
+                <div className="text-center">
+                    <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-indigo-600 mx-auto"></div>
+                    <p className="mt-4 text-gray-600 font-medium text-base">Cargando...</p>
+                </div>
+            </div>
+        );
+    }
+
+    if (isError || !user) {
+        return (
+            <div className="min-h-screen flex items-center justify-center bg-gray-50">
+                <div className="text-center">
+                    <div className="bg-red-50 p-4 rounded-full inline-flex mb-4">
+                        <LogOut className="w-8 h-8 text-red-500" />
+                    </div>
+                    <p className="text-gray-800 font-bold mb-2 text-lg">Sesión no válida</p>
+                    <p className="text-base text-gray-500">Redirigiendo al login...</p>
+                </div>
+            </div>
+        );
+    }
+
+    return <SecretariaDocenteDashboard user={user} />;
 }

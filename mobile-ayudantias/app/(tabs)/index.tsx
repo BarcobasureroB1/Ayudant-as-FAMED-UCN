@@ -144,7 +144,7 @@ export default function PerfilScreen() {
         <View style={styles.sectionContainer}>
           <ThemedText type="subtitle" style={styles.sectionHeader}>Información de Contacto</ThemedText>
           <View style={styles.cleanCard}>
-            <InfoRow label="Correo Institucional" value={user?.correo} styles={styles}/>
+            <InfoRow label="Correo Institucional" value={curriculum?.correo} styles={styles}/>
           </View>
         </View>
 

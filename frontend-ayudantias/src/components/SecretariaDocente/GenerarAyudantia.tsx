@@ -19,7 +19,8 @@ import { ModalVerCurriculum } from '../Coordinador/ModalVerCurriculum';
 
 import { 
     Search, Users, CheckSquare, Square, Filter, ChevronDown, 
-    UserCheck, FileText, Eye, XCircle, CheckCircle
+    UserCheck, FileText, Eye, XCircle, CheckCircle, SlidersHorizontal,
+    ChevronLeft
 } from 'lucide-react';
 
 
@@ -28,8 +29,22 @@ interface Props {
     onBack: () => void;
 }
 
-export default function GenerarAyudantia({ rutSecretaria }: Props) {
+// Componente Badge para consistencia visual
+const Badge = ({ children, variant = "default" }: { children: React.ReactNode; variant?: "default" | "success" | "warning" | "error" }) => {
+    const variants = {
+        default: "bg-blue-50 text-blue-700 border-blue-200",
+        success: "bg-emerald-50 text-emerald-700 border-emerald-200",
+        warning: "bg-amber-50 text-amber-700 border-amber-200",
+        error: "bg-red-50 text-red-700 border-red-200"
+    };
+    return (
+        <span className={`inline-flex items-center px-2.5 py-1 rounded-full text-xs font-bold border ${variants[variant]} shadow-sm`}>
+            {children}
+        </span>
+    );
+};
 
+export default function GenerarAyudantia({ rutSecretaria }: Props) {
 
     const { data: coordinadores } = useCoordinadoresTodos();    
     const { data: postulantes, isLoading: cargaPostulantes } = usePostulacionesCoordinador();
@@ -201,37 +216,30 @@ return (
                 />
             )}
 
-            <div className="flex flex-col xl:flex-row gap-4 items-start justify-center w-full max-w-full mx-auto px-4">
+            <div className="flex flex-col xl:flex-row gap-5 items-start">
                 
-                <div className="w-full xl:w-72 flex-shrink-0 space-y-4">
+                {/* SIDEBAR FILTROS (Estilo Unificado) */}
+                <div className="w-full xl:w-72 flex-shrink-0 bg-white rounded-2xl shadow-sm border border-gray-200 p-5 xl:sticky xl:top-24 h-fit self-start">
                     
-                    <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
-                        <div className="p-4 border-b border-gray-100 bg-gray-50/50 flex justify-between items-center">
-                            <div className="flex items-center gap-2 text-gray-800">
-                                <Users className="w-4 h-4 text-blue-600" />
-                                <h3 className="font-bold text-sm uppercase tracking-wide">Coordinadores</h3>
-                            </div>
-                            {coordinadoresSeleccionados.length > 0 && (
-                                <span className="bg-blue-100 text-blue-700 text-xs font-bold px-2 py-0.5 rounded-full">
-                                    {coordinadoresSeleccionados.length}
-                                </span>
-                            )}
+                    {/* Coordinadores */}
+                    <div className="mb-6">
+                        <div className="flex items-center gap-2 mb-3 pb-2 border-b border-gray-100">
+                            <Users className="w-5 h-5 text-blue-600" />
+                            <h3 className="font-bold text-base text-gray-900">Coordinadores</h3>
                         </div>
                         
-                        <div className="p-3 bg-white">
-                            <div className="relative">
-                                <Search className="absolute left-3 top-2.5 text-gray-400 w-4 h-4" />
-                                <input 
-                                    type="text"
-                                    placeholder="Buscar coordinador..."
-                                    className="w-full pl-9 pr-3 py-2 bg-gray-50 border border-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:bg-white transition-all outline-none text-gray-800"
-                                    value={busquedaCoordinador}
-                                    onChange={(e) => setBusquedaCoordinador(e.target.value)}
-                                />
-                            </div>
+                        <div className="relative mb-3">
+                            <Search className="absolute left-3 top-3 text-gray-400 w-4 h-4" />
+                            <input 
+                                type="text"
+                                placeholder="Buscar coordinador..."
+                                className="w-full pl-9 pr-3 py-2.5 bg-gray-50 border border-gray-200 rounded-lg text-sm placeholder-gray-500 focus:ring-2 focus:ring-blue-500 focus:bg-white transition-all outline-none"
+                                value={busquedaCoordinador}
+                                onChange={(e) => setBusquedaCoordinador(e.target.value)}
+                            />
                         </div>
                         
-                        <div className="max-h-[250px] overflow-y-auto custom-scrollbar divide-y divide-gray-100">
+                        <div className="max-h-[200px] overflow-y-auto custom-scrollbar divide-y divide-gray-100 border border-gray-100 rounded-lg bg-gray-50/50">
                             {coordinadoresVisibles.length > 0 ? (
                                 coordinadoresVisibles.map((coord: CoordinadorData) => {
                                     const isSelected = coordinadoresSeleccionados.includes(coord.rut);
@@ -239,13 +247,13 @@ return (
                                         <button
                                             key={coord.rut}
                                             onClick={() => toggleCoordinador(coord.rut)}
-                                            className={`w-full flex items-center gap-3 px-4 py-3 text-sm transition-all text-left hover:bg-gray-50 ${isSelected ? 'bg-blue-50/60' : ''}`}
+                                            className={`w-full flex items-center gap-3 px-3 py-3 text-sm transition-all text-left hover:bg-white ${isSelected ? 'bg-blue-50/50' : ''}`}
                                         >
                                             <div className={`flex-shrink-0 transition-colors ${isSelected ? 'text-blue-600' : 'text-gray-300'}`}>
                                                 {isSelected ? <CheckSquare className="w-5 h-5" /> : <Square className="w-5 h-5" />}
                                             </div>
                                             <div className="min-w-0">
-                                                <p className={`truncate font-medium ${isSelected ? 'text-blue-800' : 'text-gray-700'}`}>
+                                                <p className={`truncate font-medium ${isSelected ? 'text-blue-800' : 'text-gray-600'}`}>
                                                     {coord.nombres} {coord.apellidos}
                                                 </p>
                                             </div>
@@ -253,185 +261,158 @@ return (
                                     );
                                 })
                             ) : (
-                                <div className="p-6 text-center">
-                                    <p className="text-xs text-gray-400 italic">No se encontraron resultados</p>
+                                <div className="p-4 text-center">
+                                    <p className="text-sm text-gray-400 italic">No se encontraron resultados</p>
                                 </div>
                             )}
                         </div>
                         
                         {coordinadoresSeleccionados.length > 0 && (
-                            <div className="p-2 bg-gray-50 border-t border-gray-100">
-                                <button 
-                                    onClick={() => setCoordinadoresSeleccionados([])}
-                                    className="w-full py-1.5 text-xs font-semibold text-blue-600 hover:text-blue-800 hover:bg-blue-50 rounded transition-colors"
-                                >
-                                    Limpiar selección
-                                </button>
-                            </div>
+                            <button 
+                                onClick={() => setCoordinadoresSeleccionados([])}
+                                className="w-full mt-2 text-xs font-semibold text-blue-600 hover:text-blue-800 hover:underline transition-colors text-right"
+                            >
+                                Limpiar selección ({coordinadoresSeleccionados.length})
+                            </button>
                         )}
                     </div>
 
-                    <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-5">
-                        <div className="flex items-center gap-2 mb-4 text-gray-800 border-b border-gray-100 pb-2">
-                            <Filter className="w-4 h-4 text-blue-600" />
-                            <h3 className="font-bold text-sm uppercase tracking-wide">Filtros Datos</h3>
+                    {/* Filtros Generales */}
+                    <div className="flex items-center gap-2 mb-3 pb-2 border-b border-gray-100">
+                        <SlidersHorizontal className="w-5 h-5 text-blue-600" />
+                        <h3 className="font-bold text-base text-gray-900">Filtros Datos</h3>
+                    </div>
+
+                    <div className="space-y-5">
+                        <div>
+                            <label className="block text-xs font-bold text-gray-600 uppercase tracking-wide mb-2">Asignatura</label>
+                            <select 
+                                className="w-full bg-gray-50 border border-gray-200 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block p-2.5 outline-none transition-all"
+                                value={filtroAsignatura}
+                                onChange={(e) => setFiltroAsignatura(e.target.value)}
+                            >
+                                <option value="">Todas las asignaturas</option>
+                                {Object.entries(mapAsig).map(([id, nombre]) => (
+                                    <option key={id} value={id}>{nombre}</option>
+                                ))}
+                            </select>
                         </div>
-                        <div className="space-y-4">
-                            <div>
-                                <label className="block text-xs font-bold text-gray-500 uppercase mb-1.5">Buscar Alumno</label>
+                        
+                        <div>
+                            <label className="block text-xs font-bold text-gray-600 uppercase tracking-wide mb-2">Estado</label>
+                            <select 
+                                className="w-full bg-gray-50 border border-gray-200 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block p-2.5 outline-none transition-all"
+                                value={filtroEstado}
+                                onChange={(e) => setFiltroEstado(e.target.value)}
+                            >
+                                <option value="">Todos los estados</option>
+                                <option value="Pendiente">Pendiente</option>
+                                <option value="Seleccionado">Seleccionado</option>
+                            </select>
+                        </div>
+
+                        <div className="pt-4 border-t border-gray-100">
+                            <label className="block text-xs font-bold text-gray-600 uppercase tracking-wide mb-3">Orden por Puntaje</label>
+                            <div className="flex gap-2">
+                                <button 
+                                    onClick={() => setOrdenTotal("desc")} 
+                                    className={`flex-1 py-2 px-2 rounded-lg text-xs font-medium border transition-colors ${ordenTotal === 'desc' ? 'bg-blue-50 border-blue-200 text-blue-700' : 'border-gray-200 text-gray-600 hover:bg-gray-50'}`}
+                                >
+                                    Mayor
+                                </button>
+                                <button 
+                                    onClick={() => setOrdenTotal("asc")} 
+                                    className={`flex-1 py-2 px-2 rounded-lg text-xs font-medium border transition-colors ${ordenTotal === 'asc' ? 'bg-blue-50 border-blue-200 text-blue-700' : 'border-gray-200 text-gray-600 hover:bg-gray-50'}`}
+                                >
+                                    Menor
+                                </button>
+                            </div>
+                            {ordenTotal && (
+                                <button onClick={() => setOrdenTotal("")} className="w-full mt-2 text-xs text-gray-400 hover:text-gray-600 underline text-right">Limpiar orden</button>
+                            )}
+                        </div>
+                    </div>
+                </div>
+
+                {/* CONTENIDO PRINCIPAL (Tabla) */}
+                <div className="flex-1 w-full min-w-0">
+                    <div className="bg-white rounded-2xl shadow-sm border border-gray-200 p-6">
+                        
+                        {/* Header Interno */}
+                        <div className="flex flex-col sm:flex-row justify-between items-center mb-6 gap-4">
+                            <div className="relative w-full sm:w-96">
+                                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                    <Search className="h-5 w-5 text-gray-400" />
+                                </div>
                                 <input
                                     type="text"
-                                    placeholder="Nombre o RUT..."
+                                    className="block w-full pl-10 pr-3 py-2.5 border border-gray-200 rounded-lg leading-5 bg-gray-50 text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:bg-white transition-all text-sm"
+                                    placeholder="Buscar por nombre o RUT del alumno..."
                                     value={busquedaAlumno}
                                     onChange={(e) => setBusquedaAlumno(e.target.value)}
-                                    className="w-full px-3 py-2 bg-gray-50 border border-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:bg-white outline-none transition-all text-gray-800"
                                 />
                             </div>
 
-                            <div>
-                                <label className="block text-xs font-bold text-gray-500 uppercase mb-1.5">Asignatura</label>
-                                <div className="relative">
-                                    <select 
-                                        className="w-full appearance-none px-3 py-2 bg-gray-50 border border-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:bg-white outline-none transition-all text-gray-800 pr-8"
-                                        value={filtroAsignatura}
-                                        onChange={(e) => setFiltroAsignatura(e.target.value)}
-                                    >
-                                        <option value="">Todas las asignaturas</option>
-                                        {Object.entries(mapAsig).map(([id, nombre]) => (
-                                            <option key={id} value={id}>{nombre}</option>
-                                        ))}
-                                    </select>
-                                    <ChevronDown className="absolute right-3 top-2.5 w-4 h-4 text-gray-400 pointer-events-none" />
-                                </div>
-                            </div>
-                            
-                            <div>
-                                <label className="block text-xs font-bold text-gray-500 uppercase mb-1.5">Estado</label>
-                                <div className="relative">
-                                    <select 
-                                        className="w-full appearance-none px-3 py-2 bg-gray-50 border border-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:bg-white outline-none transition-all text-gray-800 pr-8"
-                                        value={filtroEstado}
-                                        onChange={(e) => setFiltroEstado(e.target.value)}
-                                    >
-                                        <option value="">Todos los estados</option>
-                                        <option value="Pendiente">Pendiente</option>
-                                        <option value="Seleccionado">Seleccionado</option>
-                                    </select>
-                                    <ChevronDown className="absolute right-3 top-2.5 w-4 h-4 text-gray-400 pointer-events-none" />
-                                </div>
-                            </div>
-
-                            <div className="pt-3 border-t border-gray-100">
-                                <label className="block text-xs font-bold text-gray-500 uppercase mb-2">Orden por Puntaje Total</label>
-                                <div className="space-y-2">
-                                    <label className="flex items-center gap-2 text-sm text-gray-700 cursor-pointer">
-                                        <input 
-                                            type="radio" 
-                                            name="ordenTotal" 
-                                            className="text-blue-600 focus:ring-blue-500"
-                                            checked={ordenTotal === 'desc'}
-                                            onChange={() => setOrdenTotal('desc')}
-                                        />
-                                        Mayor a menor
-                                    </label>
-                                    <label className="flex items-center gap-2 text-sm text-gray-700 cursor-pointer">
-                                        <input 
-                                            type="radio" 
-                                            name="ordenTotal" 
-                                            className="text-blue-600 focus:ring-blue-500"
-                                            checked={ordenTotal === 'asc'}
-                                            onChange={() => setOrdenTotal('asc')}
-                                        />
-                                        Menor a mayor
-                                    </label>
-                                    {ordenTotal && (
-                                        <button 
-                                            onClick={() => setOrdenTotal("")}
-                                            className="text-xs text-blue-500 hover:underline pl-5"
-                                        >
-                                            Limpiar orden
-                                        </button>
-                                    )}
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    
-                </div>
-
-                {/* Columna der: Tabla con Paginación */}
-                <div className="flex-1 w-full min-w-0">
-                    <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
-                        
-                        <div className="bg-white border-b border-gray-200 px-6 py-4 flex flex-col sm:flex-row justify-between items-center gap-4">
-                            <div>
-                                <h3 className="text-lg font-bold text-gray-800">Postulantes Disponibles</h3>
-                                <p className="text-xs text-gray-500 mt-0.5">Seleccione un postulante para formalizar su ayudantía.</p>
-                            </div>
-                            
-                            <div className="flex items-center gap-4">
-                                <div className="flex items-center gap-2">
-                                    <span className="text-sm text-gray-500 hidden sm:block">Mostrar</span>
+                            <div className="flex items-center gap-2 bg-gray-50 p-1.5 rounded-lg border border-gray-100">
+                                <div className="hidden sm:flex items-center gap-2 pl-2 pr-2 border-r border-gray-200">
+                                    <span className="text-xs font-medium text-gray-500">Filas:</span>
                                     <input
                                         type="number"
-                                        value={itemsPagina}
+                                        min="1"
+                                        max="100"
+                                        value={itemsPagina || ""}
                                         onChange={handleChangeItemsPorPagina}
-                                        className="w-16 border border-gray-300 text-black rounded-md px-2 py-1.5 text-sm text-center focus:outline-none focus:ring-2 focus:ring-blue-500"
-                                        min={1}
+                                        className="w-12 bg-white border border-gray-200 rounded text-sm font-semibold text-gray-700 text-center focus:ring-1 focus:ring-blue-500 outline-none py-1"
                                     />
-                                    <span className="text-sm text-gray-500 hidden sm:block">filas</span>
                                 </div>
-
-                                <div className="flex items-center gap-2 bg-gray-50 p-1 rounded-lg border border-gray-200">
-                                    <button 
-                                        onClick={() => handlePaginaChange(paginaActual - 1)} 
-                                        disabled={paginaActual === 1} 
-                                        className="p-1.5 rounded hover:bg-white hover:shadow-sm disabled:opacity-30 text-gray-600 transition-all"
-                                    >
-                                        ←
-                                    </button>
-                                    <span className="text-sm font-medium text-gray-700 w-20 text-center select-none">
-                                        {paginaActual} / {totalPaginas || 1}
-                                    </span>
-                                    <button 
-                                        onClick={() => handlePaginaChange(paginaActual + 1)} 
-                                        disabled={paginaActual === totalPaginas} 
-                                        className="p-1.5 rounded hover:bg-white hover:shadow-sm disabled:opacity-30 text-gray-600 transition-all"
-                                    >
-                                        →
-                                    </button>
-                                </div>
+                                <button 
+                                    onClick={() => handlePaginaChange(paginaActual - 1)} 
+                                    disabled={paginaActual === 1} 
+                                    className="p-2 rounded hover:bg-white hover:shadow-sm disabled:opacity-30 text-gray-600 transition-all"
+                                >
+                                    <ChevronLeft className="w-4 h-4" />
+                                </button>
+                                <span className="text-sm font-semibold text-gray-700 w-20 text-center">
+                                    {paginaActual} / {totalPaginas || 1}
+                                </span>
+                                <button 
+                                    onClick={() => handlePaginaChange(paginaActual + 1)} 
+                                    disabled={paginaActual === totalPaginas} 
+                                    className="p-2 rounded hover:bg-white hover:shadow-sm disabled:opacity-30 text-gray-600 transition-all"
+                                >
+                                    <ChevronLeft className="w-4 h-4 rotate-180" />
+                                </button>
                             </div>
                         </div>
 
                         {cargaPostulantes ? (
                             <div className="flex flex-col items-center justify-center py-24">
                                 <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-blue-600 mb-4"></div>
-                                <p className="text-gray-500 font-medium">Cargando postulantes...</p>
+                                <p className="text-gray-500 font-medium text-sm">Cargando postulantes...</p>
                             </div>
                         ) : (
-                            <div className="overflow-hidden">
-                                <table className="w-full text-left border-collapse table-fixed">
-                                    <thead className="bg-gray-50 text-gray-600 uppercase font-medium text-xs tracking-wider">
+                            <div className="overflow-x-auto rounded-lg border border-gray-100">
+                                <table className="min-w-full text-left">
+                                    <thead className="bg-gray-50 text-gray-600 font-bold border-b border-gray-200 text-sm">
                                         <tr>
-                                            <th className="px-2 py-4 w-[10%]">RUT</th>
-                                            <th className="px-2 py-4 w-[15%]">Alumno</th>
-                                            <th className="px-2 py-4 text-center w-[14%]">Asignatura</th>
-                                            <th className="px-2 py-4 text-center w-[14%]">Coordinador</th>
-                                            <th className="px-1 py-4 text-center w-[5%]">P. E1</th>
-                                            <th className="px-1 py-4 text-center w-[5%]">P. E2</th>
-                                            <th className="px-1 py-4 text-center w-[5%]">Total</th>
-                                            <th className="px-2 py-4 text-center w-[10%]">Estado</th>
-                                            <th className="px-2 py-4 text-center w-[20%]">Acciones</th>
+                                            <th className="px-5 py-4 whitespace-nowrap uppercase tracking-wider">RUT</th>
+                                            <th className="px-5 py-4 uppercase tracking-wider min-w-[180px]">Alumno</th>
+                                            <th className="px-5 py-4 text-center uppercase tracking-wider min-w-[120px]">Asignatura</th>
+                                            <th className="px-5 py-4 uppercase tracking-wider min-w-[160px]">Coordinador</th>
+                                            <th className="px-2 py-4 text-center uppercase tracking-wider whitespace-nowrap">P1</th>
+                                            <th className="px-2 py-4 text-center uppercase tracking-wider whitespace-nowrap">P2</th>
+                                            <th className="px-2 py-4 text-center uppercase tracking-wider whitespace-nowrap">Total</th>
+                                            <th className="px-5 py-4 text-center uppercase tracking-wider whitespace-nowrap">Estado</th>
+                                            <th className="px-5 py-4 text-center uppercase tracking-wider whitespace-nowrap">Acciones</th>
                                         </tr>
                                     </thead>
                                     
-                                    <tbody className="bg-white divide-y divide-gray-100">
+                                    <tbody className="bg-white divide-y divide-gray-100 text-sm">
                                         {dataPaginada.length > 0 ? (
                                             dataPaginada.map((item: any, index:number) => {
                                                 const nombreAsig = mapAsig[item.id_asignatura] || item.id_asignatura;
                                                 const coordNombre = item.coordinador 
-                                                    ? `${item.coordinador.nombres} ${item.coordinador.apellidos}` 
+                                                    ? `${item.coordinador.nombres.split(' ')[0]} ${item.coordinador.apellidos.split(' ')[0]}` 
                                                     : "N/A";
                                                 
                                                 const p1 = item.puntuacion_etapa1 || 0;
@@ -446,95 +427,86 @@ return (
                                                 const keyUnica = `${item.id}-${item.rut_alumno}-${item.id_asignatura}-${index}`;
 
                                                 return (
-                                                    <tr key={keyUnica} className="hover:bg-gray-50 transition-colors group">
-                                                    {/* 1. RUT */}
-                                                    <td className="px-2 py-4 text-sm font-medium text-gray-900 font-mono">
+                                                    <tr key={keyUnica} className="hover:bg-blue-50/20 transition-colors group">
+                                                    
+                                                    <td className="px-5 py-4 font-semibold text-gray-900 whitespace-nowrap text-base">
                                                         {item.rut_alumno}
                                                     </td>
 
-                                                    {/* 2. ALUMNO */}
-                                                    <td className="px-2 py-4 text-sm text-gray-700 font-medium break-words whitespace-normal">
+                                                    <td className="px-5 py-4 text-gray-800 font-semibold break-words leading-snug text-base">
                                                         {item.alumno.nombres} {item.alumno.apellidos}
                                                     </td>
 
-                                                    {/* 3. ASIGNATURA */}
-                                                    <td className="px-2 py-4 text-center text-sm text-gray-600">
-                                                        <span className="inline-block px-2 py-1 bg-gray-100 rounded text-xs truncate whitespace-normal w-full">
+                                                    <td className="px-5 py-4 text-center">
+                                                        <span className="inline-block bg-gray-100 text-gray-700 px-3 py-1 rounded text-xs font-medium border border-gray-200 leading-tight">
                                                             {nombreAsig}
                                                         </span>
                                                     </td>
 
-                                                    <td className="px-2 py-4 text-center text-sm text-gray-500 text-xs break-words whitespace-normal">
-                                                        {coordNombre}
+                                                    <td className="px-5 py-4 text-gray-600 text-sm">
+                                                        <div className="flex items-start gap-2">
+                                                            <div className="w-1.5 h-1.5 rounded-full bg-blue-400 mt-1.5 flex-shrink-0"></div>
+                                                            <span className="leading-snug break-words">{coordNombre}</span>
+                                                        </div>
                                                     </td>
 
-                                                    <td className="px-1 py-4 text-center text-sm text-gray-600">
+                                                    <td className="px-2 py-4 text-center text-gray-600 font-medium">
                                                         {p1}
                                                     </td>
-                                                    <td className="px-1 py-4 text-center text-sm text-gray-600">
-                                                        {p2 !== null ? p2 : <span className="text-gray-300">-</span>}
+                                                    <td className="px-2 py-4 text-center text-gray-600 font-medium">
+                                                        {p2 !== null ? p2 : '-'}
                                                     </td>
-                                                    <td className="px-1 py-4 text-center text-sm">
-                                                        <span className="font-bold text-blue-700 bg-blue-50 px-2 py-1 rounded">
+                                                    <td className="px-2 py-4 text-center">
+                                                        <span className="font-bold text-blue-700 bg-blue-50 px-2 py-1 rounded text-base">
                                                             {total}
                                                         </span>
                                                     </td>
 
-                                                    <td className="px-2 py-4 text-center">
-                                                        {yaTieneAyudantia ? (
-                                                            <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800 border border-green-200">
-                                                                Seleccionado
-                                                            </span>
-                                                        ) : (
-                                                            <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800 border border-yellow-200">
-                                                                Pendiente
-                                                            </span>
-                                                        )}
+                                                    <td className="px-5 py-4 text-center">
+                                                        <Badge variant={yaTieneAyudantia ? 'success' : 'warning'}>
+                                                            {yaTieneAyudantia ? 'Seleccionado' : 'Pendiente'}
+                                                        </Badge>
                                                     </td>
                                                     
-                                                    <td className="px-2 py-4 text-center align-middle">
-                                                        <div className="flex flex-wrap items-center justify-center gap-1">
-                                                            <button 
-                                                                onClick={() => setPostulanteVerDetalle(item)}
-                                                                className="p-1 bg-gray-50 text-gray-600 rounded-md hover:bg-gray-100 border border-gray-200 transition-colors"
-                                                                title="Ver Postulación"
-                                                            >
-                                                                <Eye size={15} />
+                                                    <td className="px-5 py-4">
+                                                        <div className="flex items-center justify-center gap-1">
+                                                            <button onClick={() => setPostulanteVerDetalle(item)} className="flex flex-col items-center gap-1 p-2 text-blue-600 hover:bg-blue-50 rounded-lg transition-colors min-w-[50px]" title="Ver Detalle">
+                                                                <Eye className="w-5 h-5" />
+                                                                <span className="text-[11px] font-bold">Detalle</span>
                                                             </button>
 
-                                                            <button 
-                                                                onClick={() => setRutVerCurriculum(item.rut_alumno)}
-                                                                className="p-1 bg-indigo-50 text-indigo-600 rounded-md hover:bg-indigo-100 border border-indigo-200 transition-colors"
-                                                                title="Ver Curriculum"
-                                                            >
-                                                                <FileText size={15} />
+                                                            <button onClick={() => setRutVerCurriculum(item.rut_alumno)} className="flex flex-col items-center gap-1 p-2 text-indigo-600 hover:bg-indigo-50 rounded-lg transition-colors min-w-[50px]" title="Ver CV">
+                                                                <FileText className="w-5 h-5" />
+                                                                <span className="text-[11px] font-bold">CV</span>
                                                             </button>
 
                                                             <button 
                                                                 onClick={() => !yaTieneAyudantia && setIdPostulacionDescartar(item.id)}
                                                                 disabled={yaTieneAyudantia}
-                                                                className={`p-1 rounded-md border transition-colors ${yaTieneAyudantia ? 'bg-gray-100 text-gray-300 border-gray-200 cursor-not-allowed' : 'bg-red-50 text-red-600 hover:bg-red-100 border-red-200'}`}
+                                                                className={`flex flex-col items-center gap-1 p-2 rounded-lg transition-colors min-w-[50px] ${yaTieneAyudantia ? 'text-gray-300 cursor-not-allowed' : 'text-red-600 hover:bg-red-50'}`}
                                                                 title="Descartar"
                                                             >
-                                                                <XCircle size={15} />
+                                                                <XCircle className="w-5 h-5" />
+                                                                <span className="text-[11px] font-bold">Borrar</span>
                                                             </button>
 
-                                                            {yaTieneAyudantia ? (
-                                                                <button
-                                                                    disabled
-                                                                    className="flex items-center gap-1 bg-green-600 text-white px-2 py-1.5 rounded-lg text-xs font-semibold shadow-sm opacity-90 cursor-default whitespace-nowrap"
-                                                                >
-                                                                    <CheckCircle size={14}/>
-                                                                </button>
-                                                            ) : (
-                                                                <button
-                                                                    onClick={() => handleFormalizar(item)}
-                                                                    className="flex items-center gap-1 bg-blue-600 hover:bg-blue-700 text-white px-2 py-1 rounded-lg text-xs font-semibold shadow-sm transition-all whitespace-nowrap"
-                                                                    title="Formalizar Ayudantía"
-                                                                >
-                                                                    <UserCheck size={14}/> Escoger
-                                                                </button>
-                                                            )}
+                                                            <div className="pl-1 border-l border-gray-100 ml-1">
+                                                                {yaTieneAyudantia ? (
+                                                                    <div className="flex flex-col items-center gap-1 p-2 text-emerald-600 min-w-[50px]">
+                                                                        <CheckCircle className="w-5 h-5" />
+                                                                        <span className="text-[11px] font-bold">Listo</span>
+                                                                    </div>
+                                                                ) : (
+                                                                    <button
+                                                                        onClick={() => handleFormalizar(item)}
+                                                                        className="flex flex-col items-center justify-center gap-1 p-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors shadow-sm hover:shadow-md min-w-[55px]"
+                                                                        title="Formalizar Ayudantía"
+                                                                    >
+                                                                        <UserCheck className="w-5 h-5"/>
+                                                                        <span className="text-[11px] font-bold">Elegir</span>
+                                                                    </button>
+                                                                )}
+                                                            </div>
                                                         </div>
                                                     </td>
                                                 </tr>
@@ -542,12 +514,12 @@ return (
                                             })
                                         ) : (
                                             <tr>
-                                                <td colSpan={9} className="bg-white">
-                                                    <div className="flex flex-col items-center justify-center min-h-[300px] text-gray-400 text-sm py-12">
-                                                        <div className="bg-gray-50 p-4 rounded-full mb-3">
-                                                            <Search size={40} className="text-gray-300"/>
+                                                <td colSpan={9} className="px-6 py-16 text-center text-gray-400">
+                                                    <div className="flex flex-col items-center justify-center">
+                                                        <div className="bg-gray-50 p-4 rounded-full mb-3 border border-gray-100">
+                                                            <Filter className="w-8 h-8 text-gray-300" />
                                                         </div>
-                                                        <p className="font-medium text-gray-500">No se encontraron registros que coincidan con los filtros.</p>
+                                                        <p className="text-sm font-medium">No se encontraron registros con estos filtros.</p>
                                                     </div>
                                                 </td>
                                             </tr>

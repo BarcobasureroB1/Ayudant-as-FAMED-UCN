@@ -4,6 +4,21 @@ import React, { useMemo, useState } from "react";
 import api from "@/api/axios";
 import { useCambiarTipoUsuario } from "@/hooks/useUsuarios";
 import { useCrearAlumno } from "@/hooks/useAlumnoProfile";
+import { 
+  UserCog, 
+  Search, 
+  ChevronLeft, 
+  ChevronRight, 
+  X, 
+  AlertTriangle, 
+  CheckCircle2, 
+  Save,
+  Mail,
+  Calendar,
+  GraduationCap,
+  BookOpen,
+  Hash
+} from "lucide-react";
 
 interface Usuario {
     rut: string;
@@ -112,7 +127,8 @@ export default function AdministrarUsuarios({
     const confirmarCambio = async () => {
         if (!pending) return;
 
-        if (pending.nuevoTipo !== "alumno" && pending.nuevoTipo !== "admin" && pending.nuevoTipo !== "encargado_ayudantias") {
+        // CORRECCIÓN: Si NO es alumno, actualizamos directo (incluye admin, encargado, etc.)
+        if (pending.nuevoTipo !== "alumno") {
             cambiarTipo.mutate({
                 rut_usuario: pending.rut,
                 nuevo_tipo: pending.nuevoTipo,
@@ -125,7 +141,7 @@ export default function AdministrarUsuarios({
         }
 
         // -------------------------
-        // si es alumno → verificar existencia sin hooks
+        // Lógica exclusiva para cuando se cambia a "alumno"
         // -------------------------
         let alumnoExiste = null;
         try {
@@ -136,7 +152,7 @@ export default function AdministrarUsuarios({
         }
 
         if (alumnoExiste) {
-            // alumno ya existe → actualizar tipo directamente
+            // El perfil ya existe, asignamos el rol
             cambiarTipo.mutate({
                 rut_usuario: pending.rut,
                 nuevo_tipo: "alumno",
@@ -148,9 +164,7 @@ export default function AdministrarUsuarios({
             return;
         }
 
-        // -------------------------
-        // NO existe → abrir formulario
-        // -------------------------
+        // NO existe el perfil → abrir formulario de creación
         const partes = pending.nombre.split(" ");
         const nombres = partes[0] || "";
         const apellidos = partes.slice(1).join(" ") || "";
@@ -194,7 +208,6 @@ export default function AdministrarUsuarios({
     const crearAlumnoSubmit = async () => {
         if (!pending) return;
 
-
         const campos = [
             "correo",
             "fecha_admision",
@@ -236,139 +249,187 @@ export default function AdministrarUsuarios({
         setPending(null);
     };
 
+    // Helper para inputs del formulario
+    const InputField = ({ label, icon: Icon, value, onChange, type = "text", placeholder, readOnly = false }: any) => (
+        <div className="space-y-1.5">
+            <label className="text-xs font-semibold text-slate-700 uppercase tracking-wide flex items-center gap-1.5">
+                {Icon && <Icon className="w-3.5 h-3.5 text-indigo-500" />}
+                {label}
+            </label>
+            <input
+                type={type}
+                value={value}
+                onChange={onChange}
+                readOnly={readOnly}
+                placeholder={placeholder}
+                className={`block w-full rounded-lg border py-2 px-3 text-sm transition-all shadow-sm ${
+                    readOnly 
+                    ? "bg-slate-100 text-slate-500 border-slate-200 cursor-not-allowed font-medium" 
+                    : "bg-white text-slate-900 border-slate-300 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 placeholder:text-slate-400"
+                }`}
+            />
+        </div>
+    );
+
     return (
-        <div className="bg-white rounded-xl shadow-lg p-6 border border-gray-200 relative">
-
-            <div className="flex justify-between items-center mb-4">
-                <h2 className="text-xl font-semibold text-gray-800">Administración de Usuarios</h2>
-                <button
-                    onClick={onClose}
-                    className="px-3 py-1.5 bg-red-500 text-white rounded-md hover:bg-red-600"
-                >
-                    Cerrar
-                </button>
-            </div>
-
-            <div className="flex flex-col sm:flex-row justify-between items-center mb-4">
-                <input
-                  type="text"
-                  placeholder="Buscar asignatura..."
-                  value={busqueda}
-                  onChange={(e) => {
-                    setBusqueda(e.target.value);
-                    setPaginaActual(1);
-                  }}
-                  className="w-full sm:w-1/3 border border-gray-300 text-black rounded-md px-3 py-2 text-sm"
-                />
-
-                <div className="flex items-center gap-2">
-                  <label className="text-sm text-gray-700">Mostrar</label>
-                  <input
-                    type="number"
-                    min={1}
-                    value={isNaN(itemsPorPagina) ? "" : itemsPorPagina}
-                    onChange={(e) => {
-                      const n = Number(e.target.value);
-                      if (n > 0) {
-                        setItemsPorPagina(n);
-                        setPaginaActual(1);
-                      }
-                    }}
-                    className="w-20 border border-gray-300 text-black rounded-md px-2 py-1 text-sm text-center"
-                  />
-                  <span className="text-sm text-gray-700">usuarios</span>
+        <div className="w-full">
+            
+            {/* CONTAINER PRINCIPAL */}
+            <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden mb-6">
+                
+                {/* HEADER */}
+                <div className="p-6 border-b border-gray-100 flex justify-between items-center bg-slate-50/50">
+                    <div className="flex items-center gap-3">
+                        <div className="bg-indigo-100 p-2 rounded-lg text-indigo-600">
+                            <UserCog className="w-6 h-6" />
+                        </div>
+                        <div>
+                            <h2 className="text-xl font-bold text-slate-800">Administración de Usuarios</h2>
+                            <p className="text-sm text-slate-500">Gestión de roles y permisos</p>
+                        </div>
+                    </div>
+                    <button
+                        onClick={onClose}
+                        className="p-2 text-slate-400 hover:text-slate-600 hover:bg-slate-100 rounded-full transition-colors"
+                        title="Cerrar vista"
+                    >
+                        <X className="w-5 h-5" />
+                    </button>
                 </div>
 
-                {totalPaginasFiltradas > 1 && (
-                  <div className="flex items-center gap-2 mt-2 sm:mt-0">
-                    <button
-                      onClick={() => setPaginaActual(paginaActual - 1)}
-                      disabled={paginaActual === 1}
-                      className={`px-3 py-1 rounded-md text-sm border ${
-                        paginaActual === 1
-                          ? "bg-gray-200 text-gray-400"
-                          : "bg-blue-600 text-white"
-                      }`}
-                    >
-                      ← Anterior
-                    </button>
+                <div className="p-6">
+                    {/* BARRA DE CONTROLES */}
+                    <div className="flex flex-col sm:flex-row justify-between items-center mb-6 gap-4">
+                        <div className="relative w-full sm:w-96">
+                            <Search className="absolute left-3 top-2.5 h-5 w-5 text-gray-400" />
+                            <input
+                                type="text"
+                                placeholder="Buscar usuario por nombre o RUT..."
+                                value={busqueda}
+                                onChange={(e) => {
+                                    setBusqueda(e.target.value);
+                                    setPaginaActual(1);
+                                }}
+                                className="block w-full pl-10 pr-3 py-2.5 border border-gray-200 rounded-xl bg-white text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 shadow-sm transition-all text-sm"
+                            />
+                        </div>
 
-                    <span className="text-sm text-gray-700">
-                      Página {paginaActual} de {totalPaginasFiltradas}
-                    </span>
+                        <div className="flex items-center gap-3 bg-white p-1 rounded-lg border border-gray-200 shadow-sm">
+                            <div className="flex items-center gap-2 pl-3 border-r border-gray-100 pr-3">
+                                <span className="text-xs text-gray-600 font-medium">Filas:</span>
+                                <input
+                                    type="number"
+                                    min="1"
+                                    value={isNaN(itemsPorPagina) ? "" : itemsPorPagina}
+                                    onChange={(e) => {
+                                        const n = Number(e.target.value);
+                                        if (n > 0) {
+                                            setItemsPorPagina(n);
+                                            setPaginaActual(1);
+                                        }
+                                    }}
+                                    className="w-12 text-center text-sm border-gray-100 text-gray-600 rounded-md focus:ring-indigo-500 focus:border-indigo-500 py-1"
+                                />
+                            </div>
 
-                    <button
-                      onClick={() => setPaginaActual(paginaActual + 1)}
-                      disabled={paginaActual === totalPaginasFiltradas}
-                      className={`px-3 py-1 rounded-md text-sm border ${
-                        paginaActual === totalPaginasFiltradas
-                          ? "bg-gray-200 text-gray-400"
-                          : "bg-blue-600 text-white"
-                      }`}
-                    >
-                      Siguiente →
-                    </button>
-                  </div>
-                )}
-            </div>
+                            <div className="flex items-center gap-1 pr-1">
+                                <button 
+                                    onClick={() => setPaginaActual(p => Math.max(1, p - 1))} 
+                                    disabled={paginaActual === 1} 
+                                    className="p-1.5 rounded-md hover:bg-gray-100 disabled:opacity-30 text-gray-600 transition-colors"
+                                >
+                                    <ChevronLeft className="w-4 h-4" />
+                                </button>
+                                <span className="text-sm font-medium text-gray-700 min-w-[60px] text-center">
+                                    {paginaActual} / {totalPaginasFiltradas || 1}
+                                </span>
+                                <button 
+                                    onClick={() => setPaginaActual(p => Math.min(totalPaginasFiltradas, p + 1))} 
+                                    disabled={paginaActual === totalPaginasFiltradas} 
+                                    className="p-1.5 rounded-md hover:bg-gray-100 disabled:opacity-30 text-gray-600 transition-colors"
+                                >
+                                    <ChevronRight className="w-4 h-4" />
+                                </button>
+                            </div>
+                        </div>
+                    </div>
 
-            <div className="overflow-y-auto max-h-[60vh]">
-                <table className="w-full text-left">
-                    <thead>
-                        <tr className="border-b text-black">
-                            <th className="p-2">RUT</th>
-                            <th className="p-2">Nombre</th>
-                            <th className="p-2">Tipo</th>
-                            <th className="p-2">Cambiar</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {usuariosPaginados.map((u) => (
-                            <tr key={u.rut} className="border-b text-black">
-                                <td className="p-2">{u.rut}</td>
-                                <td className="p-2">{u.nombres} {u.apellidos}</td>
-                                <td className="p-2">{u.tipo}</td>
-                                <td className="p-2">
-                                    <select
-                                        className="border px-2 py-1 rounded"
-                                        value={selectedTipos[u.rut]}
-                                        onChange={(e) => handleSelectChange(u.rut, e.target.value)}
-                                    >
-                                        {opciones.map((o) => (
-                                            <option key={o.value} value={o.value}>
-                                                {o.label}
-                                            </option>
-                                        ))}
-                                    </select>
-                                </td>
-                            </tr>
-                        ))}
-                    </tbody>
-                </table>
+                    {/* TABLA DE USUARIOS */}
+                    <div className="overflow-hidden rounded-xl border border-gray-200 shadow-sm bg-white">
+                        <table className="min-w-full divide-y divide-gray-200 table-fixed">
+                            <thead className="bg-slate-50">
+                                <tr>
+                                    <th className="w-[20%] px-6 py-4 text-left text-xs font-bold text-slate-500 uppercase tracking-wider">RUT</th>
+                                    <th className="w-[30%] px-6 py-4 text-left text-xs font-bold text-slate-500 uppercase tracking-wider">Nombre</th>
+                                    <th className="w-[20%] px-6 py-4 text-left text-xs font-bold text-slate-500 uppercase tracking-wider">Tipo Actual</th>
+                                    <th className="w-[30%] px-6 py-4 text-left text-xs font-bold text-slate-500 uppercase tracking-wider">Acción (Cambiar)</th>
+                                </tr>
+                            </thead>
+                            <tbody className="divide-y divide-gray-200 bg-white">
+                                {usuariosPaginados.map((u) => (
+                                    <tr key={u.rut} className="hover:bg-slate-50/50 transition-colors">
+                                        <td className="px-6 py-4 whitespace-nowrap text-sm font-mono text-slate-500">{u.rut}</td>
+                                        <td className="px-6 py-4 whitespace-nowrap text-sm font-semibold text-slate-900">{u.nombres} {u.apellidos}</td>
+                                        <td className="px-6 py-4 whitespace-nowrap text-sm text-slate-600">
+                                            <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-slate-100 text-slate-700 border border-slate-200">
+                                                {opciones.find(o => o.value === u.tipo)?.label || u.tipo}
+                                            </span>
+                                        </td>
+                                        <td className="px-6 py-4 whitespace-nowrap">
+                                            <select
+                                                className="block w-full max-w-[240px] rounded-lg border-slate-300 py-1.5 px-3 text-sm focus:border-indigo-500 focus:ring-indigo-500 shadow-sm bg-white text-slate-700 cursor-pointer"
+                                                value={selectedTipos[u.rut]}
+                                                onChange={(e) => handleSelectChange(u.rut, e.target.value)}
+                                            >
+                                                {opciones.map((o) => (
+                                                    <option key={o.value} value={o.value}>
+                                                        {o.label}
+                                                    </option>
+                                                ))}
+                                            </select>
+                                        </td>
+                                    </tr>
+                                ))}
+                                {usuariosPaginados.length === 0 && (
+                                    <tr>
+                                        <td colSpan={4} className="px-6 py-12 text-center text-slate-500 text-sm">
+                                            No se encontraron usuarios.
+                                        </td>
+                                    </tr>
+                                )}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
             </div>
 
             {/* POPUP CONFIRMACION */}
             {showConfirmPopup && pending && (
-                <div className="fixed inset-0 bg-black/50 flex justify-center items-center text-black">
-                    <div className="bg-white p-6 rounded-xl w-[350px]">
-                        <h3 className="text-lg font-semibold mb-3">Confirmar Cambio</h3>
-                        <p className="mb-4">
-                            ¿Seguro que deseas cambiar el tipo de  
-                            <b> {pending.nombre} </b>  
-                            a <b>{pending.nuevoTipo}</b>?
+                <div className="fixed inset-0 z-[100] flex items-center justify-center bg-slate-900/60 backdrop-blur-sm p-4 animate-in fade-in duration-200">
+                    <div className="bg-white rounded-2xl shadow-xl max-w-sm w-full p-6 text-center border border-slate-100 transform scale-100">
+                        <div className="mx-auto bg-indigo-50 w-14 h-14 rounded-full flex items-center justify-center mb-4">
+                            <UserCog className="w-7 h-7 text-indigo-600" />
+                        </div>
+                        
+                        <h3 className="text-lg font-bold text-slate-900 mb-2">Confirmar Cambio de Rol</h3>
+                        
+                        <p className="text-slate-600 text-sm leading-relaxed mb-6">
+                            ¿Seguro que deseas cambiar el rol de <br/>
+                            <span className="font-semibold text-slate-800">{pending.nombre}</span> <br/>
+                            a <span className="font-semibold text-indigo-600 bg-indigo-50 px-2 py-0.5 rounded">{opciones.find(o => o.value === pending.nuevoTipo)?.label}</span>?
                         </p>
 
-                        <div className="flex justify-between mt-4">
+                        <div className="flex justify-center gap-3">
                             <button
                                 onClick={cancelarCambio}
-                                className="px-4 py-2 bg-gray-300 rounded"
+                                className="flex-1 px-4 py-2.5 text-slate-700 bg-white border border-slate-200 hover:bg-slate-50 rounded-lg text-sm font-medium transition-colors"
                             >
                                 Cancelar
                             </button>
 
                             <button
                                 onClick={confirmarCambio}
-                                className="px-4 py-2 bg-blue-500 text-white rounded"
+                                className="flex-1 px-4 py-2.5 bg-indigo-600 text-white hover:bg-indigo-700 rounded-lg shadow-sm text-sm font-medium transition-colors"
                             >
                                 Confirmar
                             </button>
@@ -377,92 +438,103 @@ export default function AdministrarUsuarios({
                 </div>
             )}
 
-            {/* POPUP FORM PARA CAMBIAR UN TIPO POR ALUMNO */}
+            {/* POPUP FORM PARA CAMBIAR A ALUMNO */}
             {showAlumnoPopup && (
-                <div className="fixed inset-0 bg-black/50 flex justify-center items-center text-black overflow-auto p-4">
-                    <div className="bg-white p-6 rounded-xl w-[420px]">
-                        <h3 className="text-lg font-semibold mb-4">Es necesario tener datos de alumno para el cambio. Crea un perfil para el alumno:</h3>
+                <div className="fixed inset-0 z-[100] overflow-y-auto">
+                    <div className="flex min-h-full items-center justify-center p-4 text-center sm:p-0">
+                        <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-sm transition-opacity" onClick={cancelarCambio} />
+                        
+                        <div className="relative transform overflow-hidden rounded-2xl bg-white text-left shadow-2xl transition-all sm:my-8 w-full max-w-2xl border border-slate-100">
+                            {/* Header Formulario */}
+                            <div className="bg-white px-6 py-5 border-b border-slate-100 flex justify-between items-center">
+                                <div>
+                                    <h3 className="text-lg font-bold text-slate-900 flex items-center gap-2">
+                                        <GraduationCap className="w-5 h-5 text-indigo-600"/> Crear Perfil de Alumno
+                                    </h3>
+                                    <p className="text-sm text-slate-500 mt-1">Es necesario completar estos datos para el rol de Alumno.</p>
+                                </div>
+                                <button onClick={cancelarCambio} className="text-slate-400 hover:text-slate-600 p-1 rounded-full hover:bg-slate-50 transition-colors">
+                                    <X className="w-6 h-6"/>
+                                </button>
+                            </div>
 
-                        <div className="flex flex-col gap-3 overflow-auto p-4 max-h-[60vh]">
+                            <div className="p-6 bg-slate-50/30 max-h-[70vh] overflow-y-auto custom-scrollbar">
+                                <div className="space-y-6">
+                                    {/* Sección Datos Básicos (Read Only) */}
+                                    <div className="bg-slate-50 p-4 rounded-xl border border-slate-200 space-y-3">
+                                        <h4 className="text-xs font-bold text-slate-500 uppercase tracking-wide mb-2">Datos de Usuario (No Editables)</h4>
+                                        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                                            <InputField label="RUT" value={formAlumno.rut_alumno} readOnly />
+                                            <InputField label="Nombres" value={formAlumno.nombres} readOnly />
+                                            <InputField label="Apellidos" value={formAlumno.apellidos} readOnly />
+                                        </div>
+                                    </div>
 
-                            <input className="border px-3 py-2 rounded" value={formAlumno.rut_alumno} readOnly />
-                            <input className="border px-3 py-2 rounded" value={formAlumno.nombres} readOnly />
-                            <input className="border px-3 py-2 rounded" value={formAlumno.apellidos} readOnly />
+                                    {/* Sección Datos Académicos */}
+                                    <div>
+                                        <h4 className="text-xs font-bold text-indigo-600 uppercase tracking-wide mb-3 flex items-center gap-2">
+                                            <BookOpen className="w-4 h-4"/> Información Académica
+                                        </h4>
+                                        <div className="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-5">
+                                            <InputField 
+                                                label="Correo Institucional" icon={Mail}
+                                                value={formAlumno.correo} 
+                                                onChange={(e: any) => setFormAlumno({ ...formAlumno, correo: e.target.value })}
+                                                placeholder="ejemplo@alumnos.ucn.cl"
+                                            />
+                                            <InputField 
+                                                label="Fecha de Admisión" icon={Calendar} type="date"
+                                                value={formAlumno.fecha_admision} 
+                                                onChange={(e: any) => setFormAlumno({ ...formAlumno, fecha_admision: e.target.value })}
+                                            />
+                                            <InputField 
+                                                label="Nivel (Semestre)" icon={Hash} type="number"
+                                                value={formAlumno.nivel} 
+                                                onChange={(e: any) => setFormAlumno({ ...formAlumno, nivel: e.target.value })}
+                                                placeholder="Ej: 5"
+                                            />
+                                            <InputField 
+                                                label="Código Carrera" icon={Hash}
+                                                value={formAlumno.codigo_carrera} 
+                                                onChange={(e: any) => setFormAlumno({ ...formAlumno, codigo_carrera: e.target.value })}
+                                                placeholder="Ej: 1205"
+                                            />
+                                            <InputField 
+                                                label="Nombre Carrera" 
+                                                value={formAlumno.nombre_carrera} 
+                                                onChange={(e: any) => setFormAlumno({ ...formAlumno, nombre_carrera: e.target.value })}
+                                                placeholder="Ej: Medicina"
+                                            />
+                                            <InputField 
+                                                label="Promedio General" type="number"
+                                                value={formAlumno.promedio} 
+                                                onChange={(e: any) => setFormAlumno({ ...formAlumno, promedio: e.target.value })}
+                                                placeholder="Ej: 5.8"
+                                            />
+                                            <InputField 
+                                                label="Periodo Actual" placeholder="Ej: 202520"
+                                                value={formAlumno.periodo} 
+                                                onChange={(e: any) => setFormAlumno({ ...formAlumno, periodo: e.target.value })}
+                                            />
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
 
-                            <p className="text-black">Correo electrónico</p>
-                            <input
-                                className="border px-3 py-2 rounded"
-                                value={formAlumno.correo}
-                                onChange={(e) => setFormAlumno({ ...formAlumno, correo: e.target.value })}
-                                placeholder="Correo"
-                            />
-
-                            <p className="text-black">Fecha de admisión</p>
-                            <input
-                                className="border px-3 py-2 rounded"
-                                type="date"
-                                value={formAlumno.fecha_admision}
-                                onChange={(e) => setFormAlumno({ ...formAlumno, fecha_admision: e.target.value })}
-                            />
-
-                            <p className="text-black">Nivel</p>
-                            <input
-                                className="border px-3 py-2 rounded"
-                                type="number"
-                                placeholder="Nivel"
-                                value={formAlumno.nivel}
-                                onChange={(e) => setFormAlumno({ ...formAlumno, nivel: e.target.value })}
-                            />
-
-                            <p className="text-black">Código de carrera</p>
-                            <input
-                                className="border px-3 py-2 rounded"
-                                placeholder="Código de carrera"
-                                value={formAlumno.codigo_carrera}
-                                onChange={(e) => setFormAlumno({ ...formAlumno, codigo_carrera: e.target.value })}
-                            />
-
-                            <p className="text-black">Nombre de la carrera</p>
-                            <input
-                                className="border px-3 py-2 rounded"
-                                placeholder="Nombre de la carrera"
-                                value={formAlumno.nombre_carrera}
-                                onChange={(e) => setFormAlumno({ ...formAlumno, nombre_carrera: e.target.value })}
-                            />
-
-                            <p className="text-black">Promedio de notas</p>
-                            <input
-                                className="border px-3 py-2 rounded"
-                                type="number"
-                                placeholder="Promedio"
-                                value={formAlumno.promedio}
-                                onChange={(e) => setFormAlumno({ ...formAlumno, promedio: e.target.value })}
-                            />
-
-                            <p className="text-black">Periodo actual (formato YYYYSemestre) (Ej: 202520)</p>
-                            <input
-                                className="border px-3 py-2 rounded"
-                                type="number"
-                                placeholder="Periodo"
-                                value={formAlumno.periodo}
-                                onChange={(e) => setFormAlumno({ ...formAlumno, periodo: e.target.value })}
-                            />
-                        </div>
-
-                        <div className="flex justify-between mt-5">
-                            <button
-                                onClick={cancelarCambio}
-                                className="px-4 py-2 bg-gray-300 rounded"
-                            >
-                                Cancelar
-                            </button>
-
-                            <button
-                                onClick={crearAlumnoSubmit}
-                                className="px-4 py-2 bg-green-500 text-white rounded"
-                            >
-                                Guardar Alumno
-                            </button>
+                            <div className="px-6 py-4 bg-white border-t border-slate-100 flex justify-end gap-3">
+                                <button
+                                    onClick={cancelarCambio}
+                                    className="px-4 py-2.5 text-slate-700 bg-white border border-slate-200 hover:bg-slate-50 rounded-lg text-sm font-medium transition-colors"
+                                >
+                                    Cancelar
+                                </button>
+                                <button
+                                    onClick={crearAlumnoSubmit}
+                                    className="px-4 py-2.5 bg-indigo-600 text-white hover:bg-indigo-700 rounded-lg shadow-sm text-sm font-medium transition-colors flex items-center gap-2"
+                                >
+                                    <Save className="w-4 h-4" /> Guardar y Asignar
+                                </button>
+                            </div>
                         </div>
                     </div>
                 </div>

@@ -10,6 +10,7 @@ export default function RegisterPage() {
     const [rut, setRut] = useState('');
     const [nombres, setNombres] = useState('');
     const [apellidos, setApellidos] = useState('');
+    const [correo, setCorreo] = useState(''); // Estado para el correo
     const [password, setPassword] = useState('');
     const [mostrarPassword, setMostrarPassword] = useState(false);
     const router = useRouter();
@@ -33,7 +34,7 @@ export default function RegisterPage() {
     }
 
     const enviar = () => {
-      if (!rut || !nombres || !apellidos || !password) {
+      if (!rut || !nombres || !apellidos || !correo || !password) {
         Alert.alert('Campos incompletos', 'Por favor, rellena todos los campos.');
         return;
       }
@@ -42,6 +43,7 @@ export default function RegisterPage() {
           rut,
           nombres: nombres,
           apellidos: apellidos,
+          correo: correo, // Se envía el correo
           tipo: 'alumno',
           password,
       });
@@ -95,6 +97,20 @@ export default function RegisterPage() {
                         />
                     </View>
 
+                    {/* CAMPO DE CORREO AGREGADO */}
+                    <View style={styles.fieldContainer}>
+                        <Text style={styles.label}>Correo Institucional</Text>
+                        <TextInput
+                            style={styles.input}
+                            placeholder="usuario@alumnos.ucn.cl"
+                            placeholderTextColor={colors.textPlaceholder}
+                            value={correo}
+                            onChangeText={setCorreo}
+                            keyboardType="email-address"
+                            autoCapitalize="none"
+                            textContentType="emailAddress"
+                        />
+                    </View>
 
                     <View style={styles.fieldContainer}>
                         <Text style={styles.label}>Contraseña</Text>
@@ -140,104 +156,6 @@ export default function RegisterPage() {
         </SafeAreaView>
     );
 }
-
-
-/*const styles = StyleSheet.create({
-    container: {
-        flex: 1,
-        backgroundColor: '#F3F4F6', 
-    },
-    flexContainer: {
-        flex:1,
-    },
-    content: {
-        flex: 1,
-        justifyContent: 'center', 
-        padding: 16, 
-    },
-    card: {
-        backgroundColor: '#FFFFFF', 
-        borderRadius: 12, 
-        padding: 24,
-        shadowColor: "#000", 
-        shadowOffset: {
-            width: 0,
-            height: 2,
-        },
-        shadowOpacity: 0.1,
-        shadowRadius: 3.84,
-        elevation: 5,
-    },
-    title: {
-        fontSize: 18, 
-        fontWeight: '600',
-        color: '#4B5563', 
-        textAlign: 'center',
-        marginBottom: 24,
-    },
-    fieldContainer: {
-        marginBottom: 16,
-    },
-    label: {
-        fontSize: 14,
-        fontWeight: '500',
-        color: '#374151',
-        marginBottom: 4,
-    },
-    input: {
-        backgroundColor: '#F9FAFB',
-        borderWidth: 1,
-        borderColor: '#D1D5DB',
-        borderRadius: 8,
-        padding: 12,
-        fontSize: 16,
-        color: '#111827',
-    },
-    inputContainer: {
-        flexDirection: 'row',
-        alignItems: 'center',
-        backgroundColor: '#F9FAFB',
-        borderWidth: 1,
-        borderColor: '#D1D5DB',
-        borderRadius: 8,
-        
-    },
-    inputInContainer: {
-        flex: 1,
-        paddingVertical: 12,
-        paddingHorizontal: 12,
-        fontSize: 16,
-        color: '#111827',
-    },
-    eyeIcon: {
-        padding:12,
-    },
-    button: {
-        backgroundColor: '#007AFF', 
-        borderRadius: 8,
-        padding: 14,
-        alignItems: 'center', 
-        marginTop: 8,
-    },
-    buttonDisabled: {
-        backgroundColor: '#9E9E9E', 
-    },
-    buttonText: {
-        color: '#FFFFFF',
-        fontSize: 16,
-        fontWeight: 'bold',
-    },
-    switchButton: {
-        marginTop: 16,
-        padding: 8,
-    },
-    switchButtonText: {
-        color: '#007AFF', 
-        textAlign: 'center',
-        fontSize: 14,
-        fontWeight: '500',
-    },
-});*/
 
 const getStyles = (colors: ReturnType<typeof useThemeColors>) => StyleSheet.create({
     container: {

@@ -6,6 +6,7 @@ export interface AlumnoData
 {
     fecha_admision: string;
     nivel: number;
+    correo:string;
 }
 
 export function useAlumnoProfile(rut_alumno?: string){

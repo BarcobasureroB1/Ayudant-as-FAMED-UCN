@@ -1,80 +1,160 @@
-import React, { useMemo, useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import {
   StyleSheet,
   ScrollView,
   View,
   TouchableOpacity,
-  TextInputProps,
   Alert,
   TextInput,
+  TextInputProps,
+  KeyboardAvoidingView,
+  Platform,
+  SafeAreaView,
+  Pressable,
+  Modal,
+  FlatList
 } from 'react-native';
 import { ThemedText } from '@/components/themed-text';
-import { ThemedView } from '@/components/themed-view';
-import { useCrearCurriculum } from '@/hooks/useCurriculum';
-import { useUserProfile } from '@/hooks/useUserProfile';
-import { Ionicons } from '@expo/vector-icons';
 import { Stack, useRouter} from 'expo-router';
+import { Ionicons } from '@expo/vector-icons';
 import { useAuth } from '@/context/AuthContext';
 import { useQueryClient } from '@tanstack/react-query';
 import { useThemeColors } from '@/hooks/useThemeColors';
+import DateTimePicker from '@react-native-community/datetimepicker';
+import { useCrearCurriculum } from '@/hooks/useCurriculum';
+import { useUserProfile } from '@/hooks/useUserProfile';
 
-
-interface FormInputProps {
-    label: string;
-    value: string;
-    onChangeText: (text: string) => void;
-    placeholder?: string;
-    keyboardType?: 'default' | 'email-address' | 'numeric' | 'phone-pad';
-    multiline?: boolean;
-    numberOfLines?: number;
-    disabled?: boolean;
-    autoCapitalize?: TextInputProps['autoCapitalize'];
-    styles: any;
-    placeholderTextcolor: string;
+// --- COMPONENTE INPUT MODERNO ---
+interface ModernInputProps extends TextInputProps {
+  label: string;
+  icon: keyof typeof Ionicons.glyphMap;
+  showCharCount?: boolean;
+  maxLength?: number;
 }
 
-const FormInput: React.FC<FormInputProps> = ({
-    label,
-    value,
-    onChangeText,
-    placeholder,
-    keyboardType = 'default',
-    multiline = false,
-    numberOfLines = 1,
-    disabled = false,
-    autoCapitalize= "none",
-    styles,
-    placeholderTextcolor
+const ModernInput: React.FC<ModernInputProps & { styles: any, colors: any }> = ({
+  label,
+  icon,
+  styles,
+  colors,
+  showCharCount,
+  maxLength,
+  value,
+  editable = true,
+  ...props
 }) => (
-    <View style={styles.inputContainer}>
-        <ThemedText style={styles.inputLabel}>{label}</ThemedText>
-        <TextInput
-            style={[styles.input, multiline && styles.textArea, disabled && styles.inputDisabled]}
-            value={value}
-            onChangeText={onChangeText}
-            placeholder={placeholder}
-            keyboardType={keyboardType}
-            multiline={multiline}
-            numberOfLines={numberOfLines}
-            editable={!disabled}
-            placeholderTextColor={placeholderTextcolor}
-            autoCapitalize={autoCapitalize}
-        />
+  <View style={styles.inputWrapper}>
+    <ThemedText style={styles.inputLabel}>{label}</ThemedText>
+    <View style={[styles.inputContainer, props.multiline && styles.textAreaContainer, !editable && styles.inputDisabled]}>
+      <Ionicons name={icon} size={20} color={editable ? colors.primary : colors.textPlaceholder} style={[styles.inputIcon, props.multiline && { marginTop: 12 }]} />
+      <TextInput
+        style={[styles.input, props.multiline && styles.textArea, !editable && { color: colors.textPlaceholder }]}
+        placeholderTextColor={colors.textPlaceholder}
+        value={value}
+        maxLength={maxLength}
+        editable={editable}
+        {...props}
+      />
     </View>
+    {showCharCount && maxLength && (
+      <ThemedText style={[styles.charCount, (value?.length || 0) >= maxLength ? { color: colors.error } : {}]}>
+        {value?.length || 0} / {maxLength}
+      </ThemedText>
+    )}
+  </View>
 );
+
+// --- COMPONENTE PICKER MES / AÑO PERSONALIZADO ---
+const MonthYearPicker = ({ visible, onClose, onConfirm, styles, colors }: any) => {
+    const months = [
+        "Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio",
+        "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"
+    ];
+    
+    const currentYear = new Date().getFullYear();
+    const years = Array.from({ length: 50 }, (_, i) => currentYear - i); // Últimos 50 años
+
+    const [selectedMonth, setSelectedMonth] = useState(new Date().getMonth());
+    const [selectedYear, setSelectedYear] = useState(currentYear);
+
+    const handleConfirm = () => {
+        // Formato MM/AAAA
+        const monthStr = (selectedMonth + 1).toString().padStart(2, '0');
+        onConfirm(`${monthStr}/${selectedYear}`);
+        onClose();
+    };
+
+    return (
+        <Modal transparent visible={visible} animationType="fade" onRequestClose={onClose}>
+            <Pressable style={styles.modalOverlay} onPress={onClose}>
+                <View style={[styles.pickerContainer, { backgroundColor: colors.card }]}>
+                    {/* Header */}
+                    <View style={styles.pickerHeader}>
+                        <TouchableOpacity onPress={onClose}>
+                            <ThemedText style={{ color: colors.error }}>Cancelar</ThemedText>
+                        </TouchableOpacity>
+                        <ThemedText type="defaultSemiBold">Seleccionar Periodo</ThemedText>
+                        <TouchableOpacity onPress={handleConfirm}>
+                            <ThemedText style={{ color: colors.primary, fontWeight: 'bold' }}>Confirmar</ThemedText>
+                        </TouchableOpacity>
+                    </View>
+
+                    {/* Columns */}
+                    <View style={styles.pickerColumns}>
+                        {/* Meses */}
+                        <View style={styles.pickerColumn}>
+                            <ThemedText style={styles.pickerLabel}>Mes</ThemedText>
+                            <ScrollView showsVerticalScrollIndicator={false} style={styles.pickerList}>
+                                {months.map((m, i) => (
+                                    <TouchableOpacity 
+                                        key={m} 
+                                        onPress={() => setSelectedMonth(i)}
+                                        style={[styles.pickerItem, selectedMonth === i && { backgroundColor: colors.primary + '20' }]}
+                                    >
+                                        <ThemedText style={[styles.pickerItemText, selectedMonth === i && { color: colors.primary, fontWeight: 'bold' }]}>
+                                            {m}
+                                        </ThemedText>
+                                    </TouchableOpacity>
+                                ))}
+                            </ScrollView>
+                        </View>
+
+                        {/* Años */}
+                        <View style={styles.pickerColumn}>
+                            <ThemedText style={styles.pickerLabel}>Año</ThemedText>
+                            <ScrollView showsVerticalScrollIndicator={false} style={styles.pickerList}>
+                                {years.map((y) => (
+                                    <TouchableOpacity 
+                                        key={y} 
+                                        onPress={() => setSelectedYear(y)}
+                                        style={[styles.pickerItem, selectedYear === y && { backgroundColor: colors.primary + '20' }]}
+                                    >
+                                        <ThemedText style={[styles.pickerItemText, selectedYear === y && { color: colors.primary, fontWeight: 'bold' }]}>
+                                            {y}
+                                        </ThemedText>
+                                    </TouchableOpacity>
+                                ))}
+                            </ScrollView>
+                        </View>
+                    </View>
+                </View>
+            </Pressable>
+        </Modal>
+    );
+};
+
 
 export default function CrearCurriculumScreen() {
     const router = useRouter();
     const { data: user } = useUserProfile();
     const crearCurriculum = useCrearCurriculum();
     const { setToken, setUsertipo } = useAuth();
-
     const clienteQuery = useQueryClient();
-
     const colors = useThemeColors();
     const styles = useMemo(() => getStyles(colors), [colors]);
 
     const [paso, setPaso] = useState<number>(1);
+    
     const [form, setForm] = useState({
         rut_alumno: user?.rut || "",
         nombres: "",
@@ -86,68 +166,108 @@ export default function CrearCurriculumScreen() {
         correo: "",
         carrera: "",
         otros: "",
-        ayudantias: [{ nombre_asig: "", nombre_coordinador: "", evaluacion_obtenida: "" }],
-        cursos_titulos_grados: [{ nombre_asig: "", n_coordinador: "", evaluacion: "" }],
-        actividades_cientificas: [{ nombre: "", descripcion: "", periodo_participacion: "" }],
-        actividades_extracurriculares: [{ nombre: "", docente: "", descripcion: "", periodo_participacion: "" }],
+        ayudantias: [],
+        cursos_titulos_grados: [],
+        actividades_cientificas: [],
+        actividades_extracurriculares: [],
     });
 
-    const handleChange = (name: string, value: string) => {
-        setForm(prevForm => ({
-        ...prevForm,
-        [name]: value,
-        }));
-    };
+    // --- ESTADOS PARA DATE PICKERS ---
+    // 1. Fecha completa (Nacimiento / Curso)
+    const [showFullDatePicker, setShowFullDatePicker] = useState(false);
+    const [fullDateObject, setFullDateObject] = useState(new Date());
+    const [fullDateTarget, setFullDateTarget] = useState<{ type: 'nacimiento' | 'curso', index?: number } | null>(null);
 
+    // 2. Mes/Año (Periodos)
+    const [showMonthYearPicker, setShowMonthYearPicker] = useState(false);
+    const [monthYearTarget, setMonthYearTarget] = useState<{ type: 'cientifica' | 'extra', index: number } | null>(null);
+
+
+    // --- HANDLERS GENERALES ---
+
+    const handleChange = (name: string, value: string) => {
+        setForm(prev => ({ ...prev, [name]: value }));
+    };
 
     const handleArrayChange = (key: keyof typeof form, index: number, name: string, value: string) => {
         const newArray = [...(form[key] as any[])];
         newArray[index][name] = value;
-        setForm(prevForm => ({
-        ...prevForm,
-        [key]: newArray,
-        }));
+        setForm(prev => ({ ...prev, [key]: newArray }));
     };
-
 
     const addItem = (key: keyof typeof form, emptyItem: any) => {
-        setForm(prevForm => ({
-        ...prevForm,
-        [key]: [...(prevForm[key] as any[]), emptyItem],
-        }));
+        setForm(prev => ({ ...prev, [key]: [...(prev[key] as any[]), emptyItem] }));
     };
-
 
     const removeItem = (key: keyof typeof form, index: number) => {
         const newArray = (form[key] as any[]).filter((_, i) => i !== index);
-        setForm(prevForm => ({
-        ...prevForm,
-        [key]: newArray,
-        }));
+        setForm(prev => ({ ...prev, [key]: newArray }));
     };
+
+    // --- HANDLERS FECHA COMPLETA (AAAA-MM-DD) ---
+
+    const openFullDatePicker = (type: 'nacimiento' | 'curso', index?: number, currentDateString?: string) => {
+        let dateToSet = new Date();
+        if (currentDateString) {
+             const d = new Date(currentDateString); 
+             if (!isNaN(d.getTime())) dateToSet = d;
+        }
+        setFullDateObject(dateToSet);
+        setFullDateTarget({ type, index });
+        setShowFullDatePicker(true);
+    };
+
+    const onFullDateChange = (event: any, selectedDate?: Date) => {
+        const currentDate = selectedDate || fullDateObject;
+        if (Platform.OS === 'android') setShowFullDatePicker(false);
+        setFullDateObject(currentDate);
+
+        if (!fullDateTarget) return;
+
+        const year = currentDate.getFullYear();
+        const month = (currentDate.getMonth() + 1).toString().padStart(2, '0');
+        const day = currentDate.getDate().toString().padStart(2, '0');
+        const formattedDate = `${year}-${month}-${day}`;
+
+        if (fullDateTarget.type === 'nacimiento') {
+            handleChange('fecha_nacimiento', formattedDate);
+        } else if (fullDateTarget.type === 'curso' && fullDateTarget.index !== undefined) {
+            handleArrayChange('cursos_titulos_grados', fullDateTarget.index, 'evaluacion', formattedDate);
+        }
+    };
+
+    // --- HANDLERS MES/AÑO (MM/AAAA) ---
+
+    const openMonthYearPicker = (type: 'cientifica' | 'extra', index: number) => {
+        setMonthYearTarget({ type, index });
+        setShowMonthYearPicker(true);
+    };
+
+    const onMonthYearConfirm = (value: string) => {
+        if (!monthYearTarget) return;
+        if (monthYearTarget.type === 'cientifica') {
+            handleArrayChange('actividades_cientificas', monthYearTarget.index, 'periodo_participacion', value);
+        } else {
+            handleArrayChange('actividades_extracurriculares', monthYearTarget.index, 'periodo_participacion', value);
+        }
+    };
+
 
     const logout = () => {
         clienteQuery.clear();
-        if (setToken)
-        {
-            setToken(null);
-        }
-        if (setUsertipo)
-        {
-            setUsertipo(null);
-        }
-        //SecureStore.deleteItemAsync('token');
-        //SecureStore.deleteItemAsync('tipoUser');
-
+        if (setToken) setToken(null);
+        if (setUsertipo) setUsertipo(null);
         router.replace('/(auth)/login');
     }
 
-
     const handleSubmit = () => {
-        
         if (!form.nombres || !form.apellidos || !form.correo) {
-        Alert.alert("Error", "Por favor completa Todos los campos.");
-        return;
+            Alert.alert("Error", "Por favor completa todos los campos obligatorios.");
+            return;
+        }
+        if (form.otros.length > 700) {
+             Alert.alert("Error", "La información adicional excede el límite de 700 caracteres.");
+             return;
         }
 
         crearCurriculum.mutate(form, {
@@ -163,285 +283,346 @@ export default function CrearCurriculumScreen() {
     }
 
     return(
-        <ThemedView style={styles.container}>
-            <Stack.Screen
-                options={{
-                    title: 'Crear Curriculum',
-                    headerBackVisible: false,
-                    headerStyle: {backgroundColor: colors.background },
-                    headerTitleStyle: { color: colors.text },
-                    headerRight: () => (
-                        <TouchableOpacity onPress={logout} style={styles.logoutButton}>
-                            <Ionicons name="log-out-outline" size={22} color="#C70039"/>
-                            <ThemedText style={styles.logoutButtonText}>Salir</ThemedText>
-                        </TouchableOpacity>
-                    )
-                }}
-            /> 
+        <SafeAreaView style={styles.container}>
+            <Stack.Screen options={{ headerShown: false }} /> 
 
-            <ScrollView
-                contentContainerStyle={styles.scrollContent}
-                keyboardShouldPersistTaps="handled"
-            >
-                <View style={styles.stepIndicatorContainer}>
-                    <ThemedText style={styles.stepText}>Paso {paso} de 2</ThemedText>
-                    <View style={styles.stepBar}>
-                        <View style={[styles.stepBarProgress, {width: `${(paso / 2) * 100}%`}]} />
+            {/* HEADER */}
+            <View style={styles.header}>
+                <TouchableOpacity onPress={() => { if(paso===2) setPaso(1); else router.back() }} style={styles.backButton}>
+                    <Ionicons name="arrow-back" size={24} color={colors.text} />
+                </TouchableOpacity>
+                <ThemedText type="subtitle" style={styles.headerTitle}>Crear Currículum</ThemedText>
+                <TouchableOpacity onPress={logout}>
+                    <Ionicons name="log-out-outline" size={24} color={colors.error}/>
+                </TouchableOpacity>
+            </View>
+
+            <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : 'height'} style={{ flex: 1 }}>
+                <ScrollView contentContainerStyle={styles.scrollContent} keyboardShouldPersistTaps="handled" showsVerticalScrollIndicator={false}>
+                    
+                    {/* INDICADOR DE PASOS */}
+                    <View style={styles.stepIndicatorContainer}>
+                        <ThemedText style={styles.stepText}>Paso {paso} de 2</ThemedText>
+                        <View style={styles.stepBar}>
+                            <View style={[styles.stepBarProgress, {width: `${(paso / 2) * 100}%`, backgroundColor: colors.primary}]} />
+                        </View>
                     </View>
-                </View>
 
-                {paso === 1 && (
-                    <View style={styles.formContainer}>
-                        <ThemedText type="title" style={styles.title}>Datos Personales</ThemedText>
+                    {paso === 1 && (
+                        <View style={styles.card}>
+                            <View style={styles.cardHeader}>
+                                <Ionicons name="person-outline" size={20} color={colors.primary} />
+                                <ThemedText type="defaultSemiBold">Datos Personales</ThemedText>
+                            </View>
 
-                        <FormInput
-                            label="RUT"
-                            value={form.rut_alumno}
-                            onChangeText={(text) => handleChange('rut_alumno', text)}
-                            disabled
-                            styles={styles}
-                            placeholderTextcolor={colors.textPlaceholder}
+                            <ModernInput label="RUT" icon="card" value={form.rut_alumno} onChangeText={() => {}} editable={false} styles={styles} colors={colors} />
                             
-                        />
-                        <FormInput
-                            label="Nombres"
-                            value={form.nombres}
-                            onChangeText={(text) => handleChange('nombres', text)}
-                            placeholder="Juan Andrés"
-                            styles={styles}
-                            placeholderTextcolor={colors.textPlaceholder}
-                        />
-                        <FormInput
-                            label="Apellidos"
-                            value={form.apellidos}
-                            onChangeText={(text) => handleChange('apellidos', text)}
-                            placeholder="Pérez Gonzáles"
-                            styles={styles}
-                            placeholderTextcolor={colors.textPlaceholder}
-                        />
-                        <FormInput
-                            label="Fecha de Nacimiento (AAAA-MM-DD)"
-                            value={form.fecha_nacimiento}
-                            onChangeText={(text) => handleChange('fecha_nacimiento', text)}
-                            placeholder="1999-12-31"
-                            styles={styles}
-                            placeholderTextcolor={colors.textPlaceholder}
-                        />
-                        <FormInput
-                            label="Comuna"
-                            value={form.comuna}
-                            onChangeText={(text) => handleChange('comuna', text)}
-                            placeholder="Providencia"
-                            styles={styles}
-                            placeholderTextcolor={colors.textPlaceholder}
-                        />
-                        <FormInput
-                            label="Ciudad"
-                            value={form.ciudad}
-                            onChangeText={(text) => handleChange('ciudad', text)}
-                            placeholder="Santiago"
-                            styles={styles}
-                            placeholderTextcolor={colors.textPlaceholder}
-                        />
-                        <FormInput
-                            label="Número de Celular"
-                            value={form.num_celular}
-                            onChangeText={(text) => handleChange('num_celular', text)}
-                            keyboardType="phone-pad"
-                            placeholder="+56912345678"
-                            styles={styles}
-                            placeholderTextcolor={colors.textPlaceholder}
-                        />
-                        <FormInput
-                            label="Correo"
-                            value={form.correo}
-                            onChangeText={(text) => handleChange('correo', text)}
-                            keyboardType="email-address"
-                            autoCapitalize="none"
-                            placeholder="tu.correo@universidad.cl"
-                            styles={styles}
-                            placeholderTextcolor={colors.textPlaceholder}
-                        />
-                        <FormInput
-                            label="Carrera"
-                            value={form.carrera}
-                            onChangeText={(text) => handleChange('carrera', text)}
-                            placeholder="Medicina, Kinesiología, etc..."
-                            styles={styles}
-                            placeholderTextcolor={colors.textPlaceholder}
-                        />
-                        <TouchableOpacity
-                            style={[styles.button, styles.buttonNext]}
-                            onPress={() => setPaso(2)}
-                        >
-                            <ThemedText style={styles.buttonText}>Siguiente</ThemedText>
-                            <Ionicons name="arrow-forward" size={18} color="#fff" />
-                        </TouchableOpacity>
-
-                    </View>
-                )}
-
-
-                {paso === 2 && (
-                    <View style={styles.formContainer}>
-                        <ThemedText type="title" style={styles.title}>Información Académica</ThemedText>
-
-                        <View style={styles.dynamicSection}>
-                            <ThemedText style={styles.sectionTitle}>Ayudantias Previas</ThemedText>
-                            {form.ayudantias.map((a, i) => (
-                                <View key={`ayudantia-${i}`} style={styles.dynamicItem}>
-                                    <FormInput label="Asignatura" value={a.nombre_asig} onChangeText={(t) => handleArrayChange('ayudantias', i, 'nombre_asig', t)} styles={styles} placeholderTextcolor={colors.textPlaceholder}/>
-                                    <FormInput label="Coordinador" value={a.nombre_coordinador} onChangeText={(t) => handleArrayChange('ayudantias', i, 'nombre_coordinador', t)} styles={styles} placeholderTextcolor={colors.textPlaceholder}/>
-                                    <FormInput label="Evaluación (Nota)" value={a.evaluacion_obtenida} onChangeText={(t) => handleArrayChange('ayudantias', i, 'evaluacion_obtenida', t)} keyboardType="numeric" styles={styles} placeholderTextcolor={colors.textPlaceholder}/>
-                                    <TouchableOpacity style={styles.removeButton} onPress={() => removeItem('ayudantias', i)}>
-                                        <Ionicons name="trash-outline" size={20} color="#C70039"/>
-                                    </TouchableOpacity>
-                                </View>      
-                            ))}
-                            <TouchableOpacity style={styles.addButton} onPress={() => addItem('ayudantias', { nombre_asig: "", nombre_coordinador: "", evaluacion_obtenida: ""})}>
-                                <Ionicons name="add" size={20} color={colors.primary} />
-                                <ThemedText style={styles.addButtonText}>Agregar Ayudantía</ThemedText>
-                            </TouchableOpacity>
-                        </View>
-
-                        <View style={styles.dynamicSection}>
-                            <ThemedText style={styles.sectionTitle}>Cursos, Titulos y Grados</ThemedText>
-                            {form.cursos_titulos_grados.map((c, i) => (
-                                <View key={`curso-${i}`} style={styles.dynamicItem}>
-                                    <FormInput label="Nombre Título/Curso" value={c.nombre_asig} onChangeText={(t) => handleArrayChange('cursos_titulos_grados', i, 'nombre_asig', t)} styles={styles} placeholderTextcolor={colors.textPlaceholder} />
-                                    <FormInput label="Institución" value={c.n_coordinador} onChangeText={(t) => handleArrayChange('cursos_titulos_grados', i, 'n_coordinador', t)} styles={styles} placeholderTextcolor={colors.textPlaceholder} />
-                                    <FormInput label="Fecha (AAAA-MM-DD)" value={c.evaluacion} onChangeText={(t) => handleArrayChange('cursos_titulos_grados', i, 'evaluacion', t)} styles={styles} placeholderTextcolor={colors.textPlaceholder} />
-                                    <TouchableOpacity style={styles.removeButton} onPress={() => removeItem('cursos_titulos_grados', i)}>
-                                        <Ionicons name="trash-outline" size={20} color="#C70039" />
-                                    </TouchableOpacity>
+                            <View style={styles.row}>
+                                <View style={{flex: 1}}>
+                                    <ModernInput placeholder="Ej: Juan Andrés" label="Nombres" icon="person" value={form.nombres} onChangeText={(t) => handleChange('nombres', t)} styles={styles} colors={colors} />
                                 </View>
-                            ))}
-                            <TouchableOpacity style={styles.addButton} onPress={() => addItem('cursos_titulos_grados', { nombre_asig: "", n_coordinador: "", evaluacion: "" })}>
-                                <Ionicons name="add" size={20} color={colors.primary} />
-                                <ThemedText style={styles.addButtonText}>Agregar Curso/Título</ThemedText>
-                            </TouchableOpacity>
-                        </View>
-
-                        <View style={styles.dynamicSection}>
-                            <ThemedText style={styles.sectionTitle}>Actividades Científicas</ThemedText>
-                            {form.actividades_cientificas.map((a, i) => (
-                                <View key={`cientifica-${i}`} style={styles.dynamicItem}>
-                                    <FormInput label="Nombre Actividad" value={a.nombre} onChangeText={(t) => handleArrayChange('actividades_cientificas', i, 'nombre', t)} styles={styles} placeholderTextcolor={colors.textPlaceholder}/>
-                                    <FormInput label="Descripción" value={a.descripcion} onChangeText={(t) => handleArrayChange('actividades_cientificas', i, 'descripcion', t)} styles={styles} placeholderTextcolor={colors.textPlaceholder}/>
-                                    <FormInput label="Periodo de Participación" value={a.periodo_participacion} onChangeText={(t) => handleArrayChange('actividades_cientificas', i, 'periodo_participacion', t)} styles={styles} placeholderTextcolor={colors.textPlaceholder}/>
-                                    <TouchableOpacity style={styles.removeButton} onPress={() => removeItem('actividades_cientificas', i)}>
-                                        <Ionicons name="trash-outline" size={20} color="#C70039" />
-                                    </TouchableOpacity>
+                                <View style={{width: 10}} />
+                                <View style={{flex: 1}}>
+                                    <ModernInput placeholder="Ej: Pérez Soto" label="Apellidos" icon="person" value={form.apellidos} onChangeText={(t) => handleChange('apellidos', t)} styles={styles} colors={colors} />
                                 </View>
-                            ))}
-                            <TouchableOpacity style={styles.addButton} onPress={() => addItem('actividades_cientificas', { nombre: "", descripcion: "", periodo_participacion: "" })}>
-                                <Ionicons name="add" size={20} color={colors.primary} />
-                                <ThemedText style={styles.addButtonText}>Agregar Act. Científica</ThemedText>
-                            </TouchableOpacity>
-                        </View>
+                            </View>
 
-                        <View style={styles.dynamicSection}>
-                            <ThemedText style={styles.sectionTitle}>Actividades Extracurriculares</ThemedText>
-                            {form.actividades_extracurriculares.map((a, i) => (
-                                <View key={`extra-${i}`} style={styles.dynamicItem}>
-                                    <FormInput label="Nombre Actividad" value={a.nombre} onChangeText={(t) => handleArrayChange('actividades_extracurriculares', i, 'nombre', t)} styles={styles} placeholderTextcolor={colors.textPlaceholder}/>
-                                    <FormInput label="Docente / Institución" value={a.docente} onChangeText={(t) => handleArrayChange('actividades_extracurriculares', i, 'docente', t)} styles={styles} placeholderTextcolor={colors.textPlaceholder}/>
-                                    <FormInput label="Descripción" value={a.descripcion} onChangeText={(t) => handleArrayChange('actividades_extracurriculares', i, 'descripcion', t)} styles={styles} placeholderTextcolor={colors.textPlaceholder}/>
-                                    <FormInput label="Periodo de Participación" value={a.periodo_participacion} onChangeText={(t) => handleArrayChange('actividades_extracurriculares', i, 'periodo_participacion', t)} styles={styles} placeholderTextcolor={colors.textPlaceholder}/>
-                                    <TouchableOpacity style={styles.removeButton} onPress={() => removeItem('actividades_extracurriculares', i)}>
-                                        <Ionicons name="trash-outline" size={20} color="#C70039" />
-                                    </TouchableOpacity>
+                            {/* FECHA NACIMIENTO */}
+                            <View style={styles.inputWrapper}>
+                                <ThemedText style={styles.inputLabel}>Fecha de Nacimiento</ThemedText>
+                                <Pressable onPress={() => openFullDatePicker('nacimiento', undefined, form.fecha_nacimiento)}>
+                                    <View style={[styles.inputContainer, { justifyContent: 'flex-start' }]}>
+                                        <Ionicons name="calendar-outline" size={20} color={colors.primary} style={styles.inputIcon} />
+                                        <ThemedText style={[styles.dateText, !form.fecha_nacimiento && {color: colors.textPlaceholder}]}>
+                                            {form.fecha_nacimiento || "DD/MM/AAAA"}
+                                        </ThemedText>
+                                    </View>
+                                </Pressable>
+                            </View>
+
+                            <ModernInput placeholder="correo@institucional.cl" label="Correo" icon="mail" value={form.correo} onChangeText={(t) => handleChange('correo', t)} keyboardType="email-address" styles={styles} colors={colors} />
+                            <ModernInput placeholder="Ej: 912345678" label="Celular" icon="call" value={form.num_celular} onChangeText={(t) => handleChange('num_celular', t)} keyboardType="phone-pad" styles={styles} colors={colors} />
+                            
+                            <View style={styles.row}>
+                                <View style={{flex: 1}}>
+                                    <ModernInput placeholder="Ej: Viña del Mar" label="Ciudad" icon="map" value={form.ciudad} onChangeText={(t) => handleChange('ciudad', t)} styles={styles} colors={colors} />
                                 </View>
-                            ))}
-                            <TouchableOpacity style={styles.addButton} onPress={() => addItem('actividades_extracurriculares', { nombre: "", docente: "", descripcion: "", periodo_participacion: "" })}>
-                                <Ionicons name="add" size={20} color={colors.primary} />
-                                <ThemedText style={styles.addButtonText}>Agregar Act. Extracurricular</ThemedText>
-                            </TouchableOpacity>
-                        </View>                       
+                                <View style={{width: 10}} />
+                                <View style={{flex: 1}}>
+                                    <ModernInput placeholder="Ej: Centro" label="Comuna" icon="location" value={form.comuna} onChangeText={(t) => handleChange('comuna', t)} styles={styles} colors={colors} />
+                                </View>
+                            </View>
+                            
+                            <ModernInput placeholder="Ej: Medicina / Kinesiología" label="Carrera" icon="school" value={form.carrera} onChangeText={(t) => handleChange('carrera', t)} styles={styles} colors={colors} />
 
-                        <FormInput
-                            label="Información Adicional (Opcional)"
-                            value={form.otros}
-                            onChangeText={(text) => handleChange('otros', text)}
-                            multiline
-                            numberOfLines={5}
-                            placeholder="Logros, habilidades, proyectos, etc."
-                            styles={styles} 
-                            placeholderTextcolor={colors.textPlaceholder}
-                        />
-
-                        <View style={styles.buttonRow}>
-                            <TouchableOpacity
-                                style={[styles.button, styles.buttonBack]}
-                                onPress={() => setPaso(1)}
-                            >
-                                <Ionicons name="arrow-back" size={18} color={colors.text}/>
-                                <ThemedText style={styles.buttonTextBack}>Anterior</ThemedText>
-                            </TouchableOpacity>
-
-                            <TouchableOpacity
-                                style={[styles.button, styles.buttonSubmit]}
-                                onPress={handleSubmit}
-                                disabled={crearCurriculum.isPending}
-                            >
-                                <ThemedText style={styles.buttonText}>
-                                    {crearCurriculum.isPending ? 'Guardando...' : 'Guardar Currículum'}
-                                </ThemedText>
-                                <Ionicons name="save-outline" size={18} color="#fff" />
+                            <TouchableOpacity style={[styles.button, styles.buttonNext]} onPress={() => setPaso(2)}>
+                                <ThemedText style={styles.buttonText}>Siguiente</ThemedText>
+                                <Ionicons name="arrow-forward" size={18} color="#fff" />
                             </TouchableOpacity>
                         </View>
-                    </View>
-                )}
-            </ScrollView>
-        </ThemedView>
+                    )}
+
+                    {paso === 2 && (
+                        <>
+                            <ThemedText type="title" style={styles.sectionPageTitle}>Información Académica</ThemedText>
+
+                            {/* AYUDANTIAS */}
+                            <DynamicSection 
+                                title="Ayudantías Previas" 
+                                icon="book-outline"
+                                data={form.ayudantias} 
+                                onAdd={() => addItem('ayudantias', { nombre_asig: "", nombre_coordinador: "", evaluacion_obtenida: "" })}
+                                onRemove={(i: number) => removeItem('ayudantias', i)}
+                                renderItem={(item: any, i: number) => (
+                                    <>
+                                        <ModernInput placeholder="Ej: Anatomía General / Fisiología" label="Asignatura" icon="book" value={item.nombre_asig} onChangeText={(t) => handleArrayChange('ayudantias', i, 'nombre_asig', t)} styles={styles} colors={colors} />
+                                        <ModernInput placeholder="Ej: Dr. Roberto González" label="Coordinador" icon="person-circle" value={item.nombre_coordinador} onChangeText={(t) => handleArrayChange('ayudantias', i, 'nombre_coordinador', t)} styles={styles} colors={colors} />
+                                        <ModernInput placeholder="Ej: 6.8 / Aprobado" label="Evaluación (Nota)" icon="star" value={item.evaluacion_obtenida} onChangeText={(t) => handleArrayChange('ayudantias', i, 'evaluacion_obtenida', t)} styles={styles} colors={colors} />
+                                    </>
+                                )}
+                                styles={styles}
+                                colors={colors}
+                            />
+
+                            {/* CURSOS */}
+                            <DynamicSection 
+                                title="Cursos, Títulos y Grados" 
+                                icon="ribbon-outline"
+                                data={form.cursos_titulos_grados} 
+                                onAdd={() => addItem('cursos_titulos_grados', { nombre_asig: "", n_coordinador: "", evaluacion: "" })}
+                                onRemove={(i: number) => removeItem('cursos_titulos_grados', i)}
+                                renderItem={(item: any, i: number) => (
+                                    <>
+                                        <ModernInput placeholder="Ej: Curso RCP Básico / ACLS" label="Nombre Título/Curso" icon="ribbon" value={item.nombre_asig} onChangeText={(t) => handleArrayChange('cursos_titulos_grados', i, 'nombre_asig', t)} styles={styles} colors={colors} />
+                                        <ModernInput placeholder="Ej: American Heart Association (AHA)" label="Institución" icon="business" value={item.n_coordinador} onChangeText={(t) => handleArrayChange('cursos_titulos_grados', i, 'n_coordinador', t)} styles={styles} colors={colors} />
+                                        
+                                        {/* Fecha Curso (Día completo) */}
+                                        <View style={styles.inputWrapper}>
+                                            <ThemedText style={styles.inputLabel}>Fecha (AAAA-MM-DD)</ThemedText>
+                                            <Pressable onPress={() => openFullDatePicker('curso', i, item.evaluacion)}>
+                                                <View style={[styles.inputContainer, { justifyContent: 'flex-start' }]}>
+                                                    <Ionicons name="calendar-outline" size={20} color={colors.primary} style={styles.inputIcon} />
+                                                    <ThemedText style={[styles.dateText, !item.evaluacion && {color: colors.textPlaceholder}]}>
+                                                        {item.evaluacion || "AAAA-MM-DD"}
+                                                    </ThemedText>
+                                                </View>
+                                            </Pressable>
+                                        </View>
+                                    </>
+                                )}
+                                styles={styles}
+                                colors={colors}
+                            />
+
+                            {/* CIENTIFICAS (MES/AÑO) */}
+                            <DynamicSection 
+                                title="Actividades Científicas" 
+                                icon="flask-outline"
+                                data={form.actividades_cientificas} 
+                                onAdd={() => addItem('actividades_cientificas', { nombre: "", descripcion: "", periodo_participacion: "" })}
+                                onRemove={(i: number) => removeItem('actividades_cientificas', i)}
+                                renderItem={(item: any, i: number) => (
+                                    <>
+                                        <ModernInput placeholder="Ej: Publicación Case Report: Síndrome X" label="Nombre Actividad" icon="flask" value={item.nombre} onChangeText={(t) => handleArrayChange('actividades_cientificas', i, 'nombre', t)} styles={styles} colors={colors} />
+                                        <ModernInput placeholder="Ej: Presentación de póster, co-autoría..." label="Descripción" icon="document-text" value={item.descripcion} onChangeText={(t) => handleArrayChange('actividades_cientificas', i, 'descripcion', t)} styles={styles} colors={colors} />
+                                        
+                                        {/* Periodo (Mes/Año) */}
+                                        <View style={styles.inputWrapper}>
+                                            <ThemedText style={styles.inputLabel}>Periodo (MM/AAAA)</ThemedText>
+                                            <Pressable onPress={() => openMonthYearPicker('cientifica', i)}>
+                                                <View style={[styles.inputContainer, { justifyContent: 'flex-start' }]}>
+                                                    <Ionicons name="time-outline" size={20} color={colors.primary} style={styles.inputIcon} />
+                                                    <ThemedText style={[styles.dateText, !item.periodo_participacion && {color: colors.textPlaceholder}]}>
+                                                        {item.periodo_participacion || "MM/AAAA"}
+                                                    </ThemedText>
+                                                </View>
+                                            </Pressable>
+                                        </View>
+                                    </>
+                                )}
+                                styles={styles}
+                                colors={colors}
+                            />
+
+                            {/* EXTRACURRICULARES (MES/AÑO) */}
+                            <DynamicSection 
+                                title="Extracurriculares" 
+                                icon="basketball-outline"
+                                data={form.actividades_extracurriculares} 
+                                onAdd={() => addItem('actividades_extracurriculares', { nombre: "", docente: "", descripcion: "", periodo_participacion: "" })}
+                                onRemove={(i: number) => removeItem('actividades_extracurriculares', i)}
+                                renderItem={(item: any, i: number) => (
+                                    <>
+                                        <ModernInput placeholder="Ej: Operativo de Salud Rural / IFMSA" label="Nombre Actividad" icon="basketball" value={item.nombre} onChangeText={(t) => handleArrayChange('actividades_extracurriculares', i, 'nombre', t)} styles={styles} colors={colors} />
+                                        <ModernInput placeholder="Ej: Dra. María Soto" label="Docente / Inst." icon="person" value={item.docente} onChangeText={(t) => handleArrayChange('actividades_extracurriculares', i, 'docente', t)} styles={styles} colors={colors} />
+                                        <ModernInput placeholder="Ej: Atención primaria supervisada..." label="Descripción" icon="document-text" value={item.descripcion} onChangeText={(t) => handleArrayChange('actividades_extracurriculares', i, 'descripcion', t)} styles={styles} colors={colors} />
+                                        
+                                        {/* Periodo (Mes/Año) */}
+                                        <View style={styles.inputWrapper}>
+                                            <ThemedText style={styles.inputLabel}>Periodo (MM/AAAA)</ThemedText>
+                                            <Pressable onPress={() => openMonthYearPicker('extra', i)}>
+                                                <View style={[styles.inputContainer, { justifyContent: 'flex-start' }]}>
+                                                    <Ionicons name="time-outline" size={20} color={colors.primary} style={styles.inputIcon} />
+                                                    <ThemedText style={[styles.dateText, !item.periodo_participacion && {color: colors.textPlaceholder}]}>
+                                                        {item.periodo_participacion || "MM/AAAA"}
+                                                    </ThemedText>
+                                                </View>
+                                            </Pressable>
+                                        </View>
+                                    </>
+                                )}
+                                styles={styles}
+                                colors={colors}
+                            />
+
+                            {/* OTROS - CON LÍMITE */}
+                            <View style={styles.card}>
+                                <View style={styles.cardHeader}>
+                                    <Ionicons name="layers-outline" size={20} color={colors.primary} />
+                                    <ThemedText type="defaultSemiBold">Otros Antecedentes</ThemedText>
+                                </View>
+                                <ModernInput
+                                    label="Información Adicional (Opcional)"
+                                    placeholder="Ej: Nivel de Inglés C1, Manejo de Excel Avanzado, Delegado de Generación 2023. Interés en área de investigación clínica."
+                                    icon="create"
+                                    value={form.otros}
+                                    onChangeText={(text) => handleChange('otros', text)}
+                                    multiline
+                                    numberOfLines={5}
+                                    styles={styles} 
+                                    colors={colors}
+                                    maxLength={700}
+                                    showCharCount={true}
+                                />
+                            </View>
+
+                            <View style={styles.buttonRow}>
+                                <TouchableOpacity style={[styles.button, styles.buttonBack]} onPress={() => setPaso(1)}>
+                                    <Ionicons name="arrow-back" size={18} color={colors.text}/>
+                                    <ThemedText style={styles.buttonTextBack}>Anterior</ThemedText>
+                                </TouchableOpacity>
+
+                                <TouchableOpacity style={[styles.button, styles.buttonSubmit]} onPress={handleSubmit} disabled={crearCurriculum.isPending}>
+                                    <ThemedText style={styles.buttonText}>
+                                        {crearCurriculum.isPending ? 'Guardando...' : 'Guardar CV'}
+                                    </ThemedText>
+                                    <Ionicons name="save-outline" size={18} color="#fff" />
+                                </TouchableOpacity>
+                            </View>
+                        </>
+                    )}
+                </ScrollView>
+            </KeyboardAvoidingView>
+
+            {/* --- DATE PICKER COMPLETO (ANDROID/IOS) --- */}
+            {Platform.OS === 'android' && showFullDatePicker && (
+                <DateTimePicker
+                    value={fullDateObject}
+                    mode="date"
+                    display="default"
+                    onChange={onFullDateChange}
+                    locale="es-ES"
+                />
+            )}
+            {Platform.OS === 'ios' && (
+                <Modal
+                    transparent={true}
+                    visible={showFullDatePicker}
+                    animationType="fade"
+                    onRequestClose={() => setShowFullDatePicker(false)}
+                >
+                    <Pressable style={styles.modalOverlay} onPress={() => setShowFullDatePicker(false)}>
+                        <View style={[styles.iosDatePickerContainer, { backgroundColor: colors.card }]}>
+                            <View style={styles.iosDatePickerHeader}>
+                                <TouchableOpacity onPress={() => setShowFullDatePicker(false)}>
+                                    <ThemedText style={{ color: colors.primary, fontWeight: 'bold', fontSize: 16 }}>Listo</ThemedText>
+                                </TouchableOpacity>
+                            </View>
+                            <DateTimePicker
+                                value={fullDateObject}
+                                mode="date"
+                                display="spinner"
+                                onChange={onFullDateChange}
+                                locale="es-ES"
+                                textColor={colors.text}
+                                themeVariant={colors.background === '#000' ? 'dark' : 'light'}
+                            />
+                        </View>
+                    </Pressable>
+                </Modal>
+            )}
+
+            {/* --- MONTH YEAR PICKER (PERSONALIZADO) --- */}
+            <MonthYearPicker 
+                visible={showMonthYearPicker} 
+                onClose={() => setShowMonthYearPicker(false)}
+                onConfirm={onMonthYearConfirm}
+                styles={styles}
+                colors={colors}
+            />
+
+        </SafeAreaView>
     );
 }
-    
+
+// --- Componente auxiliar con Scroll interno ---
+const DynamicSection = ({ title, icon, data, onAdd, onRemove, renderItem, styles, colors }: any) => (
+    <View style={[styles.card, { paddingBottom: 10 }]}>
+        <View style={[styles.cardHeader, { justifyContent: 'space-between' }]}>
+            <View style={{flexDirection: 'row', alignItems: 'center', gap: 8}}>
+                <Ionicons name={icon || "list"} size={20} color={colors.primary} />
+                <ThemedText type="defaultSemiBold">{title}</ThemedText>
+            </View>
+            <TouchableOpacity onPress={onAdd} style={styles.miniAddBtn}>
+                <Ionicons name="add" size={18} color="#fff" />
+            </TouchableOpacity>
+        </View>
+        <ScrollView style={styles.dynamicListScroll} nestedScrollEnabled={true} showsVerticalScrollIndicator={true}>
+            {data.length === 0 && (
+                <ThemedText style={{fontStyle: 'italic', color: colors.textPlaceholder, marginBottom: 10, marginTop: 5}}>
+                    No hay registros. Toca el botón + para agregar.
+                </ThemedText>
+            )}
+            {data.map((item: any, i: number) => (
+                <View key={i} style={styles.dynamicItemContainer}>
+                    <View style={styles.dynamicItemHeader}>
+                        <ThemedText style={styles.itemIndex}>#{i + 1}</ThemedText>
+                        <TouchableOpacity onPress={() => onRemove(i)}>
+                            <Ionicons name="trash-outline" size={20} color={colors.error} />
+                        </TouchableOpacity>
+                    </View>
+                    {renderItem(item, i)}
+                </View>
+            ))}
+        </ScrollView>
+    </View>
+);
 
 const getStyles = (colors: ReturnType<typeof useThemeColors>) => StyleSheet.create({
     container: {
         flex: 1,
         backgroundColor: colors.background,
     },
+    header: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        justifyContent: 'space-between',
+        paddingHorizontal: 20,
+        paddingVertical: 16,
+        borderBottomWidth: 1,
+        borderBottomColor: colors.inputBorder,
+        backgroundColor: colors.background,
+    },
+    backButton: {
+        padding: 4,
+    },
+    headerTitle: {
+        fontSize: 18,
+        fontWeight: '700',
+    },
     scrollContent: {
         padding: 20,
-        paddingBottom: 40,
-    },
-    formContainer: {
-        gap: 16,
-    },
-    title: {
-        textAlign: 'center',
-        marginBottom: 16,
-        fontSize: 24,
-        color: colors.text,
-    },
-    inputContainer: {
-        marginBottom: 4,
-    },
-    inputLabel: {
-        fontSize: 14,
-        fontWeight: '600',
-        marginBottom: 6,
-        color: colors.textLabel,
-    },
-    input: {
-        borderWidth: 1,
-        borderColor: colors.inputBorder,
-        borderRadius: 8,
-        paddingHorizontal: 14,
-        paddingVertical: 12,
-        fontSize: 16,
-        backgroundColor: colors.inputBackground, 
-        color: colors.text, 
-    },
-    inputDisabled: {
-        backgroundColor: colors.card, 
-        color: colors.textPlaceholder,
-    },
-    textArea: {
-        height: 120,
-        textAlignVertical: 'top',
+        paddingBottom: 60,
     },
     stepIndicatorContainer: {
         marginBottom: 24,
@@ -463,56 +644,153 @@ const getStyles = (colors: ReturnType<typeof useThemeColors>) => StyleSheet.crea
         backgroundColor: colors.primary,
         borderRadius: 3,
     },
-    dynamicSection: {
+    sectionPageTitle: {
+        fontSize: 22,
+        fontWeight: 'bold',
+        marginBottom: 20,
+        textAlign: 'center',
+    },
+    
+    // Cards
+    card: {
+        backgroundColor: colors.card,
+        borderRadius: 16,
+        padding: 16,
         borderWidth: 1,
         borderColor: colors.inputBorder,
-        borderRadius: 8,
-        padding: 12,
+        marginBottom: 20,
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.05,
+        shadowRadius: 4,
+        elevation: 2,
+    },
+    cardHeader: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        gap: 10,
         marginBottom: 16,
-        backgroundColor: colors.card
-    },
-    sectionTitle: {
-        fontSize: 18,
-        fontWeight: '600',
-        marginBottom: 12,
-        color: colors.text, 
-    },
-    dynamicItem: {
+        paddingBottom: 10,
         borderBottomWidth: 1,
         borderBottomColor: colors.inputBorder,
-        paddingBottom: 12,
+    },
+    
+    // Inputs
+    inputWrapper: {
         marginBottom: 12,
-        position: 'relative',
+    },
+    inputLabel: {
+        fontSize: 12,
+        fontWeight: '600',
+        color: colors.textLabel,
+        marginBottom: 6,
+        marginLeft: 4,
+    },
+    inputContainer: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        borderWidth: 1,
+        borderColor: colors.inputBorder,
+        borderRadius: 12,
+        backgroundColor: colors.inputBackground,
+        paddingHorizontal: 12,
+        height: 48,
+    },
+    inputDisabled: {
+        opacity: 0.7,
+        backgroundColor: colors.inputBackground, 
+    },
+    inputIcon: {
+        marginRight: 10,
+    },
+    input: {
+        flex: 1,
+        fontSize: 15,
+        color: colors.text,
+        height: '100%',
+    },
+    textAreaContainer: {
+        height: 'auto',
+        alignItems: 'flex-start',
+        paddingVertical: 8,
+    },
+    textArea: {
+        minHeight: 80,
+        textAlignVertical: 'top',
+    },
+    dateText: {
+        fontSize: 15,
+        color: colors.text,
+    },
+    charCount: {
+        textAlign: 'right',
+        fontSize: 11,
+        color: colors.textPlaceholder,
+        marginTop: 4,
+        marginRight: 4,
+    },
+    
+    // Grid
+    row: {
+        flexDirection: 'row',
+        gap: 10,
+    },
+
+    // Dynamic Lists & Scroll
+    dynamicListScroll: {
+        maxHeight: 400, 
+    },
+    miniAddBtn: {
+        backgroundColor: colors.primary,
+        width: 28,
+        height: 28,
+        borderRadius: 14,
+        justifyContent: 'center',
+        alignItems: 'center',
+    },
+    dynamicItemContainer: {
+        backgroundColor: colors.background,
+        borderRadius: 12,
+        padding: 12,
+        marginBottom: 12,
+        borderWidth: 1,
+        borderColor: colors.inputBorder,
+        marginRight: 4, 
+    },
+    dynamicItemHeader: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+        marginBottom: 8,
+    },
+    itemIndex: {
+        fontSize: 12,
+        fontWeight: 'bold',
+        color: colors.primary,
     },
     addButton: {
         flexDirection: 'row',
         alignItems: 'center',
         justifyContent: 'center',
         paddingVertical: 10,
-        borderRadius: 6,
-        backgroundColor: colors.background, 
-        borderWidth: 1,
-        borderColor: colors.primary,
-        borderStyle: 'dashed'
+        borderRadius: 8,
+        backgroundColor: colors.primary + '15',
+        marginTop: 4,
     },
     addButtonText: {
         color: colors.primary,
-        fontSize: 15,
+        fontSize: 14,
         fontWeight: '600',
         marginLeft: 8,
     },
-    removeButton: {
-        position: 'absolute',
-        top: 0,
-        right: 0,
-        padding: 4,
-    },
+
+    // Buttons
     button: {
         flexDirection: 'row',
         alignItems: 'center',
         justifyContent: 'center',
         paddingVertical: 14,
-        borderRadius: 10,
+        borderRadius: 12,
         gap: 10,
     },
     buttonNext: {
@@ -527,7 +805,8 @@ const getStyles = (colors: ReturnType<typeof useThemeColors>) => StyleSheet.crea
     buttonRow: {
         flexDirection: 'row',
         gap: 12,
-        marginTop: 16,
+        marginTop: 20,
+        marginBottom: 40,
     },
     buttonBack: {
         flex: 1,
@@ -542,19 +821,85 @@ const getStyles = (colors: ReturnType<typeof useThemeColors>) => StyleSheet.crea
     },
     buttonSubmit: {
         flex: 2,
-        backgroundColor: '#28a745', 
+        backgroundColor: colors.primary,
+        shadowColor: colors.primary,
+        shadowOffset: { width: 0, height: 4 },
+        shadowOpacity: 0.3,
+        shadowRadius: 5,
+        elevation: 4,
     },
-    logoutButton: {
+
+    // iOS Picker Styles
+    modalOverlay: {
+        flex: 1,
+        backgroundColor: 'rgba(0,0,0,0.4)',
+        justifyContent: 'flex-end',
+    },
+    iosDatePickerContainer: {
+        width: '100%',
+        borderTopLeftRadius: 20,
+        borderTopRightRadius: 20,
+        paddingBottom: 20,
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: -4 },
+        shadowOpacity: 0.1,
+        shadowRadius: 10,
+        elevation: 10,
+    },
+    iosDatePickerHeader: {
         flexDirection: 'row',
-        alignItems: 'center',
-        paddingVertical: 4,
-        paddingHorizontal: 8,
-        marginRight: 10,
-        gap: 4,
+        justifyContent: 'flex-end',
+        padding: 16,
+        borderBottomWidth: 1,
+        borderBottomColor: 'rgba(0,0,0,0.1)',
+        marginBottom: 8,
     },
-    logoutButtonText: {
-        color: '#C70039',
-        fontWeight: '600',
+
+    // Custom MonthYear Picker Styles
+    pickerContainer: {
+        width: '100%',
+        height: 320,
+        borderTopLeftRadius: 20,
+        borderTopRightRadius: 20,
+        padding: 20,
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: -4 },
+        shadowOpacity: 0.1,
+        shadowRadius: 10,
+        elevation: 10,
+    },
+    pickerHeader: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+        marginBottom: 20,
+        borderBottomWidth: 1,
+        borderColor: '#eee',
+        paddingBottom: 10,
+    },
+    pickerColumns: {
+        flexDirection: 'row',
+        flex: 1,
+        gap: 10,
+    },
+    pickerColumn: {
+        flex: 1,
+    },
+    pickerList: {
+        flex: 1,
+    },
+    pickerLabel: {
+        textAlign: 'center',
+        fontWeight: 'bold',
+        marginBottom: 10,
+        fontSize: 14,
+    },
+    pickerItem: {
+        paddingVertical: 12,
+        alignItems: 'center',
+        borderRadius: 8,
+    },
+    pickerItemText: {
         fontSize: 16,
-    }
+    },
 });
