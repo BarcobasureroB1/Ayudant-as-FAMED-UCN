@@ -95,10 +95,17 @@ const ConstanciaPDFDocument = ({ ayudantia }: { ayudantia: AyudantiasAnteriores 
           {ayudantia.alumno.nombres.toUpperCase()} {ayudantia.alumno.apellidos.toUpperCase()}
         </Text>
 
-        <Text style={[styles.body, {fontSize: 12}]}>
-          Ha realizado <Text style={styles.bold}>{ayudantia.tipo_ayudantia}</Text> para la asignatura de <Text style={styles.bold}>{ayudantia.asignatura.nombre}</Text>,
-          estudiante de la carrera de <Text style={styles.bold}>{ayudantia.alumno.nombre_carrera}</Text>, de la Facultad de Medicina de la Universidad Católica del Norte,
-          durante el semestre <Text style={styles.bold}>{semestre}</Text>, desde el <Text style={styles.bold}>{formatSimpleDate(inicio || "")}</Text> hasta el <Text style={styles.bold}>{formatSimpleDate(fin || "")}.</Text>
+        <Text style={[styles.body, { fontSize: 12 }]}>
+          Ha realizado{" "}
+          {ayudantia.tipo_ayudantia === "Investigacion" ? "ayudantia de" : "ayudantia"}{" "}
+          <Text style={styles.bold}>{ayudantia.tipo_ayudantia}</Text> para la asignatura
+          de <Text style={styles.bold}>{ayudantia.asignatura.nombre}</Text>, estudiante
+          de la carrera de{" "}
+          <Text style={styles.bold}>{ayudantia.alumno.nombre_carrera}</Text>, de la
+          Facultad de Medicina de la Universidad Católica del Norte, durante el semestre{" "}
+          <Text style={styles.bold}>{semestre}</Text>, desde el{" "}
+          <Text style={styles.bold}>{formatSimpleDate(inicio || "")}</Text> hasta el{" "}
+          <Text style={styles.bold}>{formatSimpleDate(fin || "")}.</Text>
         </Text>
 
         <Text style={styles.body}>Esta ayudantia es <Text style={styles.bold}>{ayudantia.remunerada}</Text></Text>

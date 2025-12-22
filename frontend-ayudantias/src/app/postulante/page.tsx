@@ -1154,7 +1154,7 @@ export const PostulanteVista = ({user, alumno, curriculum, actividadesExtracurri
                                         onChange={handleChange} 
                                         required 
                                         className={inputClass}
-                                        placeholder="Ej: Ingeniería Civil Informática"
+                                        placeholder="Ej: Medicina, Kinesiología, etc."
                                     />
                                 </div>
                             </div>
@@ -1205,7 +1205,7 @@ export const PostulanteVista = ({user, alumno, curriculum, actividadesExtracurri
                                             <div className="grid grid-cols-1 gap-4">
                                                 <div className="space-y-1">
                                                     <label className={labelClass}>Asignatura</label>
-                                                    <input placeholder="Ej: Cálculo I" name="nombre_asig" value={a.nombre_asig} onChange={(e) => handleArrayChange(e, "ayudantias", i)} className={inputClass} />
+                                                    <input placeholder="Ej: Biofísica" name="nombre_asig" value={a.nombre_asig} onChange={(e) => handleArrayChange(e, "ayudantias", i)} className={inputClass} />
                                                 </div>
                                                 <div className="space-y-1">
                                                     <label className={labelClass}>Coordinador</label>
@@ -1213,8 +1213,28 @@ export const PostulanteVista = ({user, alumno, curriculum, actividadesExtracurri
                                                 </div>
                                                 <div className="space-y-1">
                                                     <label className={labelClass}>Nota</label>
-                                                    {/* Input full width, sin boton al lado */}
-                                                    <input placeholder="7.0" name="evaluacion_obtenida" type="number" value={a.evaluacion_obtenida} onChange={(e) => handleArrayChange(e, "ayudantias", i)} className={inputClass} />
+                                                    <input
+                                                        placeholder="Ej: 4.0" 
+                                                        name="evaluacion_obtenida"
+                                                        type="number"
+                                                        min="1.0"
+                                                        max="5.0"
+                                                        step="0.1"
+                                                        value={a.evaluacion_obtenida}
+                                                        onChange={(e) => handleArrayChange(e, "ayudantias", i)}
+                                                        className={`${inputClass} ${
+                                                        a.evaluacion_obtenida !== "" && (parseFloat(a.evaluacion_obtenida) < 1.0 || parseFloat(a.evaluacion_obtenida) > 5.0)
+                                                            ? "border-red-500 focus:ring-red-500"
+                                                            : ""
+                                                        }`}
+                                                    />
+
+                                                    {a.evaluacion_obtenida !== "" &&
+                                                        (parseFloat(a.evaluacion_obtenida) < 1.0 || parseFloat(a.evaluacion_obtenida) > 5.0) && (
+                                                        <p className="text-red-500 text-xs mt-1">
+                                                            Ingrese una nota entre 1.0 y 5.0
+                                                        </p>
+                                                    )}
                                                 </div>
                                             </div>
                                         </div>

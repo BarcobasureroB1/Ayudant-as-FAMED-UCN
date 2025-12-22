@@ -316,7 +316,7 @@ export default function GestionCoordinadoresAdmin({
                                         value: c.rut,
                                         label: `${c.nombres} ${c.apellidos} (${c.rut})`,
                                     }))}
-                                    placeholder="Buscar docente..."
+                                    placeholder="Ingrese el nombre docente..."
                                     className="text-sm"
                                     // AQUÍ ESTÁ LA CORRECCIÓN DE ESTILOS:
                                     classNames={{
