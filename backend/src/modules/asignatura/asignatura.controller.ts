@@ -3,6 +3,7 @@ import { AsignaturaService } from './asignatura.service';
 import { CreateAsignaturaDto } from './dto/create-asignatura.dto';
 
 
+
 @Controller('asignatura')
 export class AsignaturaController {
   constructor(private readonly asignaturaService: AsignaturaService) {}
@@ -61,4 +62,6 @@ export class AsignaturaController {
   denegarConcurso(@Param('id') id: string){
     return this.asignaturaService.denegarConcurso(+id);
   }
+
+  
 }

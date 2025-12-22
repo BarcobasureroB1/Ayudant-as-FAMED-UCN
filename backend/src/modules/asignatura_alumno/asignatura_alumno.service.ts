@@ -53,16 +53,7 @@ export class AsignaturaAlumnoService {
 
     return await this.asignaturaAlumnoRepository.save(asignaturaAlumno);
   }
-  async findPostulablesByRut(rut_alumno: string) {
-    return await this.asignaturaAlumnoRepository
-      .createQueryBuilder('aa')
-      .innerJoinAndSelect('aa.asignatura', 'asignatura')
-      .innerJoinAndSelect('aa.alumno', 'alumno')
-      .where('alumno.rut_alumno = :rut', { rut: rut_alumno })
-      .andWhere('asignatura.estado = :estado', { estado: 'abierto' })
-      .andWhere('aa.nota IS NOT NULL')
-      .getMany();
-  }
+  
 
   async findAll() {
     return await this.asignaturaAlumnoRepository.find();

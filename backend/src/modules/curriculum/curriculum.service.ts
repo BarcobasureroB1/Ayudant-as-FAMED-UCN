@@ -254,17 +254,7 @@ export class CurriculumService {
     });
   }
 
-  findAll() {
-    return `This action returns all curriculum`;
-  }
-
-  async findOne(id: number) {
-    
-    return `This action returns a #${id} curriculum`;
-  }
-
-  
-
+ 
   async findByRut(rut: string) {
   const curriculum = await this.curriculumRepository.findOne({
     where: { usuario: { rut } },

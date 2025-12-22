@@ -49,6 +49,19 @@ export class PostulacionService {
       return null;
     }
 
+    // Validar que no se supere el límite de postulantes
+    const postulacionesActivas = await this.postulacionRepository.count({
+      where: {
+        asignatura: { id: asignaturaId },
+        cancelada_por_usuario: false,
+        rechazada_por_jefatura: false,
+      },
+    });
+
+    if (postulacionesActivas >= asignatura.limite_postulantes) {
+      return null;
+    }
+
     const [alumno, asignaturaAlumno, ayudantiasPrevias, asignaturasAlumnoList] = await Promise.all([
       this.alumnoRepository.findOne({ where: { rut_alumno: createPostulacionDto.rut_alumno } }),
       this.asignaturaAlumnoRepository.findOne({

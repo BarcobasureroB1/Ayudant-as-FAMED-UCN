@@ -12,10 +12,6 @@ export class CurriculumController {
     return this.curriculumService.create(createCurriculumDto);
   }
 
-  @Get()
-  findAll() {
-    return this.curriculumService.findAll();
-  }
 
   @Get(':rut_alumno')
   findByRut(@Param('rut_alumno') rut_alumno: string) {

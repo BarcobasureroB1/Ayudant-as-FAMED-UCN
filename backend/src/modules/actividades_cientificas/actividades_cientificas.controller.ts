@@ -9,10 +9,7 @@ export class ActividadesCientificasController {
 
 
 
-  @Get()
-  findAll() {
-    return this.actividadesCientificasService.findAll();
-  }
+  
 
   @Get(':rut')
   findByAlumno(@Param('rut') rut: string) {

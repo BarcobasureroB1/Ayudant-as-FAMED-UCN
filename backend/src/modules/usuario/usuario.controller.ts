@@ -43,7 +43,7 @@ export class UsuarioController {
     const { rut_usuario, nuevo_tipo } = cambiarTipoDto;
     return this.usuarioService.cambiartipo(rut_usuario, nuevo_tipo);
   }
-
+  
   @Patch('deshabilitar/:rut')
   deshabilitarUsuario(@Param('rut') rut: string) {
     return this.usuarioService.deshabilitarUsuario(rut);

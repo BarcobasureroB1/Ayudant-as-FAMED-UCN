@@ -19,6 +19,8 @@ export class Asignatura {
     nrc: string;
     @Column({ default: false })
     abierta_postulacion: boolean;
+    @Column({ default: 30 })
+    limite_postulantes: number;
     @ManyToMany(() => Departamento, (departamento) => departamento.asignaturas)
     departamentos: Departamento[];
     

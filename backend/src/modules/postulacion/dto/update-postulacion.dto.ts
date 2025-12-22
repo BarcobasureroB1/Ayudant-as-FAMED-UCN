@@ -8,7 +8,7 @@ export class UpdatePostulacionDto {
   @IsString()
   rut_alumno?: string;
 
-  // id de la asignatura (preferible a nombre cuando esté disponible)
+  // id de la asignatura 
   @IsOptional()
   @IsNumber()
   id_asignatura?: number;

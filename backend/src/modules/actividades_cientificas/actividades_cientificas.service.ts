@@ -12,9 +12,7 @@ export class ActividadesCientificasService {
     private readonly actividadesCientificaRepository: Repository<ActividadesCientifica>,
   ) {}
 
-  findAll() {
-    return `This action returns all actividadesCientificas`;
-  }
+  
 
  
 

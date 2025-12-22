@@ -12,10 +12,7 @@ export class AsignaturaAlumnoController {
     return this.asignaturaAlumnoService.create(createAsignaturaAlumnoDto);
   }
 
-  @Get(':rut_alumno')
-  findPostulablesByRut(@Param('rut_alumno') rut_alumno: string) {
-    return this.asignaturaAlumnoService.findPostulablesByRut(rut_alumno);
-  }
+ 
 
   @Get()
   async findAll() {
