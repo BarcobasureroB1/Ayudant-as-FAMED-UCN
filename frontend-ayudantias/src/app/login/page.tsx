@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { useAuth } from "@/context/AuthContext";
 import { useLogin } from "@/hooks/useLogin";
 import { Eye, EyeOff } from "lucide-react";
+import { error } from "console";
 
 export default function LoginPage() {
     const [rut, setRut] = useState("");
@@ -19,7 +20,7 @@ export default function LoginPage() {
         setUsertipo(data.user.tipo);
         router.push("/dashboard");
     },
-    (error) => {
+    (_error) => {
         setErrorMsg("Rut o contraseña incorrectos");
     });
 
