@@ -590,6 +590,7 @@ export const PostulanteVista = ({user, alumno, curriculum, actividadesExtracurri
     // Variables UI
     const opcionesAsignaturasDisponibles: OptionType[] = asignaturasDisponibles?.map((a: any) => ({ value: String(a.id), label: a.nombre, })) || [];
     const opcionesAsignaturas: OptionType[] = asignaturasTodas?.map((a: any) => ({ value: String(a.id), label: a.nombre, })) || []; 
+    const asignaturasPostular = isAdminOrEncargado ? opcionesAsignaturas : opcionesAsignaturasDisponibles;
     const inputClass = "w-full px-4 py-3 bg-white border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all text-gray-900 placeholder:text-gray-500 shadow-sm";
     const labelClass = "text-xs font-bold text-gray-600 uppercase tracking-wide mb-1 block";
 
@@ -856,10 +857,10 @@ export const PostulanteVista = ({user, alumno, curriculum, actividadesExtracurri
                                         {/* Select Asignatura */}
                                         <div>
                                             <label className="block text-sm font-bold text-gray-700 mb-2">Asignatura</label>
-                                            {opcionesAsignaturasDisponibles.length > 0 ? (
+                                            {asignaturasPostular.length > 0 ? (
                                                 <Select
-                                                    options={opcionesAsignaturasDisponibles}
-                                                    value={opcionesAsignaturasDisponibles.find((opt) => opt.value === String(formPostulacion.id_asignatura)) || null}
+                                                    options={asignaturasPostular}
+                                                    value={asignaturasPostular.find((opt) => opt.value === String(formPostulacion.id_asignatura)) || null}
                                                     onChange={(selectedOption) => {
                                                         if (!selectedOption) return;
                                                         setFormPostulacion({ ...formPostulacion, id_asignatura: selectedOption.value, nombre_asignatura: selectedOption.label, });
@@ -970,7 +971,7 @@ export const PostulanteVista = ({user, alumno, curriculum, actividadesExtracurri
                     <div className="fixed inset-0 flex items-center justify-center bg-black/60 backdrop-blur-sm z-50 p-4" onClick={() => setMostrarPopupEditarPostulacion(false)}>
                         <div className="bg-white rounded-2xl shadow-2xl p-6 w-full max-w-4xl max-h-[calc(100vh-4rem)] overflow-auto relative animate-fadeIn" onClick={(e) => e.stopPropagation()}>
                             <button onClick={() => setMostrarPopupEditarPostulacion(false)} className="absolute top-3 right-3 text-gray-500 hover:text-gray-800 text-xl font-bold" aria-label="Cerrar">✖</button>
-                            <FormularioEditarPostulacion postulacion={postulacionSeleccionada} opcionesAsignaturas={opcionesAsignaturas} onClose={() => setMostrarPopupEditarPostulacion(false)} />
+                            <FormularioEditarPostulacion postulacion={postulacionSeleccionada} opcionesAsignaturas={asignaturasPostular} onClose={() => setMostrarPopupEditarPostulacion(false)} />
                         </div>
                     </div>
                 )}
