@@ -14,7 +14,6 @@ export function useAlumnoProfile(rut_alumno?: string){
         queryKey:['alumno', rut_alumno],
         queryFn: async () => {
             const respuesta = await api.get(`usuario/alumno/${rut_alumno}`);
-            console.log("datos alumno: ", respuesta.data);
             return respuesta.data;
         },
 

@@ -82,6 +82,7 @@ interface ModernInputProps extends TextInputProps {
   colors: any;
   showCharCount?: boolean;
   maxLength?: number;
+  error?: string;
 }
 
 const ModernInput: React.FC<ModernInputProps> = ({
@@ -92,27 +93,98 @@ const ModernInput: React.FC<ModernInputProps> = ({
   colors,
   showCharCount,
   maxLength,
+  editable = true,
+  error,
   ...props
 }) => (
   <View style={styles.inputWrapper}>
     <ThemedText style={styles.inputLabel}>{label}</ThemedText>
-    <View style={[styles.inputContainer, props.multiline && styles.textAreaContainer]}>
-      <Ionicons name={icon} size={20} color={colors.primary} style={[styles.inputIcon, props.multiline && { marginTop: 12 }]} />
+    <View style={[styles.inputContainer, props.multiline && styles.textAreaContainer, !editable && { opacity: 0.7, backgroundColor: colors.inputBackground}, error ? { borderColor: colors.error } : {}]}>
+      <Ionicons name={icon} size={20} color={error ? colors.error : (editable ? colors.primary : colors.textPlaceholder)} style={[styles.inputIcon, props.multiline && { marginTop: 12 }]} />
       <TextInput
         style={[styles.input, props.multiline && styles.textArea]}
         value={value}
         placeholderTextColor={colors.textPlaceholder}
         maxLength={maxLength}
+        editable={editable}
         {...props}
       />
     </View>
-    {showCharCount && maxLength && (
+
+    {error && (
+        <ThemedText style={{ color: colors.error, fontSize: 12, marginTop: 4, marginLeft: 4 }}>
+            {error}
+        </ThemedText>
+    )}
+
+    {showCharCount && maxLength && !error && (
       <ThemedText style={[styles.charCount, (value?.length || 0) >= maxLength ? { color: colors.error } : {}]}>
         {value?.length || 0} / {maxLength}
       </ThemedText>
     )}
   </View>
 );
+
+// --- COMPONENTE PICKER MES / AÑO (Copiado de Crear Curriculum) ---
+const MonthYearPicker = ({ visible, onClose, onConfirm, styles, colors }: any) => {
+    const months = [
+        "Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio",
+        "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"
+    ];
+    const currentYear = new Date().getFullYear();
+    const years = Array.from({ length: 50 }, (_, i) => currentYear - i);
+
+    const [selectedMonth, setSelectedMonth] = useState(new Date().getMonth());
+    const [selectedYear, setSelectedYear] = useState(currentYear);
+
+    const handleConfirm = () => {
+        const monthStr = (selectedMonth + 1).toString().padStart(2, '0');
+        onConfirm(`${monthStr}/${selectedYear}`);
+        onClose();
+    };
+
+    return (
+        <Modal transparent visible={visible} animationType="fade" onRequestClose={onClose}>
+            <Pressable style={styles.modalOverlay} onPress={onClose}>
+                <View style={[styles.pickerContainer, { backgroundColor: colors.card }]}>
+                    <View style={styles.pickerHeader}>
+                        <TouchableOpacity onPress={onClose}>
+                            <ThemedText style={{ color: colors.error }}>Cancelar</ThemedText>
+                        </TouchableOpacity>
+                        <ThemedText type="defaultSemiBold">Seleccionar Periodo</ThemedText>
+                        <TouchableOpacity onPress={handleConfirm}>
+                            <ThemedText style={{ color: colors.primary, fontWeight: 'bold' }}>Confirmar</ThemedText>
+                        </TouchableOpacity>
+                    </View>
+                    <View style={styles.pickerColumns}>
+                        <View style={styles.pickerColumn}>
+                            <ThemedText style={styles.pickerLabel}>Mes</ThemedText>
+                            <ScrollView showsVerticalScrollIndicator={false} style={styles.pickerList}>
+                                {months.map((m, i) => (
+                                    <TouchableOpacity key={m} onPress={() => setSelectedMonth(i)} style={[styles.pickerItem, selectedMonth === i && { backgroundColor: colors.primary + '20' }]}>
+                                        <ThemedText style={[styles.pickerItemText, selectedMonth === i && { color: colors.primary, fontWeight: 'bold' }]}>{m}</ThemedText>
+                                    </TouchableOpacity>
+                                ))}
+                            </ScrollView>
+                        </View>
+                        <View style={styles.pickerColumn}>
+                            <ThemedText style={styles.pickerLabel}>Año</ThemedText>
+                            <ScrollView showsVerticalScrollIndicator={false} style={styles.pickerList}>
+                                {years.map((y) => (
+                                    <TouchableOpacity key={y} onPress={() => setSelectedYear(y)} style={[styles.pickerItem, selectedYear === y && { backgroundColor: colors.primary + '20' }]}>
+                                        <ThemedText style={[styles.pickerItemText, selectedYear === y && { color: colors.primary, fontWeight: 'bold' }]}>{y}</ThemedText>
+                                    </TouchableOpacity>
+                                ))}
+                            </ScrollView>
+                        </View>
+                    </View>
+                </View>
+            </Pressable>
+        </Modal>
+    );
+};
+
+
 
 export default function EditarCurriculumScreen() {
   const router = useRouter();
@@ -146,19 +218,20 @@ export default function EditarCurriculumScreen() {
     actividades_extracurriculares: [],
   });
 
-  const [showDatePicker, setShowDatePicker] = useState(false);
-  const [dateObject, setDateObject] = useState(new Date());
+  const [ayudantiaErrores, setAyudantiaErrores] = useState<{ [key: number]: string }>({});
+
+  const [mostrarFullFechaPicker, setMostrarFullFechaPicker] = useState(false);
+  const [fullFechaObjeto, setFullFechaObjeto] = useState(new Date());
+  const [fullFechaTarget, setFullFechaTarget] = useState<{ type: 'nacimiento' | 'curso', index?: number } | null>(null);
+
+
+  const [mostrarMesAnoPicker, setMostrarMesAnoPicker] = useState(false);
+  const [mesAnoTarget, setMesAnoTarget] = useState<{ type: 'cientifica' | 'extracurricular', index: number } | null>(null);
 
   useEffect(() => {
     if (curriculum && ayudantias && cursosTitulosGrados && actividadesCientificas && actividadesExtracurriculares) {
       const d = curriculum as CurriculumResponse;
-      if (d.fecha_nacimiento) {
-        const [day, month, year] = d.fecha_nacimiento.split('/');
-        if (day && month && year) {
-           const newDate = new Date(parseInt(year), parseInt(month) - 1, parseInt(day));
-           if (!isNaN(newDate.getTime())) setDateObject(newDate);
-        }
-      }
+      
       setFormData({
         id: d.id || 0,
         nombres: d.nombres || "",
@@ -199,16 +272,6 @@ export default function EditarCurriculumScreen() {
     setFormData(prev => ({ ...prev, [name]: value }));
   };
 
-  const onDateChange = (event: any, selectedDate?: Date) => {
-    const currentDate = selectedDate || dateObject;
-    if (Platform.OS === 'android') setShowDatePicker(false);
-    setDateObject(currentDate);
-    const day = currentDate.getDate().toString().padStart(2, '0');
-    const month = (currentDate.getMonth() + 1).toString().padStart(2, '0');
-    const year = currentDate.getFullYear();
-    handleChange('fecha_nacimiento', `${day}/${month}/${year}`);
-  };
-
   const handleArrayChange = (key: keyof CurriculumDataEditar, index: number, field: string, value: string) => {
     setFormData(prev => {
       const current = prev[key];
@@ -238,8 +301,108 @@ export default function EditarCurriculumScreen() {
     });
   };
 
+  const handleNotaChange = (index: number, text: string) => {
+        handleArrayChange('ayudantias', index, 'evaluacion_obtenida', text);
+
+        const nota = text.replace(',', '.');
+        const numNota = parseFloat(nota);
+
+        let errorMsg = "";
+
+        if (text.trim() === "") {
+            errorMsg = "La nota es obligatoria.";
+        } else if (isNaN(numNota)) {
+            errorMsg = "La nota debe ser un número válido.";
+        } else if (numNota < 1.0 || numNota > 5.0) {
+            errorMsg = "La nota debe estar entre 1.0 y 5.0.";
+        }
+
+        setAyudantiaErrores(prev => ({
+            ...prev,
+            [index]: errorMsg
+        }));
+    };
+
+    const openFullDatePicker = (type: 'nacimiento' | 'curso', index?: number, currentDateString?: string) => {
+    let dateToSet = new Date();
+    // Intenta parsear la fecha si existe string
+    if (currentDateString) {
+        // Formato esperado DD/MM/AAAA o AAAA-MM-DD
+        if(currentDateString.includes('/')) {
+            const [d, m, y] = currentDateString.split('/');
+            const parsed = new Date(parseInt(y), parseInt(m)-1, parseInt(d));
+            if(!isNaN(parsed.getTime())) dateToSet = parsed;
+        } else if (currentDateString.includes('-')) {
+             const parsed = new Date(currentDateString + 'T12:00:00');
+             if(!isNaN(parsed.getTime())) dateToSet = parsed;
+        }
+    }
+    setFullFechaObjeto(dateToSet);
+    setFullFechaTarget({ type, index });
+    setMostrarFullFechaPicker(true);
+  };
+
+  const onFullDateChange = (event: any, selectedDate?: Date) => {
+    const currentDate = selectedDate || fullFechaObjeto;
+    if (Platform.OS === 'android') setMostrarFullFechaPicker(false);
+    setFullFechaObjeto(currentDate);
+
+    if (!fullFechaTarget) return;
+
+    const year = currentDate.getFullYear();
+    const month = (currentDate.getMonth() + 1).toString().padStart(2, '0');
+    const day = currentDate.getDate().toString().padStart(2, '0');
+    
+    // Formato de salida: DD/MM/AAAA (Ajustar si se prefiere AAAA-MM-DD)
+    const formattedDate = `${day}/${month}/${year}`;
+
+    if (fullFechaTarget.type === 'nacimiento') {
+        handleChange('fecha_nacimiento', formattedDate);
+    } else if (fullFechaTarget.type === 'curso' && fullFechaTarget.index !== undefined) {
+        handleArrayChange('cursos_titulos_grados', fullFechaTarget.index, 'evaluacion', formattedDate);
+    }
+  };
+
+  const openMonthYearPicker = (type: 'cientifica' | 'extracurricular', index: number) => {
+    setMesAnoTarget({ type, index });
+    setMostrarMesAnoPicker(true);
+    setMostrarFullFechaPicker(false);
+  };
+
+  const onMonthYearConfirm = (value: string) => {
+    if (!mesAnoTarget) return;
+    if (mesAnoTarget.type === 'cientifica') {
+        handleArrayChange('actividades_cientificas', mesAnoTarget.index, 'periodo_participacion', value);
+    } else {
+        handleArrayChange('actividades_extracurriculares', mesAnoTarget.index, 'periodo_participacion', value);
+    }
+  };
+  
   const handleSubmit = async () => {
     if (!formData.id) return Alert.alert("Error", "Falta el ID del curriculum.");
+
+    let hayCamposVacios = false;
+    const nuevosErrores = { ...ayudantiaErrores };
+
+    formData.ayudantias?.forEach((a, index) => {
+      if (!a.evaluacion_obtenida || a.evaluacion_obtenida.toString().trim() === "") {
+        nuevosErrores[index] = "La nota es obligatoria.";
+        hayCamposVacios = true;
+      }
+    });
+
+    if (hayCamposVacios) {
+      setAyudantiaErrores(nuevosErrores);
+      Alert.alert("Atención", "Por favor completa las notas de ayudantías previas.");
+      return;
+    }
+
+    const hayErrores = Object.values(ayudantiaErrores).some(err => err !== "");
+    if(hayErrores) {
+        Alert.alert("Atención", "Por favor corrige las notas fuera de rango (1.0 - 5.0) en Ayudantías.");
+        return;
+    }
+
     editarCurriculum(formData, {
       onSuccess: () => {
         Alert.alert("Éxito", "Currículum actualizado correctamente");
@@ -295,10 +458,10 @@ export default function EditarCurriculumScreen() {
                 </View>
             </View>
             
-            {/* INPUT DE FECHA */}
+            {/* PICKER FECHA */}
             <View style={styles.inputWrapper}>
                 <ThemedText style={styles.inputLabel}>Fecha de Nacimiento</ThemedText>
-                <Pressable onPress={() => setShowDatePicker(true)}>
+                <Pressable onPress={() => openFullDatePicker('nacimiento', undefined, formData.fecha_nacimiento)}>
                     <View style={[styles.inputContainer, { justifyContent: 'flex-start' }]}>
                         <Ionicons name="calendar-outline" size={20} color={colors.primary} style={styles.inputIcon} />
                         <ThemedText style={[styles.dateText, !formData.fecha_nacimiento && {color: colors.textPlaceholder}]}>
@@ -335,12 +498,17 @@ export default function EditarCurriculumScreen() {
             icon="book-outline"
             data={formData.ayudantias || []} 
             onAdd={() => handleAddArrayItem("ayudantias", { nombre_asig: "", nombre_coordinador: "", evaluacion_obtenida: "" })}
-            onRemove={(i: number) => handleRemoveArrayItem("ayudantias", i)}
+            onRemove={(i: number) => {
+              handleRemoveArrayItem("ayudantias", i);
+              const errores = {...ayudantiaErrores};
+              delete errores[i];
+              setAyudantiaErrores(errores);
+            }}
             renderItem={(item: any, i: number) => (
                 <>
                     <ModernInput placeholder="Ej: Anatomía General / Fisiología" label="Asignatura" icon="book" value={item.nombre_asig} onChangeText={(t) => handleArrayChange('ayudantias', i, 'nombre_asig', t)} styles={styles} colors={colors} />
                     <ModernInput placeholder="Ej: Dr. Roberto González" label="Docente Coordinador" icon="person-circle" value={item.nombre_coordinador} onChangeText={(t) => handleArrayChange('ayudantias', i, 'nombre_coordinador', t)} styles={styles} colors={colors} />
-                    <ModernInput placeholder="Ej: 6.8 / Aprobado con distinción" label="Nota Final / Evaluación" icon="star" value={item.evaluacion_obtenida} onChangeText={(t) => handleArrayChange('ayudantias', i, 'evaluacion_obtenida', t)} styles={styles} colors={colors} />
+                    <ModernInput placeholder="Ej: 4.8 " label="Evaluación (1.0 - 5.0)" icon="star" value={item.evaluacion_obtenida} keyboardType = "numeric" onChangeText={(t) => handleNotaChange(i,t)} error={ayudantiaErrores[i]} styles={styles} colors={colors} />
                 </>
             )}
             styles={styles}
@@ -357,7 +525,19 @@ export default function EditarCurriculumScreen() {
                 <>
                     <ModernInput placeholder="Ej: Curso RCP Básico / ACLS" label="Nombre Título/Curso" icon="ribbon" value={item.nombre_asig} onChangeText={(t) => handleArrayChange('cursos_titulos_grados', i, 'nombre_asig', t)} styles={styles} colors={colors} />
                     <ModernInput placeholder="Ej: American Heart Association (AHA)" label="Institución" icon="business" value={item.n_coordinador} onChangeText={(t) => handleArrayChange('cursos_titulos_grados', i, 'n_coordinador', t)} styles={styles} colors={colors} />
-                    <ModernInput placeholder="Ej: Certificado 2024" label="Estado / Año" icon="stats-chart" value={item.evaluacion} onChangeText={(t) => handleArrayChange('cursos_titulos_grados', i, 'evaluacion', t)} styles={styles} colors={colors} />
+
+                    <View style={styles.inputWrapper}>
+                        <ThemedText style={styles.inputLabel}>Fecha Realización (AAAA-MM-DD)</ThemedText>
+                        <Pressable onPress={() => openFullDatePicker('curso', i, item.evaluacion)}>
+                            <View style={[styles.inputContainer, { justifyContent: 'flex-start' }]}>
+                                <Ionicons name="calendar-outline" size={20} color={colors.primary} style={styles.inputIcon} />
+                                <ThemedText style={[styles.dateText, !item.evaluacion && {color: colors.textPlaceholder}]}>
+                                    {item.evaluacion || "DD/MM/AAAA"}
+                                </ThemedText>
+                            </View>
+                        </Pressable>
+                    </View>
+
                 </>
             )}
             styles={styles}
@@ -385,7 +565,19 @@ export default function EditarCurriculumScreen() {
                         maxLength={700}
                         showCharCount={true}
                     />
-                    <ModernInput placeholder="Ej: 2023 - 2024" label="Periodo" icon="time" value={item.periodo_participacion} onChangeText={(t) => handleArrayChange('actividades_cientificas', i, 'periodo_participacion', t)} styles={styles} colors={colors} />
+
+                    <View style={styles.inputWrapper}>
+                        <ThemedText style={styles.inputLabel}>Periodo (MM/AAAA)</ThemedText>
+                        <Pressable onPress={() => openMonthYearPicker('cientifica', i)}>
+                            <View style={[styles.inputContainer, { justifyContent: 'flex-start' }]}>
+                                <Ionicons name="time-outline" size={20} color={colors.primary} style={styles.inputIcon} />
+                                <ThemedText style={[styles.dateText, !item.periodo_participacion && {color: colors.textPlaceholder}]}>
+                                    {item.periodo_participacion || "MM/AAAA"}
+                                </ThemedText>
+                            </View>
+                        </Pressable>
+                    </View>
+
                 </>
             )}
             styles={styles}
@@ -402,19 +594,20 @@ export default function EditarCurriculumScreen() {
                 <>
                     <ModernInput placeholder="Ej: Operativo de Salud Rural / IFMSA" label="Nombre Actividad" icon="basketball" value={item.nombre} onChangeText={(t) => handleArrayChange('actividades_extracurriculares', i, 'nombre', t)} styles={styles} colors={colors} />
                     <ModernInput placeholder="Ej: Dra. María Soto" label="Docente / Encargado" icon="person" value={item.docente} onChangeText={(t) => handleArrayChange('actividades_extracurriculares', i, 'docente', t)} styles={styles} colors={colors} />
-                    <ModernInput 
-                        placeholder="Ej: Atención primaria supervisada en zona rural..." 
-                        label="Descripción" 
-                        icon="document-text" 
-                        value={item.descripcion} 
-                        onChangeText={(t) => handleArrayChange('actividades_extracurriculares', i, 'descripcion', t)} 
-                        multiline 
-                        styles={styles} 
-                        colors={colors} 
-                        maxLength={700}
-                        showCharCount={true}
-                    />
-                    <ModernInput placeholder="Ej: Enero 2024" label="Periodo" icon="time" value={item.periodo_participacion} onChangeText={(t) => handleArrayChange('actividades_extracurriculares', i, 'periodo_participacion', t)} styles={styles} colors={colors} />
+                    
+                    <View style={styles.inputWrapper}>
+                        <ThemedText style={styles.inputLabel}>Periodo (MM/AAAA)</ThemedText>
+                        <Pressable onPress={() => openMonthYearPicker('extracurricular', i)}>
+                            <View style={[styles.inputContainer, { justifyContent: 'flex-start' }]}>
+                                <Ionicons name="time-outline" size={20} color={colors.primary} style={styles.inputIcon} />
+                                <ThemedText style={[styles.dateText, !item.periodo_participacion && {color: colors.textPlaceholder}]}>
+                                    {item.periodo_participacion || "MM/AAAA"}
+                                </ThemedText>
+                            </View>
+                        </Pressable>
+                    </View>
+
+
                 </>
             )}
             styles={styles}
@@ -447,12 +640,12 @@ export default function EditarCurriculumScreen() {
       </KeyboardAvoidingView>
 
       {/* --- DATE PICKER ANDROID --- */}
-      {Platform.OS === 'android' && showDatePicker && (
+      {Platform.OS === 'android' && mostrarFullFechaPicker && (
         <DateTimePicker
-            value={dateObject}
+            value={fullFechaObjeto}
             mode="date"
             display="default"
-            onChange={onDateChange}
+            onChange={onFullDateChange}
             maximumDate={new Date()}
             locale="es-ES"
         />
@@ -462,31 +655,39 @@ export default function EditarCurriculumScreen() {
       {Platform.OS === 'ios' && (
         <Modal
             transparent={true}
-            visible={showDatePicker}
+            visible={mostrarFullFechaPicker}
             animationType="fade"
-            onRequestClose={() => setShowDatePicker(false)}
+            onRequestClose={() => setMostrarFullFechaPicker(false)}
         >
-            <Pressable style={styles.modalOverlay} onPress={() => setShowDatePicker(false)}>
+            <Pressable style={styles.modalOverlay} onPress={() => setMostrarFullFechaPicker(false)}>
                 <View style={[styles.iosDatePickerContainer, { backgroundColor: colors.card }]}>
                     <View style={styles.iosDatePickerHeader}>
-                        <TouchableOpacity onPress={() => setShowDatePicker(false)}>
+                        <TouchableOpacity onPress={() => setMostrarFullFechaPicker(false)}>
                             <ThemedText style={{ color: colors.primary, fontWeight: 'bold', fontSize: 16 }}>Listo</ThemedText>
                         </TouchableOpacity>
                     </View>
                     <DateTimePicker
-                        value={dateObject}
+                        value={fullFechaObjeto}
                         mode="date"
                         display="spinner"
-                        onChange={onDateChange}
+                        onChange={onFullDateChange}
                         maximumDate={new Date()}
                         locale="es-ES"
-                        textColor={colors.text} // Importante para modo oscuro/claro en iOS
+                        textColor={colors.text}
                         themeVariant={colors.background === '#000' ? 'dark' : 'light'}
                     />
                 </View>
             </Pressable>
         </Modal>
       )}
+
+      <MonthYearPicker 
+        visible={mostrarMesAnoPicker} 
+        onClose={() => setMostrarMesAnoPicker(false)}
+        onConfirm={onMonthYearConfirm}
+        styles={styles}
+        colors={colors}
+      />
 
     </SafeAreaView>
   );
@@ -682,5 +883,53 @@ const getStyles = (colors: ReturnType<typeof useThemeColors>) => StyleSheet.crea
     borderBottomWidth: 1,
     borderBottomColor: 'rgba(0,0,0,0.1)',
     marginBottom: 8,
+  },
+  pickerContainer: {
+    width: '100%',
+    height: 320,
+    borderTopLeftRadius: 20,
+    borderTopRightRadius: 20,
+    padding: 20,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: -4 },
+    shadowOpacity: 0.1,
+    shadowRadius: 10,
+    elevation: 10,
+  },
+  pickerHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 20,
+    borderBottomWidth: 1,
+    borderColor: '#eee',
+    paddingBottom: 10,
+  },
+  pickerColumns: {
+    flexDirection: 'row',
+    flex: 1,
+    gap: 10,
+  },
+  pickerColumn: {
+    flex: 1,
+  },
+  pickerList: {
+    flex: 1,
+  },
+  pickerLabel: {
+    textAlign: 'center',
+    fontWeight: 'bold',
+    marginBottom: 10,
+    fontSize: 14,
+    color: colors.text,
+  },
+  pickerItem: {
+    paddingVertical: 12,
+    alignItems: 'center',
+    borderRadius: 8,
+  },
+  pickerItemText: {
+    fontSize: 16,
+    color: colors.text,
   },
 });

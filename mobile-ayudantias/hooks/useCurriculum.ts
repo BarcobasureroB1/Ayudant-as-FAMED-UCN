@@ -121,7 +121,6 @@ export function useComprobarCurriculum(rut_alumno?: string) {
         queryKey: ['curriculum', rut_alumno],
         queryFn: async() => {
             const respuesta = await api.get(`curriculum/${rut_alumno}`);
-            console.log("rut: ", respuesta.data)
             return respuesta.data
         },
         enabled: !!rut_alumno,
@@ -199,10 +198,8 @@ export function useEditarCurriculum(){
     return useMutation({
         mutationFn: async (curriculum: CurriculumDataEditar) => {
             await api.patch(`curriculum/${curriculum.id}`, curriculum)
-            console.log("ID hook: ", curriculum.id);
         },
         onSuccess: (_data) => {
-            console.log("datos: ", _data);
             clienteQuery.invalidateQueries({queryKey:['curriculum']});
             clienteQuery.invalidateQueries({queryKey:['curriculum_ayudantias']});
             clienteQuery.invalidateQueries({queryKey:['curriculum_cursos_titulos_grados']});

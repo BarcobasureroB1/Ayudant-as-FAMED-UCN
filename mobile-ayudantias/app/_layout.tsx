@@ -102,8 +102,7 @@ function RootLayoutNav() {
             }}
           />
 
-          <Stack.Screen name="modal" options={{presentation: 'modal', title: 'Modal'}}/>
-        </Stack>
+         </Stack>
         <StatusBar style = {colorScheme === 'dark' ? 'light' : 'dark'}/>
       </View>
     </ThemeProvider>

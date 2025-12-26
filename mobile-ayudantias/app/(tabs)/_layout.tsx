@@ -62,15 +62,12 @@ export default function TabLayout() {
 
     if (!user || !user.rut)
     {
-      console.log("Usuario no detectado, redirigiendo al login...");
       setToken(null);
       setUsertipo(null);
       router.replace('/(auth)/login');
-      console.log("devolviendo");
       return;
     }
 
-    console.log("ruuut: ", user.rut);
     if (cargaCurriculum)
     {
       return;
@@ -82,20 +79,6 @@ export default function TabLayout() {
       router.replace('/crear-curriculum');
       return;
     }
-
-    /*if (
-      cargaAlumno ||
-      cargaExtra ||
-      cargaCientifica ||
-      cargaCursos ||
-      cargaAyudantias ||
-      cargaAyuAnteriores ||
-      cargaPostulaciones ||
-      cargaAsigDisp ||
-      cargaAsigTodas
-    ) {
-      return;
-    }*/
 
     setAppReady(true);
 

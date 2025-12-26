@@ -30,6 +30,7 @@ interface ModernInputProps extends TextInputProps {
   icon: keyof typeof Ionicons.glyphMap;
   showCharCount?: boolean;
   maxLength?: number;
+  error?: string;
 }
 
 const ModernInput: React.FC<ModernInputProps & { styles: any, colors: any }> = ({
@@ -41,12 +42,13 @@ const ModernInput: React.FC<ModernInputProps & { styles: any, colors: any }> = (
   maxLength,
   value,
   editable = true,
+  error,
   ...props
 }) => (
   <View style={styles.inputWrapper}>
     <ThemedText style={styles.inputLabel}>{label}</ThemedText>
-    <View style={[styles.inputContainer, props.multiline && styles.textAreaContainer, !editable && styles.inputDisabled]}>
-      <Ionicons name={icon} size={20} color={editable ? colors.primary : colors.textPlaceholder} style={[styles.inputIcon, props.multiline && { marginTop: 12 }]} />
+    <View style={[styles.inputContainer, props.multiline && styles.textAreaContainer, !editable && styles.inputDisabled, error ? { borderColor: colors.error } : {}]}>
+      <Ionicons name={icon} size={20} color={error ? colors.error : (editable ? colors.primary : colors.textPlaceholder)} style={[styles.inputIcon, props.multiline && { marginTop: 12 }]} />
       <TextInput
         style={[styles.input, props.multiline && styles.textArea, !editable && { color: colors.textPlaceholder }]}
         placeholderTextColor={colors.textPlaceholder}
@@ -56,7 +58,14 @@ const ModernInput: React.FC<ModernInputProps & { styles: any, colors: any }> = (
         {...props}
       />
     </View>
-    {showCharCount && maxLength && (
+
+    {error && (
+        <ThemedText style={{ color: colors.error, fontSize: 12, marginTop: 4, marginLeft: 4 }}>
+            {error}
+        </ThemedText>
+    )}
+
+    {showCharCount && maxLength && !error && (
       <ThemedText style={[styles.charCount, (value?.length || 0) >= maxLength ? { color: colors.error } : {}]}>
         {value?.length || 0} / {maxLength}
       </ThemedText>
@@ -154,7 +163,8 @@ export default function CrearCurriculumScreen() {
     const styles = useMemo(() => getStyles(colors), [colors]);
 
     const [paso, setPaso] = useState<number>(1);
-    
+    const [ayudantiaErrores, setAyudantiaErrores] = useState<{[key: number]: string}>({});
+
     const [form, setForm] = useState({
         rut_alumno: user?.rut || "",
         nombres: "",
@@ -184,6 +194,28 @@ export default function CrearCurriculumScreen() {
 
 
     // --- HANDLERS GENERALES ---
+    //Handler para validar nota ayudantía
+    const handleNotaChange = (index: number, text: string) => {
+        handleArrayChange('ayudantias', index, 'evaluacion_obtenida', text);
+
+        const nota = text.replace(',', '.');
+        const numNota = parseFloat(nota);
+
+        let errorMsg = "";
+
+        if (text.trim() === "") {
+            errorMsg = "La nota es obligatoria.";
+        } else if (isNaN(numNota)) {
+            errorMsg = "La nota debe ser un número válido.";
+        } else if (numNota < 1.0 || numNota > 5.0) {
+            errorMsg = "La nota debe estar entre 1.0 y 5.0.";
+        }
+
+        setAyudantiaErrores(prev => ({
+            ...prev,
+            [index]: errorMsg
+        }));
+    };
 
     const handleChange = (name: string, value: string) => {
         setForm(prev => ({ ...prev, [name]: value }));
@@ -270,6 +302,12 @@ export default function CrearCurriculumScreen() {
              return;
         }
 
+        const notaErrores = Object.values(ayudantiaErrores).find(err => err !== "");
+        if (notaErrores) {
+            Alert.alert("Error", "Por favor corrige la nota de ayudantias previas antes de continuar.");
+            return;
+        }
+
         crearCurriculum.mutate(form, {
             onSuccess: async () => {
                 Alert.alert("¡Éxito!", "Currículum creado correctamente.");
@@ -288,9 +326,15 @@ export default function CrearCurriculumScreen() {
 
             {/* HEADER */}
             <View style={styles.header}>
-                <TouchableOpacity onPress={() => { if(paso===2) setPaso(1); else router.back() }} style={styles.backButton}>
+                {paso > 1 ? (
+                    <TouchableOpacity onPress={() => setPaso(paso - 1)} style={styles.backButton}>
                     <Ionicons name="arrow-back" size={24} color={colors.text} />
                 </TouchableOpacity>
+                ) : (
+                    <View style={[styles.backButton, { opacity: 0 }]}>
+                        <Ionicons name="arrow-back" size={24} color={colors.text} />
+                    </View>
+                )}
                 <ThemedText type="subtitle" style={styles.headerTitle}>Crear Currículum</ThemedText>
                 <TouchableOpacity onPress={logout}>
                     <Ionicons name="log-out-outline" size={24} color={colors.error}/>
@@ -372,12 +416,17 @@ export default function CrearCurriculumScreen() {
                                 icon="book-outline"
                                 data={form.ayudantias} 
                                 onAdd={() => addItem('ayudantias', { nombre_asig: "", nombre_coordinador: "", evaluacion_obtenida: "" })}
-                                onRemove={(i: number) => removeItem('ayudantias', i)}
+                                onRemove={(i: number) => {
+                                    removeItem('ayudantias', i);
+                                    const newErrores = {...ayudantiaErrores};
+                                    delete newErrores[i];
+                                    setAyudantiaErrores(newErrores);
+                                }}
                                 renderItem={(item: any, i: number) => (
                                     <>
                                         <ModernInput placeholder="Ej: Anatomía General / Fisiología" label="Asignatura" icon="book" value={item.nombre_asig} onChangeText={(t) => handleArrayChange('ayudantias', i, 'nombre_asig', t)} styles={styles} colors={colors} />
                                         <ModernInput placeholder="Ej: Dr. Roberto González" label="Coordinador" icon="person-circle" value={item.nombre_coordinador} onChangeText={(t) => handleArrayChange('ayudantias', i, 'nombre_coordinador', t)} styles={styles} colors={colors} />
-                                        <ModernInput placeholder="Ej: 6.8 / Aprobado" label="Evaluación (Nota)" icon="star" value={item.evaluacion_obtenida} onChangeText={(t) => handleArrayChange('ayudantias', i, 'evaluacion_obtenida', t)} styles={styles} colors={colors} />
+                                        <ModernInput placeholder="Ej: 4.8" label="Evaluación (Nota)" icon="star" value={item.evaluacion_obtenida} keyboardType="numeric" onChangeText={(t) => handleNotaChange(i,t)} error={ayudantiaErrores[i]} styles={styles} colors={colors} />
                                     </>
                                 )}
                                 styles={styles}

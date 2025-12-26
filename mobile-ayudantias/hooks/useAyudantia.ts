@@ -5,15 +5,25 @@ import api from '../api/axios';
 export interface AyudantiasAnteriores
 {
     id: number;
-    rut_alumno: string;
-    nombre_alumno: string;
-    id_asignatura: string;
-    nombre_asig: string;
-    n_coordinador: string;
+    alumno: {
+        rut: string;
+        nombres: string;
+        apellidos: string;
+        nombre_carrera: string;
+    };
+    asignatura: {
+        id: string;
+        nombre: string;
+    }
+    coordinador: {
+        rut: string;
+        nombres: string;
+        apellidos: string;
+    }
     evaluacion: string;
-    rut_coordinador_otro: string;
     periodo: string;
     remunerada: string;
+    tipo_ayudantia: string;
 }
 
 export function useAyudantiasPorAlumno(rut_alumno?: string){

@@ -27,7 +27,7 @@ const DetailRow = ({ icon, label, value, colors, isLast }: any) => {
 };
 
 // Tarjeta para items de (Ayudantías, Cursos, etc.)
-const ListItemCard = ({ title, subtitle1, value1, subtitle2, value2, colors, icon = "school-outline" }: any) => (
+const ListItemCard = ({ title, subtitle1, value1, subtitle2, value2, subtitle3, value3, colors, icon = "school-outline" }: any) => (
   <View style={[localStyles.itemCard, { backgroundColor: colors.card, borderColor: colors.inputBorder }]}>
     <View style={localStyles.itemHeader}>
       <Ionicons name={icon} size={20} color={colors.primary} style={{ marginRight: 8 }} />
@@ -50,6 +50,13 @@ const ListItemCard = ({ title, subtitle1, value1, subtitle2, value2, colors, ico
           <ThemedText style={[localStyles.itemValue, { color: colors.text }]} numberOfLines={1}>{value2}</ThemedText>
         </View>
       ) : null}
+
+      {value3 ? (
+        <View style={localStyles.itemRow}>
+          <ThemedText style={[localStyles.itemLabel, { color: colors.textLabel }]}>{subtitle3}:</ThemedText>
+          <ThemedText style={[localStyles.itemValue, { color: colors.text }]} numberOfLines={1}>{value3}</ThemedText>
+        </View>
+      ) : null}
     </View>
   </View>
 );
@@ -61,6 +68,16 @@ const SectionBlock = ({ title, children }: any) => (
     {children}
   </View>
 );
+
+const formatNota = (valor: any) => {
+  const num = Number(valor);
+  // Si es un número válido y es mayor o igual a 10 (ej: 50, 65, 70), lo dividimos por 10
+  if (!isNaN(num) && num >= 10) {
+    return (num / 10).toFixed(1); // Retorna "5.0", "6.5", etc.
+  }
+  // Si ya viene como 5.0 o 4.5, se devuelve tal cual
+  return valor;
+};
 
 interface CurriculumModalProps {
   visible: boolean;
@@ -134,9 +151,9 @@ export default function CurriculumModal({
                   ))}
                   {ayudantiasAnteriores?.map((a) => (
                     <ListItemCard
-                      key={`prev-${a.id}`} title={a.nombre_asig} colors={colors}
-                      subtitle1="Coordinador" value1={a.n_coordinador}
-                      subtitle2="Evaluación" value2={a.evaluacion}
+                      key={`prev-${a.id}`} title={a.asignatura.nombre} colors={colors}
+                      subtitle1="Coordinador" value1={a.coordinador.nombres + " " + a.coordinador.apellidos}
+                      subtitle2="Evaluación" value2={formatNota(a.evaluacion)}
                       icon="time-outline"
                     />
                   ))}
@@ -154,7 +171,7 @@ export default function CurriculumModal({
                     <ListItemCard
                       key={c.id} title={c.nombre_asig} colors={colors}
                       subtitle1="Institución/Coord" value1={c.n_coordinador}
-                      subtitle2="Estado/Nota" value2={c.evaluacion}
+                      subtitle2="Fecha" value2={c.evaluacion}
                       icon="ribbon-outline"
                     />
                  ))
@@ -168,8 +185,15 @@ export default function CurriculumModal({
                 <SectionBlock title="Extracurriculares">
                     {actividadesExtracurriculares?.map((item, index) => (
                         <ListItemCard
-                            key={index} title={item.nombre} colors={colors}
-                            subtitle1="Descripción" value1={item.descripcion}
+                            key={index} 
+                            title={item.nombre} 
+                            colors={colors}
+                            subtitle1="Docente" 
+                            value1={item.docente}
+                            subtitle2="Descripción" 
+                            value2={item.descripcion}
+                            subtitle3="Periodo"
+                            value3={item.periodo_participacion}
                             icon="basketball-outline"
                         />
                     ))}
@@ -181,8 +205,13 @@ export default function CurriculumModal({
                 <SectionBlock title="Científicas">
                     {actividadesCientificas?.map((item, index) => (
                         <ListItemCard
-                            key={index} title={item.nombre} colors={colors}
-                            subtitle1="Descripción" value1={item.descripcion}
+                            key={index} 
+                            title={item.nombre} 
+                            colors={colors}
+                            subtitle1="Descripción" 
+                            value1={item.descripcion}
+                            subtitle2="Periodo" 
+                            value2={item.periodo_participacion}
                             icon="flask-outline"
                         />
                     ))}
@@ -190,15 +219,18 @@ export default function CurriculumModal({
             )}
 
             {/* OTROS ANTECEDENTES */}
-            {(otros?.length || 0) > 0 && (
+            {curriculum?.otros && curriculum.otros.trim() !== "" && (
                 <SectionBlock title="Otros Antecedentes">
-                    {otros?.map((item, index) => (
-                        <ListItemCard
-                            key={index} title={item.nombre || item.titulo || "Sin título"} colors={colors}
-                            subtitle1="Descripción" value1={item.descripcion}
-                            icon="layers-outline"
-                        />
-                    ))}
+                    <View style={[localStyles.itemCard, { backgroundColor: colors.card, borderColor: colors.inputBorder }]}>
+                        <View style={localStyles.itemHeader}>
+                            <Ionicons name="layers-outline" size={20} color={colors.primary} style={{ marginRight: 8 }} />
+                            <ThemedText style={[localStyles.itemTitle, { color: colors.text }]}>Información Adicional</ThemedText>
+                        </View>
+                        <View style={localStyles.itemDivider} />
+                        <ThemedText style={{ color: colors.text, lineHeight: 22, marginTop: 4 }}>
+                            {curriculum.otros}
+                        </ThemedText>
+                    </View>
                 </SectionBlock>
             )}
 

@@ -48,7 +48,6 @@ export default function LoginPage() {
     }
 
     const enviar = () => {
-        console.log("datos enviados");
         if (validacionDatos())
         {
             loginMutation.mutate({ rut, password });
