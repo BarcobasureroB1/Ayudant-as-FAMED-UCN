@@ -7,10 +7,8 @@ import {
     Building2, // Icono para Depto
     LogOut, 
     ChevronLeft, 
-    FileBadge, // Para Constancias
     Users, 
     GraduationCap, // Para Concursos
-    LayoutDashboard,
     ScrollText
 } from 'lucide-react'; 
 

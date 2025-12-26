@@ -4,12 +4,9 @@ import React, { useMemo, useState, useEffect } from "react";
 import {
   useAbrirConcurso,
   useCerrarConcurso,
-  useAsignaturasCoordinadores
 } from "@/hooks/useAsignaturas";
 import {
   useCrearConcurso,
-  useCancelarAficheConcurso,
-  useBuscarDatosAfiche
 } from "@/hooks/useConcursoPostulacion";
 import api from "@/api/axios";
 import { Document, Page, Text, View, StyleSheet, Image } from "@react-pdf/renderer";
@@ -25,7 +22,6 @@ import {
     ChevronRight, 
     FileText, 
     Calendar,
-    Clock,
     Users,
     Trash2,
     Briefcase,

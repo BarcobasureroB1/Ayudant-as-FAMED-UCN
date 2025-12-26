@@ -1,7 +1,7 @@
 "use client";
 import React, { useState, useMemo } from 'react';
 import { CoordinadorData } from '@/hooks/useCoordinadores';
-import { Search, User, Users } from 'lucide-react';
+import { Search, Users } from 'lucide-react';
 
 interface Props {
     abierto: boolean;

@@ -280,7 +280,7 @@ export default function AdministrarAsignaturas({
                         {pending.accion === "aprobar" ? "APROBAR" : "DENEGAR"}
                     </strong>
                     la solicitud para la asignatura <br/>
-                    <span className="font-semibold text-slate-800">"{pending.nombre}"</span>?
+                    <span className="font-semibold text-slate-800">&quot;{pending.nombre}&quot;</span>?
                 </p>
 
                 <div className="flex justify-center gap-3">

@@ -3,8 +3,6 @@
 import { SyntheticEvent, useState } from "react";
 import { useRouter } from "next/navigation"; // Next.js Router
 import { useForgotPassword } from "@/hooks/useForgotPassword";
-import { ArrowLeft, CheckCircle, AlertCircle } from "lucide-react";
-
 export default function RecuperarPasswordPage() {
     const [rut, setRut] = useState("");
     const [mensajeExito, setMensajeExito] = useState("");

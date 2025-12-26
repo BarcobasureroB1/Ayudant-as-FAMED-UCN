@@ -4,7 +4,7 @@ import React, { useState, useEffect } from "react";
 import { useEditarCurriculum } from "@/hooks/useCurriculum";
 import { CurriculumResponse } from "@/hooks/useCurriculum";
 import { 
-    User, Mail, Phone, MapPin, Calendar, GraduationCap, 
+    User, Calendar, 
     BookOpen, Award, Beaker, Briefcase, Plus, Trash2, 
     Save, LayoutDashboard, FileText, Check, X
 } from 'lucide-react';

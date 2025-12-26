@@ -20,7 +20,6 @@ import {
     Users, 
     ShieldCheck,
     ChevronRight,
-    Briefcase
 } from 'lucide-react';
 
 interface UserProps {

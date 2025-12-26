@@ -1,9 +1,8 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
-import Select from "react-select";
+import React, { useEffect,} from "react";
 import { useDatosDepartamento } from "@/hooks/useDepartamento";
-import { useUserProfile, User} from '@/hooks/useUserProfile';
+import { User} from '@/hooks/useUserProfile';
 import { useRouter } from "next/dist/client/components/navigation";
 
 

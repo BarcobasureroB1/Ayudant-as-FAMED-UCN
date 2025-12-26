@@ -1,8 +1,8 @@
 import React from 'react';
 import { useComprobarCurriculum } from '@/hooks/useCurriculum';
 import { 
-    User, Mail, Phone, MapPin, Calendar, GraduationCap, 
-    BookOpen, Award, Beaker, Briefcase, FileText, Check, LayoutDashboard 
+    User, Mail, Phone, MapPin, Calendar,
+    BookOpen, Award, Beaker, FileText, LayoutDashboard 
 } from 'lucide-react';
 
 interface ModalVerCurriculumProps {

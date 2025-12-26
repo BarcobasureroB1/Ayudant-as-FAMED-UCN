@@ -12,7 +12,6 @@ import {
     FileText, 
     Files, 
     GraduationCap,
-    LayoutDashboard 
 } from 'lucide-react'; 
 
 import { useAuth } from "@/context/AuthContext";

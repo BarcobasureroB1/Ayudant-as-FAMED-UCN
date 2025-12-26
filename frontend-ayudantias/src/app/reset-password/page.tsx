@@ -25,7 +25,7 @@ function ResetPasswordForm() {
     }, [token]);
 
     const restablecer = useRestablecerPassword(
-        (data) => {
+        (_data) => {
             setMensajeExito("Contraseña actualizada correctamente.");
             setTimeout(() => {
                 router.push("/login");

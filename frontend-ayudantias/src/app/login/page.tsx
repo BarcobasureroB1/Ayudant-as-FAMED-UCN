@@ -5,7 +5,6 @@ import { useRouter } from "next/navigation";
 import { useAuth } from "@/context/AuthContext";
 import { useLogin } from "@/hooks/useLogin";
 import { Eye, EyeOff } from "lucide-react";
-import { error } from "console";
 
 export default function LoginPage() {
     const [rut, setRut] = useState("");
